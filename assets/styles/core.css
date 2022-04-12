@@ -1,0 +1,63 @@
+
+.isml__loader {
+	display: none;
+}
+
+.isml__message {
+	display: none;
+}
+
+.isml__page {
+	max-width: 1200px;
+}
+
+.isml__page .isml__block {
+	padding-bottom: 25px;
+	margin-bottom: 25px;
+	border-bottom: 1px #0080FF solid;
+}
+
+.isml__page .isml__block .row {
+	height: 75px;
+	align-items: center;
+}
+
+.isml__page .isml__block .row.larger {
+	height: 150px;
+}
+
+.isml__page label {
+	font-weight: bold;
+}
+
+.isml__page h4 {
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: #0080FF;
+}
+
+.isml__page .isml__block input[type=button],
+.isml__page input[type=submit] {
+	background: #0080FF;
+	box-shadow: none;
+	border-radius: 3px;
+	border: none;
+	font-weight: 300;
+	text-shadow: none;
+	text-decoration: none;
+	letter-spacing: 1px;
+	font-size: 12px;
+	padding: 10px 15px 9px 15px;
+	box-sizing: border-box;
+	height: auto;
+	line-height: 16px;
+}
+
+.isml__page .isml__block input[type=button]:hover,
+.isml__page input[type=submit]:hover {
+	background-color: #0069FF;
+}
+
+#message {
+	margin: 0;
+}

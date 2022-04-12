@@ -1,0 +1,18 @@
+{
+	"name": "imageshop",
+	"version": "1.0.0",
+	"devDependencies": {
+		"@wordpress/env": "~4.2.1",
+		"@wordpress/scripts": "~21.0.2",
+		"@wordpress/stylelint-config": "~20.0.1",
+		"react": "~17.0.2",
+		"react-dom": "~17.0.2"
+	},
+	"scripts": {
+		"build": "wp-scripts build src/onboarding.js",
+		"start": "wp-scripts start src/onboarding.js",
+		"wp-env": "wp-env",
+		"lint-js": "wp-scripts lint-js",
+		"lint-css": "wp-scripts lint-css"
+	}
+}
