@@ -21,6 +21,7 @@ if (!class_exists('ISML_Attachment')) {
 			add_filter('wp_get_attachment_image_src', [$this, 'attachment_image_src'], 10, 3);
 			add_action('add_attachment', [$this, 'import_to_imageshop'], 10, 1);
 			add_filter('wp_generate_attachment_metadata', [$this, 'filter_wp_generate_attachment_metadata'], 20, 2);
+			add_filter('media_send_to_editor', [$this, 'media_send_to_editor'], 10, 3);
 		}
 
 		/**
@@ -307,6 +308,24 @@ if (!class_exists('ISML_Attachment')) {
 			}
 			update_post_meta($post->ID, '_imageshop_media_sizes', $media_details);
 			return $media_details;
+		}
+
+		public function media_send_to_editor($html, $id, $attachment) {
+			$media_details = get_post_meta($id, '_imageshop_media_sizes', true);
+			$document_id = get_post_meta($id, '_imageshop_document_id', true);
+
+			if (empty($media_details) && $document_id) {
+				$att = ISML_Attachment::get_instance();
+				$media_details = $att->generate_imageshop_metadata(get_post($id));
+
+			}
+			if (isset($media_details['sizes']['original'])) {
+				$data = $media_details['sizes']['original'];
+				$html = '<img src="' . $data['source_url'] . '" alt="" width="' . $data['width'] . '" height="' . $data['height'] . '" class="alignnone size-medium wp-image-3512" />';
+			}
+
+			return $html;
+
 		}
 	}
 }

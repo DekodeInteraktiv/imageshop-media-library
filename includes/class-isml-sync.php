@@ -25,6 +25,7 @@ if (!class_exists('ISML_Sync')) {
 			add_action('plugin_loaded', [$this, 'register_init_actions']);
 			add_action('wp_ajax_isml_import_wp_to_imageshop', [$this, 'import_wp_to_imageshop']);
 			add_action('wp_ajax_isml_import_imageshop_to_wp', [$this, 'import_imageshop_to_wp']);
+			add_action('admin_notices', [$this, 'check_import_progress']);
 		}
 
 		/**
@@ -53,12 +54,7 @@ if (!class_exists('ISML_Sync')) {
 		 * @return void
 		 */
 		public function import_wp_to_imageshop() {
-			$args = [
-				'hook'   => self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP,
-				'status' => ActionScheduler_Store::STATUS_PENDING,
-			];
-			$pending_scheduled_actions = as_get_scheduled_actions($args);
-			if (count($pending_scheduled_actions) > 0) {
+			if ($this->get_pending_scheduled_import_events(self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP)) {
 				$this->helpers->show_message('Previous import did not finished yet. Try later.', true);
 				die();
 			}
@@ -93,18 +89,23 @@ if (!class_exists('ISML_Sync')) {
 			die();
 		}
 
+		public function get_pending_scheduled_import_events($hook): bool {
+			$args = [
+				'hook'   => $hook,
+				'status' => ActionScheduler_Store::STATUS_PENDING,
+			];
+			$pending_scheduled_actions = as_get_scheduled_actions($args);
+
+			return (bool)count($pending_scheduled_actions) > 0;
+		}
+
 		/**
 		 * Import all media from Imageshop to WP in scheduled batches.
 		 *
 		 * @return void
 		 */
 		public function import_imageshop_to_wp() {
-			$args = [
-				'hook'   => self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP,
-				'status' => ActionScheduler_Store::STATUS_PENDING,
-			];
-			$pending_scheduled_actions = as_get_scheduled_actions($args);
-			if (count($pending_scheduled_actions) > 0) {
+			if ($this->get_pending_scheduled_import_events(self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP)) {
 				$this->helpers->show_message('Previous import did not finished yet. Try later.', true);
 				die();
 			}
@@ -231,6 +232,36 @@ if (!class_exists('ISML_Sync')) {
 			}
 
 			return $ret;
+		}
+
+		/**
+		 * @param $hook
+		 *
+		 * @return string
+		 */
+		public static function get_events_hook_preaty_text($hook): string {
+			$data = [
+				self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP => 'WP to imageshop',
+				self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP => 'imageshop to WP',
+			];
+
+
+			return $data[$hook];
+		}
+
+		/**
+		 *
+		 */
+		public function check_import_progress() {
+			echo '<div class="notice notice-warning inline">
+				<h2>Imageshop import status</h2>';
+			foreach ([self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP, self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP] as $hook) {
+				$ret = $this->get_pending_scheduled_import_events($hook);
+				if ($ret) {
+					echo "<p>Import <strong>" . self::get_events_hook_preaty_text($hook) . "</strong> still in prigress. Please check later</p>";
+				}
+			}
+			echo '</div>';
 		}
 	}
 }

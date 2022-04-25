@@ -36,8 +36,9 @@ if (!class_exists('ISML_Library')) {
 		public function hide_list_view_button() {
 			?>
 			<style>
-				.wp-admin.upload-php .view-switch .view-list {
-					display: none;
+				.wp-admin.upload-php .view-switch .view-list,
+				.wp-admin.upload-php .select-mode-toggle-button{
+					display: none!important;
 				}
 			</style>
 			<?php
