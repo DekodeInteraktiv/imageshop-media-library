@@ -11,6 +11,7 @@
 		"wp-coding-standards/wpcs": "^2.3.0"
 	},
 	"scripts": {
-		"lint": "php ./vendor/squizlabs/php_codesniffer/bin/phpcs"
+		"lint": "php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
+		"lint:fix": "php ./vendor/squizlabs/php_codesniffer/bin/phpcbf"
 	}
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Dekode\WordPress\Imageshop_Media_Library_V2;
 
-if (!class_exists('ISML')) {
+if ( ! class_exists( 'ISML' ) ) {
 
 	/**
 	 * Imageshop Media Library main class.
@@ -13,10 +13,10 @@ if (!class_exists('ISML')) {
 		private static $instance;
 
 		public function __construct() {
-			add_action('admin_menu', [$this, 'register_menu']);
-			add_action('admin_init', [$this, 'register_settings']);
-			add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
-			add_action('admin_enqueue_scripts', [$this, 'register_styles']);
+			add_action( 'admin_menu', array( $this, 'register_menu' ) );
+			add_action( 'admin_init', array( $this, 'register_settings' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'register_styles' ) );
 		}
 
 		/**
@@ -24,7 +24,7 @@ if (!class_exists('ISML')) {
 		 * @return self
 		 */
 		public static function get_instance() {
-			if (!self::$instance) {
+			if ( ! self::$instance ) {
 				self::$instance = new self();
 			}
 
@@ -50,7 +50,7 @@ if (!class_exists('ISML')) {
 			wp_enqueue_script(
 				'isml-core-js',
 				ISML_PLUGIN_DIR_URL . '/assets/scripts/core.js',
-				['jquery'],
+				array( 'jquery' ),
 				'1.4.0',
 				true
 			);
@@ -60,23 +60,23 @@ if (!class_exists('ISML')) {
 		 * Enqueue styles.
 		 */
 		public function register_styles() {
-			wp_enqueue_style('isml-flexboxgrid', ISML_PLUGIN_DIR_URL . '/assets/styles/flexboxgrid.min.css');
-			wp_enqueue_style('isml-core-css', ISML_PLUGIN_DIR_URL . '/assets/styles/core.css');
+			wp_enqueue_style( 'isml-flexboxgrid', ISML_PLUGIN_DIR_URL . '/assets/styles/flexboxgrid.min.css' );
+			wp_enqueue_style( 'isml-core-css', ISML_PLUGIN_DIR_URL . '/assets/styles/core.css' );
 		}
 
 		/**
 		 * Register settings.
 		 */
 		public function register_settings() {
-			register_setting('isml_settings', 'isml_api_key');
-			register_setting('isml_settings', 'isml_storage_file_only');
+			register_setting( 'isml_settings', 'isml_api_key' );
+			register_setting( 'isml_settings', 'isml_storage_file_only' );
 		}
 
 		/**
 		 * Register settings page.
 		 */
 		public function register_setting_page() {
-			include_once(ISML_ABSPATH . '/admin/isml_settings_page.php');
+			include_once( ISML_ABSPATH . '/admin/isml_settings_page.php' );
 		}
 
 		/**
@@ -88,7 +88,7 @@ if (!class_exists('ISML')) {
 				'Imageshop Sync',
 				'manage_options',
 				'setting_page.php',
-				[$this, 'register_setting_page']
+				array( $this, 'register_setting_page' )
 			);
 		}
 	}

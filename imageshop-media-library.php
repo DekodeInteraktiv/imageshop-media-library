@@ -18,7 +18,7 @@ define( 'ISML_ABSPATH', __DIR__ );
 define( 'ISML_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'ISML_PLUGIN_BASE_NAME', __FILE__ );
 
-require ISML_ABSPATH."/vendor/autoload.php";
+require ISML_ABSPATH . '/vendor/autoload.php';
 
 // Load plugin classes.
 foreach ( glob( __DIR__ . '/includes/*.php' ) as $file ) {
@@ -43,8 +43,8 @@ if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 			)
 		);
 	} elseif ( ! function_exists( 'curl_version' )
-	           || ! ( $curl = curl_version() ) || empty( $curl['version'] ) || empty( $curl['features'] )
-	           || version_compare( $curl['version'], '7.16.2', '<' )
+			   || ! ( $curl = curl_version() ) || empty( $curl['version'] ) || empty( $curl['features'] )
+			   || version_compare( $curl['version'], '7.16.2', '<' )
 	) {
 		isml_incompatibile(
 			__( 'Plugin Imageshop Media Library requires cURL 7.16.2+. The plugin has now disabled itself.', 'isml' )

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Dekode\WordPress\Imageshop_Media_Library_V2;
 
-if (!class_exists('ISML_Helpers')) {
+if ( ! class_exists( 'ISML_Helpers' ) ) {
 
 	/**
 	 * Helper class.
@@ -12,7 +12,7 @@ if (!class_exists('ISML_Helpers')) {
 		private static $instance;
 
 		public function __construct() {
-			add_action('wp_ajax_isml_test_connection', [$this, 'test_connection']);
+			add_action( 'wp_ajax_isml_test_connection', array( $this, 'test_connection' ) );
 
 		}
 
@@ -21,7 +21,7 @@ if (!class_exists('ISML_Helpers')) {
 		 * @return self
 		 */
 		public static function get_instance() {
-			if (!self::$instance) {
+			if ( ! self::$instance ) {
 				self::$instance = new self();
 			}
 
@@ -32,25 +32,25 @@ if (!class_exists('ISML_Helpers')) {
 		 *
 		 */
 		public function test_connection() {
-			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+			if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 				$api_key = $_POST['isml_api_key'] ?? '';
 			}
 			try {
-				$isml_rest_controller = new ISML_REST_Controller($api_key);
-				$can_upload = $isml_rest_controller->can_upload();
-				if ($can_upload) {
-					$this->show_message(__('Connection is successfully established. Save the settings.', 'isml'));
+				$isml_rest_controller = new ISML_REST_Controller( $api_key );
+				$can_upload           = $isml_rest_controller->can_upload();
+				if ( $can_upload ) {
+					$this->show_message( __( 'Connection is successfully established. Save the settings.', 'isml' ) );
 				} else {
-					$this->show_message(__('Connection Error.', 'isml'), true);
+					$this->show_message( __( 'Connection Error.', 'isml' ), true );
 				}
 
 				exit();
-			} catch (Exception $e) {
+			} catch ( Exception $e ) {
 				$this->show_message(
 					__(
 						'Connection is not established.',
 						'isml'
-					) . ' : ' . $e->getMessage() . ($e->getCode() == 0 ? '' : ' - ' . $e->getCode()),
+					) . ' : ' . $e->getMessage() . ( $e->getCode() == 0 ? '' : ' - ' . $e->getCode() ),
 					true
 				);
 				exit();
@@ -61,8 +61,8 @@ if (!class_exists('ISML_Helpers')) {
 		 * @param       $message
 		 * @param false $errormsg
 		 */
-		public function show_message($message, $errormsg = false) {
-			if ($errormsg) {
+		public function show_message( $message, $errormsg = false ) {
+			if ( $errormsg ) {
 				echo '<div id="message" class="error">';
 			} else {
 				echo '<div id="message" class="updated fade">';
@@ -79,17 +79,17 @@ if (!class_exists('ISML_Helpers')) {
 		 *
 		 * @return bool|string
 		 */
-		public function collect_file($url) {
+		public function collect_file( $url ) {
 			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_VERBOSE, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_AUTOREFERER, false);
-			curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			$result = curl_exec($ch);
-			curl_close($ch);
-			return ($result);
+			curl_setopt( $ch, CURLOPT_URL, $url );
+			curl_setopt( $ch, CURLOPT_VERBOSE, 1 );
+			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+			curl_setopt( $ch, CURLOPT_AUTOREFERER, false );
+			curl_setopt( $ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1 );
+			curl_setopt( $ch, CURLOPT_HEADER, 0 );
+			$result = curl_exec( $ch );
+			curl_close( $ch );
+			return ( $result );
 		}
 	}
 }
