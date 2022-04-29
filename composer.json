@@ -1,5 +1,16 @@
 {
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
     "require": {
         "woocommerce/action-scheduler": "^3.4"
-    }
+    },
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^2.3.0"
+	},
+	"scripts": {
+		"lint": "php ./vendor/squizlabs/php_codesniffer/bin/phpcs"
+	}
 }
