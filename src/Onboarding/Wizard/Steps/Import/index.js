@@ -20,15 +20,23 @@ const Import = ( { setStep } ) => {
 
 	return (
 		<>
-			Do imports
+			<p>
+				{ __( 'Would you like to import your current media library to Imageshop?', 'imageshop' ) }
+			</p>
 
-			<button type="button" className="button button-primary" onClick={ () => startImports() }>
-				{ __( 'Import existing media', 'imageshop' ) }
-			</button>
+			<p>
+				{ __( 'By importing your media library, you ensure that it will remain available to insert into new posts or apges, and also makes it available to the rest of your organization via the normal Imageshop interfaces and integrations', 'imageshop' ) }
+			</p>
 
-			<button type="button" className="button button-secondary" onClick={ () => setupComplete() }>
-				{ __( 'Continue without importing media', 'imageshop' ) }
-			</button>
+			<div className="imageshop-modal-actions">
+				<button type="button" className="button button-primary" onClick={ () => startImports() }>
+					{ __( 'Import existing media', 'imageshop' ) }
+				</button>
+
+				<button type="button" className="button button-secondary" onClick={ () => setupComplete() }>
+					{ __( 'Continue without importing media', 'imageshop' ) }
+				</button>
+			</div>
 		</>
 	)
 }

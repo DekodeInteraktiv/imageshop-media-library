@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
+import './tokens.scss'
+
 const Tokens = ( { setStep } ) => {
 	const [ token, setToken ] = useState( '' );
 	const [ validToken, setValidToken ] = useState( false );
@@ -28,34 +30,46 @@ const Tokens = ( { setStep } ) => {
 	return (
 		<>
 			<p>
-				Setup tokens
+				{ __( 'Enter your API token here. You can find your API token in your ImageShop account.', 'imageshop' ) }
 			</p>
-
-			<input type="text" value={ token } onChange={ ( e ) => setToken( e.target.value ) } />
 
 			{ validationNotice &&
 				<>
-					<p>
-						{ __( 'Validation response:', 'imageshop' ) }
-					</p>
+					{ validToken &&
+						<p className="valid-token">
+							{ __( '✔ Your API token is valid.', 'imageshop' ) }
+						</p>
+					}
 
-					<p>
-						{ validationNotice }
-					</p>
+					{ ! validToken &&
+						<>
+							<p className="invalid-token">
+								{ __( '❌ Your API token is invalid:', 'imageshop' ) }
+							</p>
+
+							<p className="invalid-token">
+								{ validationNotice }
+							</p>
+						</>
+					}
 				</>
 			}
 
-			{ ! validToken &&
-				<button type="button" className="button button-primary" onClick={ () => testToken() }>
-					{ __( 'Test API token', 'imageshop' ) }
-				</button>
-			}
+			<input type="text" value={ token } onChange={ ( e ) => setToken( e.target.value ) } />
 
-			{ validToken &&
-				<button type="button" className="button button-primary" onClick={ () => setStep( 3 ) }>
-					{ __( 'Continue to upload settings', 'imageshop' ) }
-				</button>
-			}
+			<div className="imageshop-modal-actions">
+				{ ! validToken &&
+					<button type="button" className="button button-primary" onClick={ () => testToken() }>
+						{ __( 'Test API token', 'imageshop' ) }
+					</button>
+				}
+
+				{ validToken &&
+					<button type="button" className="button button-primary" onClick={ () => setStep( 3 ) }>
+						{ __( 'Continue to upload settings', 'imageshop' ) }
+					</button>
+				}
+			</div>
 		</>
 	)
 }

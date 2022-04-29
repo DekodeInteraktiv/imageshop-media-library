@@ -44,7 +44,9 @@ const Interfaces = ( { setStep } ) => {
 
 	return (
 		<>
-			Interfaces determine where files are stored in your Imageshop account.
+			<p>
+				{ __( 'Interfaces determine where files are stored in your Imageshop account.', 'imageshop')}
+			</p>
 
 			<SelectControl
 				label={ __( 'Select which interface is used for uploaded media files', 'imageshop' ) }
@@ -52,11 +54,13 @@ const Interfaces = ( { setStep } ) => {
 				onChange={ ( selection ) => setApiInterface( selection ) }
 			/>
 
-			{ apiInterface &&
-				<button type="button" className="button button-primary" onClick={ () => setStep( 4 ) }>
-					{ __( 'Continue to imports', 'imageshop' ) }
-				</button>
-			}
+			<div className="imageshop-modal-actions">
+				{ apiInterface &&
+					<button type="button" className="button button-primary" onClick={ () => setStep( 4 ) }>
+						{ __( 'Continue to imports', 'imageshop' ) }
+					</button>
+				}
+			</div>
 		</>
 	)
 }

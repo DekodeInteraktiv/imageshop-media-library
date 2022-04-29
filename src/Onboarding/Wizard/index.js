@@ -16,21 +16,34 @@ const Wizard = ( { setShowWizard, setShowNotice } ) => {
 			<div className="imageshop-modal-overlay">
 				<div className="imageshop-wizard-wrapper">
 					<dialog className="imageshop-wizard">
-						{ 1 === step &&
-							<Introduction setStep={ setStep } />
-						}
-						{ 2 === step &&
-							<Tokens setStep={ setStep } />
-						}
-						{ 3 === step &&
-							<Interfaces setStep={ setStep } />
-						}
-						{ 4 === step &&
-							<Import setStep={ setStep } />
-						}
-						{ 5 === step &&
-							<Completed setShowNotice={ setShowNotice } setShowWizard={ setShowWizard } />
-						}
+						<div className="imageshop-modal-header">
+							<h2>
+								{ __( 'Imageshop setup', 'imageshop' ) }
+							</h2>
+
+							<button type="button" className="imageshop-modal-close" onClick={ () => setShowWizard( false ) }>
+								<span className={ 'dashicons dashicons-no' } />
+								<span className="screen-reader-text">{ __( 'Close Imageshop setup modal', 'imageshop' ) }</span>
+							</button>
+						</div>
+
+						<div className="imageshop-modal-body">
+							{ 1 === step &&
+								<Introduction setStep={ setStep } />
+							}
+							{ 2 === step &&
+								<Tokens setStep={ setStep } />
+							}
+							{ 3 === step &&
+								<Interfaces setStep={ setStep } />
+							}
+							{ 4 === step &&
+								<Import setStep={ setStep } />
+							}
+							{ 5 === step &&
+								<Completed setShowNotice={ setShowNotice } setShowWizard={ setShowWizard } />
+							}
+						</div>
 					</dialog>
 				</div>
 			</div>

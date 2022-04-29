@@ -9,11 +9,15 @@ const Completed = ( { setShowWizard, setShowNotice } ) => {
 
 	return (
 		<>
-			Final page
+			<p>
+				{ __( 'Your site has now been configured to use all media via Imageshop.', 'imageshop' ) }
+			</p>
 
-			<button type="button" className="button button-primary" onClick={ () => closeOnboarding() }>
-				{ __( 'Finish setup', 'imageshop' ) }
-			</button>
+			<div className="imageshop-modal-actions">
+				<button type="button" className="button button-primary" onClick={ () => closeOnboarding() }>
+					{ __( 'Finish setup', 'imageshop' ) }
+				</button>
+			</div>
 		</>
 	)
 }
