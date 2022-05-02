@@ -21,9 +21,17 @@
 		<div class="row">
 
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<?php esc_html_e( 'Type in your Imageshop access information.', 'imageshop' ); ?>
+				<p>
+					<?php esc_html_e( 'The Imageshop plugin will automatically replace your Media Library with the Imageshop media bank, giving you direct access to your organizations entire media portfolio.', 'imageshop' ); ?>
+				</p>
 
-				<?php esc_html_e( 'Don\'t have an account? <a  href="https://www.imageshop.no" target="_blank">Create it</a>', 'imageshop' ); ?>
+				<p>
+					<?php esc_html_e( 'To make use of the Imageshop services, you will need to register for an account.', 'imageshop' ); ?>
+
+					<a href="https://www.imageshop.no" target="_blank">
+						<?php esc_html_e( 'Create a new Imageshop account, or view your account details.', 'imageshop' ); ?>
+					</a>
+				</p>
 			</div>
 
 		</div>
@@ -34,9 +42,9 @@
 			<div class="row">
 
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-					<h4>
+					<h2>
 						<?php esc_html_e( 'Connection settings', 'isml' ); ?>
-					</h4>
+					</h2>
 				</div>
 
 			</div>
@@ -72,9 +80,9 @@
 				<div class="row">
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>
+						<h2>
 							<?php esc_html_e( 'Full sync commands', 'imageshop' ); ?>
-						</h4>
+						</h2>
 					</div>
 
 				</div>
@@ -102,9 +110,9 @@
 			<div class="row">
 
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-					<h4>
+					<h2>
 						<?php esc_html_e( 'Sync settings', 'imageshop' ); ?>
-					</h4>
+					</h2>
 				</div>
 
 			</div>
@@ -149,14 +157,6 @@
 			</div>
 
 		</form>
-
-	</div>
-
-	<div class="col-xs-12 col-xs-12 col-md-4 col-lg-4">
-
-		<p>
-			<?php esc_html_e( 'This plugin syncs your WordPress library with Imageshop Container.', 'imageshop' ); ?>
-		</p>
 
 	</div>
 
