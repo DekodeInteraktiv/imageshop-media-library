@@ -42,6 +42,7 @@ if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 	if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 		isml_incompatibile(
 			sprintf(
+				// translators: %s is the PHP version.
 				__(
 					'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
 					'imagesop'
