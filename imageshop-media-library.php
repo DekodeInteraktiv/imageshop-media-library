@@ -20,8 +20,8 @@ define( 'ISML_PLUGIN_BASE_NAME', __FILE__ );
 
 require_once ISML_ABSPATH . '/vendor/autoload.php';
 
+require_once __DIR__ . '/includes/class-isml.php';
 require_once __DIR__ . '/includes/class-isml-attachment.php';
-require_once __DIR__ . '/includes/class-isml-core.php';
 require_once __DIR__ . '/includes/class-isml-helpers.php';
 require_once __DIR__ . '/includes/class-isml-library.php';
 require_once __DIR__ . '/includes/class-isml-onboarding.php';
@@ -42,21 +42,7 @@ if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 		isml_incompatibile(
 			__(
 				'Plugin Imageshop Media Library requires PHP 5.3.3 or higher. The plugin has now disabled itself.',
-				'isml'
-			)
-		);
-	} elseif ( ! function_exists( 'curl_version' )
-		|| ! ( $curl = curl_version() ) || empty( $curl['version'] ) || empty( $curl['features'] )
-		|| version_compare( $curl['version'], '7.16.2', '<' )
-	) {
-		isml_incompatibile(
-			__( 'Plugin Imageshop Media Library requires cURL 7.16.2+. The plugin has now disabled itself.', 'isml' )
-		);
-	} elseif ( ! ( $curl['features'] & CURL_VERSION_SSL ) ) {
-		isml_incompatibile(
-			__(
-				'Plugin Imageshop Media Library requires that cURL is compiled with OpenSSL. The plugin has now disabled itself.',
-				'isml'
+				'imagesop'
 			)
 		);
 	}
