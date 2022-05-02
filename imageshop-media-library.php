@@ -18,13 +18,16 @@ define( 'ISML_ABSPATH', __DIR__ );
 define( 'ISML_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'ISML_PLUGIN_BASE_NAME', __FILE__ );
 
-require ISML_ABSPATH . '/vendor/autoload.php';
+require_once ISML_ABSPATH . '/vendor/autoload.php';
 
-// Load plugin classes.
-foreach ( glob( __DIR__ . '/includes/*.php' ) as $file ) {
-	require $file;
-}
-
+require_once __DIR__ . '/includes/class-isml-attachment.php';
+require_once __DIR__ . '/includes/class-isml-core.php';
+require_once __DIR__ . '/includes/class-isml-helpers.php';
+require_once __DIR__ . '/includes/class-isml-library.php';
+require_once __DIR__ . '/includes/class-isml-onboarding.php';
+require_once __DIR__ . '/includes/class-isml-rest-controller.php';
+require_once __DIR__ . '/includes/class-isml-search.php';
+require_once __DIR__ . '/includes/class-isml-sync.php';
 
 load_plugin_textdomain( 'isml', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
