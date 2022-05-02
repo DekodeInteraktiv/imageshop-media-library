@@ -32,8 +32,6 @@ require_once __DIR__ . '/includes/class-isml-rest-controller.php';
 require_once __DIR__ . '/includes/class-isml-search.php';
 require_once __DIR__ . '/includes/class-isml-sync.php';
 
-load_plugin_textdomain( 'isml', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
-
 function isml_incompatibile( $msg ) {
 	require_once ABSPATH . DIRECTORY_SEPARATOR . 'wp-admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'plugin.php';
 	deactivate_plugins( __FILE__ );
