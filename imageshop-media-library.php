@@ -1,6 +1,4 @@
 <?php
-namespace Dekode\WordPress\Imageshop_Media_Library_V2;
-
 /**
  * Plugin Name: Imageshop Media Library V2
  * Plugin URI:
@@ -9,9 +7,14 @@ namespace Dekode\WordPress\Imageshop_Media_Library_V2;
  * Author: Dekode
  * Author URI: https://dekode.no
  * License: MIT
- * Text Domain: isml
+ * Text Domain: imageshop
  * Domain Path: /languages
+ * Requires PHP: 5.6
+ * Requires at least: 5.0
  */
+
+namespace Dekode\WordPress\Imageshop_Media_Library_V2;
+
 defined( 'ABSPATH' ) || exit;
 
 define( 'ISML_ABSPATH', __DIR__ );
@@ -38,11 +41,14 @@ function isml_incompatibile( $msg ) {
 }
 
 if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-	if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 		isml_incompatibile(
-			__(
-				'Plugin Imageshop Media Library requires PHP 5.3.3 or higher. The plugin has now disabled itself.',
-				'imagesop'
+			sprintf(
+				__(
+					'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
+					'imagesop'
+				),
+				PHP_VERSION
 			)
 		);
 	}
