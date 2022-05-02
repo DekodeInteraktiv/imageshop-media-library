@@ -133,7 +133,7 @@ if ( ! class_exists( 'ISML_Search' ) ) {
 						'post_title'     => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 						'comment_status' => 'closed',
 						'ping_status'    => 'closed',
-						'post_date'      => date( 'Y-m-d H:i:s', strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+						'post_date_gmt'  => gmdate( 'Y-m-d H:i:s', strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
 						'post_mime_type' => $a,
 						'meta_input'     => array(
 							'_imageshop_document_id' => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.

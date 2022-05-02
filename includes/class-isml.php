@@ -76,7 +76,7 @@ if ( ! class_exists( 'ISML' ) ) {
 		 * Register settings page.
 		 */
 		public function register_setting_page() {
-			include_once( ISML_ABSPATH . '/admin/isml_settings_page.php' );
+			include_once( ISML_ABSPATH . '/admin/isml-settings-page.php' );
 		}
 
 		/**
