@@ -92,10 +92,10 @@ if ( ! class_exists( 'ISML_Search' ) ) {
 
 			$search_results = $this->imageshop->search( $search_attributes );
 
-			header( 'X-WP-Total: ' . (int) $search_results->NumberOfDocuments );
+			header( 'X-WP-Total: ' . (int) $search_results->NumberOfDocuments ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_Results->NumberOfDocuments` is provided by the SaaS API.
 			header( 'X-WP-TotalPages: ' . (int) $search_attributes['Pagesize'] );
 
-			foreach ( $search_results->DocumentList as $result ) {
+			foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 				$media[] = $this->imageshop_pseudo_post( $result );
 			}
 
@@ -120,23 +120,23 @@ if ( ! class_exists( 'ISML_Search' ) ) {
 				array(
 					'posts_per_page' => 1,
 					'meta_key'       => '_imageshop_document_id',
-					'meta_value'     => $media->DocumentID,
+					'meta_value'     => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
 					'post_type'      => 'attachment',
 				)
 			);
 
 			if ( ! $wp_post ) {
-				$a          = wp_check_filetype( $media->FileName )['type'];
+				$a          = wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
 				$wp_post_id = wp_insert_post(
 					array(
 						'post_type'      => 'attachment',
-						'post_title'     => $media->Name,
+						'post_title'     => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 						'comment_status' => 'closed',
 						'ping_status'    => 'closed',
-						'post_date'      => date( 'Y-m-d H:i:s', strtotime( $media->Created ) ),
+						'post_date'      => date( 'Y-m-d H:i:s', strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
 						'post_mime_type' => $a,
 						'meta_input'     => array(
-							'_imageshop_document_id' => $media->DocumentID,
+							'_imageshop_document_id' => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
 						),
 					)
 				);
@@ -149,19 +149,19 @@ if ( ! class_exists( 'ISML_Search' ) ) {
 			}
 
 			return (object) array(
-				'filename'  => $media->FileName,
+				'filename'  => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
 				'id'        => $wp_post_id,
 				'meta'      => false,
-				'date'      => $media->Created,
-				'name'      => $media->Name,
+				'date'      => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+				'name'      => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 				'sizes'     => array(
 					'medium' => array(
-						'url' => $media->DetailThumbUrl,
+						'url' => $media->DetailThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DetailThumbUrl` is provided by the SaaS API.
 					),
 				),
 				'status'    => 'inherit',
-				'title'     => $media->Name,
-				'url'       => $media->ListThumbUrl,
+				'title'     => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+				'url'       => $media->ListThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
 				'menuOrder' => 0,
 			);
 		}

@@ -32,7 +32,7 @@ if ( ! class_exists( 'ISML_Helpers' ) ) {
 		 *
 		 */
 		public function test_connection() {
-			if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+			if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 				$api_key = $_POST['isml_api_key'] ?? '';
 			}
 			try {
@@ -50,7 +50,7 @@ if ( ! class_exists( 'ISML_Helpers' ) ) {
 					__(
 						'Connection is not established.',
 						'isml'
-					) . ' : ' . $e->getMessage() . ( $e->getCode() == 0 ? '' : ' - ' . $e->getCode() ),
+					) . ' : ' . $e->getMessage() . ( 0 === $e->getCode() ? '' : ' - ' . $e->getCode() ),
 					true
 				);
 				exit();

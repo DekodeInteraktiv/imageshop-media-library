@@ -69,7 +69,7 @@ if ( ! class_exists( 'ISML_REST_Controller' ) ) {
 				$response      = wp_remote_request( $url, $args );
 				$response_code = wp_remote_retrieve_response_code( $response );
 
-				if ( ! in_array( $response_code, array( 200, 201 ) ) ) {
+				if ( ! in_array( $response_code, array( 200, 201 ), true ) ) {
 					return array(
 						'code'    => wp_remote_retrieve_response_code( $response ),
 						'message' => wp_remote_retrieve_response_message( $response ),
@@ -188,17 +188,17 @@ if ( ! class_exists( 'ISML_REST_Controller' ) ) {
 		 * @return array|mixed
 		 */
 		public function search( array $attributes ) {
-			$interfaceIds   = array();
+			$interface_ids  = array();
 			$interface_list = $this->get_interfaces();
 
 			foreach ( $interface_list as $interface ) {
-				$interfaceIds[] = $interface->Id;
+				$interface_ids[] = $interface->Id; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Id` is defined by the third party SaaS API.
 			}
 
 			// set default search attributes
 			$attributes = \array_merge(
 				array(
-					'InterfaceIds'  => $interfaceIds,
+					'InterfaceIds'  => $interface_ids,
 					'Language'      => 'no',
 					'Querystring'   => '',
 					'Page'          => 0,
@@ -280,20 +280,19 @@ if ( ! class_exists( 'ISML_REST_Controller' ) ) {
 		}
 
 		/**
-		 * @param $DocumentId
+		 * @param int $document_id The ID of the document to be downloaded.
 		 *
 		 * @return array|mixed
 		 */
-		public function download( $DocumentId ) {
+		public function download( $document_id ) {
 			$payload = array(
-				'DocumentId'           => $DocumentId,
+				'DocumentId'           => $document_id,
 				'Quality'              => 'OriginalFile',
 				'DownloadAsAttachment' => false,
 			);
 			$args    = array(
 				'method'  => 'POST',
 				'headers' => $this->get_headers(),
-				'body'    => json_encode( $payload ),
 			);
 
 			return $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_DOWNLOAD, $args );

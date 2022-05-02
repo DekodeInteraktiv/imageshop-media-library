@@ -46,8 +46,8 @@ if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 			)
 		);
 	} elseif ( ! function_exists( 'curl_version' )
-			   || ! ( $curl = curl_version() ) || empty( $curl['version'] ) || empty( $curl['features'] )
-			   || version_compare( $curl['version'], '7.16.2', '<' )
+		|| ! ( $curl = curl_version() ) || empty( $curl['version'] ) || empty( $curl['features'] )
+		|| version_compare( $curl['version'], '7.16.2', '<' )
 	) {
 		isml_incompatibile(
 			__( 'Plugin Imageshop Media Library requires cURL 7.16.2+. The plugin has now disabled itself.', 'isml' )

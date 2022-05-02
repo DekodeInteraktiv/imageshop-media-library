@@ -118,12 +118,12 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 			);
 			$ret  = $rest->search( $attr );
 
-			if ( count( $ret->DocumentList ) <= 0 ) {
+			if ( count( $ret->DocumentList ) <= 0 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->DocumentList` is defined by the SaaS API.
 				$this->helpers->show_message( 'Nothing to import.' );
 				die();
 			}
 
-			$response = $this->prepare_response( $ret->DocumentList );
+			$response = $this->prepare_response( $ret->DocumentList ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->DocumentList` is defined by the SaaS API.
 			$batches  = array_chunk( $response, 5 );
 			foreach ( $batches as $documents ) {
 				as_enqueue_async_action( self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP, array( $documents ) );
@@ -144,7 +144,7 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 			foreach ( $documents as $document ) {
 				$rest = ISML_REST_Controller::get_instance();
 				$ret  = $rest->download( $document['DocumentID'] );
-				$this->execute_import_to_wp( $ret->Url, $document );
+				$this->execute_import_to_wp( $ret->Url, $document ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->Url` is defined by the SaaS API.
 			}
 		}
 
@@ -156,11 +156,19 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 		public function get_post_id_by_document_id( $document_id ) {
 			global $wpdb;
 			$ret = $wpdb->get_var(
-				"
-				SELECT pm.post_id
-				FROM {$wpdb->prefix}postmeta pm
-				WHERE pm.meta_value = '{$document_id}'
-				    AND pm.meta_key = '_imageshop_document_id';"
+				$wpdb->prepare(
+					"
+					SELECT
+						pm.post_id
+					FROM
+				        {$wpdb->prefix}postmeta pm
+					WHERE
+						pm.meta_value = %d
+					    AND
+						pm.meta_key = '_imageshop_document_id'
+			    	",
+					$document_id
+				)
 			);
 
 			return $ret;
@@ -188,7 +196,9 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 						'_imageshop_document_id' => $document['DocumentID'],
 					),
 				);
-				if ( $ret = $this->get_post_id_by_document_id( $document['DocumentID'] ) ) {
+
+				$ret = $this->get_post_id_by_document_id( $document['DocumentID'] );
+				if ( $ret ) {
 					$attachment = array_merge( array( 'ID' => $ret ), $attachment );
 				}
 
