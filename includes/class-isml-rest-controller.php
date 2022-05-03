@@ -107,7 +107,7 @@ if ( ! class_exists( 'ISML_REST_Controller' ) ) {
 			$pyload = array(
 				'bFile'         => $b64_file_content,
 				'fileName'      => str_replace( '/', '_', $name ),
-				'interfaceName' => '57332',
+				'interfaceName' => get_option( 'imageshop_upload_interface' ),
 				'doc'           => array(
 					'Active' => true,
 				),
