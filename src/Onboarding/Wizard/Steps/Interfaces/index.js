@@ -13,6 +13,12 @@ const Interfaces = ( { setStep } ) => {
 			.then( ( response ) => {
 				const interfaces = [];
 
+				// Add non-valued interface to the option dropdown.
+				interfaces.push( {
+					value: '',
+					label: __( 'Select an interface', 'imageshop' ),
+				} );
+
 				response.interfaces.map( ( single ) => {
 					const singleInterface = {
 						value: single.Id,
@@ -31,9 +37,13 @@ const Interfaces = ( { setStep } ) => {
 	}, [] );
 
 	useEffect( () => {
+		if ( ! apiInterface ) {
+			return;
+		}
+
 		apiFetch(
 			{
-				path: '/imageshop/v1/onboarding/set-interface',
+				path: '/imageshop/v1/onboarding/interfaces',
 				method: 'POST',
 				data: {
 					interface: apiInterface

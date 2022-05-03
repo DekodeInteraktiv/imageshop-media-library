@@ -15,6 +15,16 @@ const Notice = () => {
 		} );
 	}, [] );
 
+	useEffect( () => {
+		const bodyTag = document.querySelector( 'body' );
+
+		if ( showWizard ) {
+			bodyTag.classList.add( 'disable-scroll' );
+		} else {
+			bodyTag.classList.remove( 'disable-scroll' );
+		}
+	}, [ showWizard ] );
+
 	if ( ! showNotice ) {
 		return (
 			<></>

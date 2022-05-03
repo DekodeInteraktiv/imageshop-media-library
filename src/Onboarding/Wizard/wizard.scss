@@ -1,3 +1,7 @@
+body.wp-admin.disable-scroll {
+	overflow: hidden;
+}
+
 .imageshop-modal-overlay {
 	position: fixed;
 	top: 0;
@@ -5,13 +9,13 @@
 	width: 100vw;
 	height: 100vh;
 	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 100;
+	z-index: 10000;
 }
 
 .imageshop-wizard-wrapper {
-	position: absolute;
-	top: 50%;
-	left: 50%;
+	position: fixed;
+	top: 25%;
+	left: 40%;
 }
 
 .imageshop-wizard {

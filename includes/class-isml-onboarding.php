@@ -12,7 +12,6 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 	class ISML_Onboarding {
 		private static $instance;
 
-
 		public function __construct() {
 			$onboarding_completed = get_option( 'imageshop_onboarding_completed', false );
 
@@ -44,7 +43,7 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 				'imageshop/v1',
 				'onboarding/token',
 				array(
-					'methods'             => 'POST',
+					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'rest_test_token' ),
 					'permission_callback' => array( $this, 'user_can_setup_plugin' ),
 				)
@@ -54,19 +53,16 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 				'imageshop/v1',
 				'onboarding/interfaces',
 				array(
-					'methods'             => 'GET',
-					'callback'            => array( $this, 'rest_get_interfaces' ),
-					'permission_callback' => array( $this, 'user_can_setup_plugin' ),
-				)
-			);
-
-			register_rest_route(
-				'imageshop/v1',
-				'onboarding/set-interface',
-				array(
-					'methods'             => 'POST',
-					'callback'            => array( $this, 'rest_set_interface' ),
-					'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					array(
+						'methods'             => \WP_REST_Server::READABLE,
+						'callback'            => array( $this, 'rest_get_interfaces' ),
+						'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					),
+					array(
+						'methods'             => \WP_REST_Server::CREATABLE,
+						'callback'            => array( $this, 'rest_set_interface' ),
+						'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					),
 				)
 			);
 
@@ -74,9 +70,16 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 				'imageshop/v1',
 				'onboarding/import',
 				array(
-					'methods'             => 'GET',
-					'callback'            => array( $this, 'rest_import_media' ),
-					'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					array(
+						'methods'             => \WP_REST_Server::CREATABLE,
+						'callback'            => array( $this, 'rest_import_media_start' ),
+						'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					),
+					array(
+						'methods'             => \WP_REST_Server::READABLE,
+						'callback'            => array( $this, 'rest_import_media_status' ),
+						'permission_callback' => array( $this, 'user_can_setup_plugin' ),
+					),
 				)
 			);
 
@@ -84,7 +87,7 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 				'imageshop/v1',
 				'onboarding/completed',
 				array(
-					'methods'             => 'GET',
+					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'rest_completed' ),
 					'permission_callback' => array( $this, 'user_can_setup_plugin' ),
 				)
@@ -97,13 +100,20 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 			return new \WP_REST_Response( true, 200 );
 		}
 
-		function rest_import_media() {
-			$a = $this;
-			// TODO: Add import functionality.
+		function rest_import_media_status() {
 			return new \WP_REST_Response(
-				array(
-					'success' => true,
-				),
+				$this->get_media_import_data(),
+				200
+			);
+		}
+
+		function rest_import_media_start() {
+			$sync = ISML_Sync::get_instance();
+
+			$sync->import_wp_to_imageshop();
+
+			return new \WP_REST_Response(
+				$this->get_media_import_data(),
 				200
 			);
 		}
@@ -114,7 +124,7 @@ if ( ! class_exists( 'ISML_Onboarding' ) ) {
 			$imageshop = new ISML_REST_Controller( $token );
 
 			if ( $imageshop->test_valid_token() ) {
-				update_option( 'imageshop_auth_token', $token );
+				update_option( 'isml_api_key', $token );
 
 				return new \WP_REST_Response(
 					array(

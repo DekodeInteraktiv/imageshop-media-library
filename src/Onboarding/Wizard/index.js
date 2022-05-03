@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 
 import './wizard.scss';
