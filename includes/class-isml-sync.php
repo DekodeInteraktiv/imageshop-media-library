@@ -48,6 +48,20 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 			add_action( self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
 		}
 
+		public function get_media_import_status() {
+			global $wpdb;
+
+			$total_attachments = $wpdb->get_var( "SELECT COUNT( DISTINCT( p.ID ) ) AS total FROM {$wpdb->posts} AS p WHERE p.post_type = 'attachment'" );
+			$total_imported    = $wpdb->get_var( "SELECT COUNT( DISTINCT( p.ID ) ) AS total FROM {$wpdb->posts} AS p LEFT JOIN {$wpdb->postmeta} AS pm ON (p.ID = pm.post_id) WHERE p.post_type = 'attachment' AND pm.meta_key = '_imageshop_document_id' AND ( pm.meta_value IS NOT NULL AND pm.meta_value != '' )" );
+
+			$response = array(
+				'total'    => absint( $total_attachments ),
+				'imported' => absint( $total_imported ),
+			);
+
+			return $response;
+		}
+
 		/**
 		 * Import all media from WP to Imageshop in scheduled batches.
 		 *
@@ -265,15 +279,38 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 		 *
 		 */
 		public function check_import_progress() {
-			echo '<div class="notice notice-warning inline">
-				<h2>Imageshop import status</h2>';
-			foreach ( array( self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP, self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP ) as $hook ) {
-				$ret = $this->get_pending_scheduled_import_events( $hook );
-				if ( $ret ) {
-					echo '<p>Import <strong>' . self::get_events_hook_preaty_text( $hook ) . '</strong> still in prigress. Please check later</p>';
-				}
+			if ( ! current_user_can( 'manage_options' ) || ! $this->get_pending_scheduled_import_events( self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP ) ) {
+				return;
 			}
-			echo '</div>';
+
+			$status = $this->get_media_import_status();
+
+			?>
+			<div class="notice notice-warning">
+				<h2>
+					<?php esc_html_e( 'Imageshop import status', 'imageshop' ); ?>
+				</h2>
+
+				<p>
+					<?php esc_html_e( 'An import job has been initiated, the current status of it can be seen below. This notice will go away once the import is completed.', 'imageshop' ); ?>
+				</p>
+
+				<progress max="<?php echo esc_attr( $status['total'] ); ?>" value="<?php echo esc_attr( $status['imported'] ); ?>">
+					<?php
+						printf(
+							esc_html__(
+								// translators: 1: Current progress. 2: Total items to import.
+								'%1$s of %2$s attachments imported to Imageshop',
+								'imageshop'
+							),
+							$status['imported'],
+							$status['total']
+						)
+					?>
+				</progress>
+			</div>
+
+			<?php
 		}
 	}
 }
