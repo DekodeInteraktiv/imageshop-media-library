@@ -38,20 +38,56 @@ function isml_incompatibile( $msg ) {
 	wp_die( $msg );
 }
 
-if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-	if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
-		isml_incompatibile(
-			sprintf(
-				// translators: %s is the PHP version.
-				__(
-					'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
-					'imagesop'
-				),
-				PHP_VERSION
-			)
-		);
+// Validate that the plugin is compatible when being activated.
+register_activation_hook( __FILE__, function() {
+	if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+			isml_incompatibile(
+				sprintf(
+					// translators: %s is the PHP version.
+					__(
+						'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
+						'imagesop'
+					),
+					PHP_VERSION
+				)
+			);
+		}
 	}
-}
+} );
+
+// Clean up the database when the plugin is deactivated.
+register_deactivation_hook( __FILE__, function() {
+	global $wpdb;
+
+	$attachments = $wpdb->get_results( "
+		SELECT
+	       p.ID
+		FROM
+			{$wpdb->posts} AS p
+	    LEFT JOIN
+		    {$wpdb->postmeta} AS pm
+		        ON (p.ID = pm.post_id)
+		WHERE
+			p.post_type = 'attachment'
+		AND
+			pm.meta_key = '_imageshop_document_id'
+		AND (
+		    pm.meta_value IS NOT NULL
+		        OR
+		    pm.meta_value != ''
+		    )
+	    " );
+
+	$removable = array();
+
+	foreach ( $attachments as $attachment ) {
+		$removable[] = $attachment->ID;
+	}
+
+	$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN (" . implode( ',', $removable ) . ")" );
+	$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN (" . implode( ',', $removable ) . ")" );
+} );
 
 $isml = ISML::get_instance();
 $isml->start();
