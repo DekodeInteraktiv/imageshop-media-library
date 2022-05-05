@@ -23,6 +23,12 @@
         <severity>0</severity>
     </rule>
 
+    <rule ref="WordPress.WP.I18n">
+    	<properties>
+    		<property name="text_domain" type="array" value="imageshop" />
+		</properties>
+	</rule>
+
     <!-- Exclude third party libraries and tools -->
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/vendor/*</exclude-pattern>

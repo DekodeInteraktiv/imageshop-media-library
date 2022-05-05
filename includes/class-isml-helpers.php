@@ -39,9 +39,9 @@ if ( ! class_exists( 'ISML_Helpers' ) ) {
 				$isml_rest_controller = new ISML_REST_Controller( $api_key );
 				$can_upload           = $isml_rest_controller->can_upload();
 				if ( $can_upload ) {
-					$this->show_message( __( 'Connection is successfully established. Save the settings.', 'isml' ) );
+					$this->show_message( __( 'Connection is successfully established. Save the settings.', 'imageshop' ) );
 				} else {
-					$this->show_message( __( 'Connection Error.', 'isml' ), true );
+					$this->show_message( __( 'Connection Error.', 'imageshop' ), true );
 				}
 
 				exit();
@@ -49,7 +49,7 @@ if ( ! class_exists( 'ISML_Helpers' ) ) {
 				$this->show_message(
 					__(
 						'Connection is not established.',
-						'isml'
+						'imageshop'
 					) . ' : ' . $e->getMessage() . ( 0 === $e->getCode() ? '' : ' - ' . $e->getCode() ),
 					true
 				);

@@ -298,8 +298,8 @@ if ( ! class_exists( 'ISML_Sync' ) ) {
 				<progress max="<?php echo esc_attr( $status['total'] ); ?>" value="<?php echo esc_attr( $status['imported'] ); ?>">
 					<?php
 						printf(
+							// translators: 1: Current progress. 2: Total items to import.
 							esc_html__(
-								// translators: 1: Current progress. 2: Total items to import.
 								'%1$s of %2$s attachments imported to Imageshop',
 								'imageshop'
 							),
