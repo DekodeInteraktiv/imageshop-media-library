@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Imageshop Media Library V2
+ * Plugin Name: Imageshop Media Library
  * Plugin URI:
- * Description: This WordPress plugin syncs your media library with Imageshop.
+ * Description: Use the Imageshop media library as your companys one source for all media.
  * Version: 0.0.1
  * Author: Dekode
  * Author URI: https://dekode.no
@@ -71,13 +71,37 @@ register_deactivation_hook( __FILE__, function() {
 		WHERE
 			p.post_type = 'attachment'
 		AND
+		(
 			pm.meta_key = '_imageshop_document_id'
-		AND (
-		    pm.meta_value IS NOT NULL
-		        OR
-		    pm.meta_value != ''
+			AND
+			(
+			    pm.meta_value IS NOT NULL
+			        OR
+			    pm.meta_value != ''
 		    )
+		)
+		AND
+	    	NOT EXISTS (
+	    	    SELECT
+					1
+				FROM
+				     {$wpdb->postmeta} as spm
+	    	    WHERE
+					spm.post_id = p.ID
+				AND
+			    	spm.meta_key = '_wp_attached_file'
+			    AND
+				(
+				    spm.meta_value IS NOT NULL
+				        AND
+				    spm.meta_value != ''
+				)
+			)
 	    " );
+
+	if ( empty( $attachments ) ) {
+		return;
+	}
 
 	$removable = array();
 
