@@ -13,7 +13,9 @@
  * Requires at least: 5.0
  */
 
-namespace Dekode\WordPress\Imageshop_Media_Library_V2;
+declare( strict_types = 1 );
+
+namespace Imageshop\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -21,16 +23,14 @@ define( 'ISML_ABSPATH', __DIR__ );
 define( 'ISML_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'ISML_PLUGIN_BASE_NAME', __FILE__ );
 
-require_once ISML_ABSPATH . '/vendor/autoload.php';
-
-require_once __DIR__ . '/includes/class-isml.php';
-require_once __DIR__ . '/includes/class-isml-attachment.php';
-require_once __DIR__ . '/includes/class-isml-helpers.php';
-require_once __DIR__ . '/includes/class-isml-library.php';
-require_once __DIR__ . '/includes/class-isml-onboarding.php';
-require_once __DIR__ . '/includes/class-isml-rest-controller.php';
-require_once __DIR__ . '/includes/class-isml-search.php';
-require_once __DIR__ . '/includes/class-isml-sync.php';
+require_once __DIR__ . '/includes/class-imageshop.php';
+require_once __DIR__ . '/includes/class-attachment.php';
+require_once __DIR__ . '/includes/class-helpers.php';
+require_once __DIR__ . '/includes/class-library.php';
+require_once __DIR__ . '/includes/class-onboarding.php';
+require_once __DIR__ . '/includes/class-rest-controller.php';
+require_once __DIR__ . '/includes/class-search.php';
+require_once __DIR__ . '/includes/class-sync.php';
 
 function isml_incompatibile( $msg ) {
 	require_once ABSPATH . DIRECTORY_SEPARATOR . 'wp-admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'plugin.php';
@@ -116,10 +116,10 @@ register_deactivation_hook(
 			$removable[] = absint( $attachment->ID );
 		}
 
-		$wpdb->query( 'DELETE FROM {$wpdb->posts} WHERE ID IN (' . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
-		$wpdb->query( 'DELETE FROM {$wpdb->postmeta} WHERE post_id IN (' . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
+		$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN (" . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
+		$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN (" . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
 	}
 );
 
-$isml = ISML::get_instance();
+$isml = Imageshop::get_instance();
 $isml->start();

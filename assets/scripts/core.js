@@ -1,12 +1,4 @@
-const isml_loader = jQuery('.isml__loader')
-const isml_message = jQuery('.isml__message')
-const isml_test_connection = jQuery('.isml__test__connection')
-const isml__sync_to_imageshop = jQuery('.isml__sync_wp_to_imageshop')
-const isml__sync_to_local_wp = jQuery('.isml__sync_imageshop_to_wp')
-
 function send_request(data) {
-	isml_loader.hide()
-
 	jQuery.ajax({
 		type: 'POST',
 		url: ajaxurl,
@@ -20,20 +12,48 @@ function send_request(data) {
 	})
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
-	// check connection button
-	isml_test_connection.on('click', function () {
-		send_request({
-				isml_api_key: document.querySelector('input[name=isml_api_key]').value,
-				action: 'isml_test_connection'
-			}
-		)
-	})
-	isml__sync_to_imageshop.on('click', function () {
-		send_request({action: 'isml_import_wp_to_imageshop'})
-	})
-	isml__sync_to_local_wp.on('click', function () {
-		console.log('intrta')
-		send_request({action: 'isml_import_imageshop_to_wp'})
-	})
+const ismlLoadingIndicator = document.getElementsByClassName( '.isml__loader' )[0],
+	ismlMessage = document.getElementsByClassName( '.isml__message' )[0],
+	ismlTestConnection = document.getElementsByClassName( '.isml__test__connection' )[0],
+	ismlSyncToImageshop = document.getElementsByClassName( '.isml__sync_wp_to_imageshop' )[0],
+	ismlSyncToLocal = document.getElementsByClassName( '.isml__sync_imageshop_to_wp' )[0];
+
+// check connection button
+ismlTestConnection.on('click', function () {
+	send_request({
+			isml_api_key: document.querySelector('input[name=isml_api_key]').value,
+			action: 'isml_test_connection'
+		}
+	)
 })
+
+ismlSyncToImageshop.addEventListener( 'click', function() {
+	ismlLoadingIndicator.style.display = 'block';
+
+	wp.apiFetch( { path: '/imageshop/v1/sync/remote', method: 'POST' } )
+		.then( function( response ) {
+			ismlLoadingIndicator.style.display = 'none';
+
+			ismlMessage.innerHTML = response.data.message;
+		} );
+} );
+
+ismlSyncToLocal.addEventListener( 'click', function() {
+	ismlLoadingIndicator.style.display = 'block';
+
+	wp.apiFetch( { path: '/imageshop/v1/sync/local', method: 'POST' } )
+		.then( function( response ) {
+			ismlLoadingIndicator.style.display = 'none';
+
+			ismlMessage.innerHTML = response.data.message;
+		} );
+} );
+
+ismlSyncToImageshop.on('click', function () {
+	send_request({action: 'isml_import_wp_to_imageshop'})
+} );
+
+ismlSyncToLocal.on('click', function () {
+	console.log('intrta')
+	send_request({action: 'isml_import_imageshop_to_wp'})
+} );
