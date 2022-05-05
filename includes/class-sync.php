@@ -76,12 +76,10 @@ class Sync {
 		$total_attachments = $wpdb->get_var( "SELECT COUNT( DISTINCT( p.ID ) ) AS total FROM {$wpdb->posts} AS p WHERE p.post_type = 'attachment'" );
 		$total_imported    = $wpdb->get_var( "SELECT COUNT( DISTINCT( p.ID ) ) AS total FROM {$wpdb->posts} AS p LEFT JOIN {$wpdb->postmeta} AS pm ON (p.ID = pm.post_id) WHERE p.post_type = 'attachment' AND pm.meta_key = '_imageshop_document_id' AND ( pm.meta_value IS NOT NULL AND pm.meta_value != '' )" );
 
-		$response = array(
+		return array(
 			'total'    => absint( $total_attachments ),
 			'imported' => absint( $total_imported ),
 		);
-
-		return $response;
 	}
 
 	public function sync_remote() {
