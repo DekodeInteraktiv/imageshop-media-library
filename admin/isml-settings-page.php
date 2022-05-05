@@ -106,47 +106,6 @@
 				</div>
 			</div>
 
-
-			<div class="row">
-
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-					<h2>
-						<?php esc_html_e( 'Sync settings', 'imageshop' ); ?>
-					</h2>
-				</div>
-
-			</div>
-
-			<div class="row">
-
-				<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="width: 50px;">
-					<input id="onlystorage" type="checkbox" name="isml_storage_file_only"
-						value="1" <?php echo checked( get_option( 'isml_storage_file_only' ), 1 ); ?>
-					/>
-				</div>
-
-				<div class="col-xs-11 col-sm-11 col-md-11 col-lg-11">
-					<?php esc_html_e( 'Store files only in the Imageshop cloud and delete after successful upload.', 'imageshop' ); ?>
-
-					<?php esc_html_e( 'In that case file will be removed from your server after being uploaded to cloud storage, that saves you space.', 'imageshop' ); ?>
-				</div>
-
-			</div>
-
-			<div class="row">
-
-				<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-					<input id="isml_storage_file_delete" type="checkbox" name="isml_storage_file_delete"
-						value="1" <?php echo checked( get_option( 'isml_storage_file_delete' ), 1 ); ?>
-					/>
-				</div>
-
-				<div class="col-xs-11 col-sm-11 col-md-11 col-lg-11">
-					<?php esc_html_e( 'Delete file from cloud storage as soon as it was removed from your library.', 'imageshop' ); ?>
-				</div>
-
-			</div>
-
 			<div class="row">
 
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
