@@ -13,8 +13,7 @@ class Imageshop {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 	}
 
 	/**
@@ -44,7 +43,13 @@ class Imageshop {
 	/**
 	 * Enqueue scripts.
 	 */
-	public function register_scripts() {
+	public function register_assets() {
+		$screen = get_current_screen();
+
+		if ( 'settings_page_imageshop-settings' !== $screen->base ) {
+			return;
+		}
+
 		wp_enqueue_script(
 			'isml-core-js',
 			ISML_PLUGIN_DIR_URL . '/assets/scripts/core.js',
@@ -52,12 +57,7 @@ class Imageshop {
 			'1.4.0',
 			true
 		);
-	}
 
-	/**
-	 * Enqueue styles.
-	 */
-	public function register_styles() {
 		wp_enqueue_style( 'isml-flexboxgrid', ISML_PLUGIN_DIR_URL . '/assets/styles/flexboxgrid.min.css' );
 		wp_enqueue_style( 'isml-core-css', ISML_PLUGIN_DIR_URL . '/assets/styles/core.css' );
 	}
@@ -85,7 +85,7 @@ class Imageshop {
 			esc_html__( 'Imageshop Sync', 'imageshop' ),
 			esc_html__( 'Imageshop Sync', 'imageshop' ),
 			'manage_options',
-			'setting_page.php',
+			'imageshop-settings',
 			array( $this, 'register_setting_page' )
 		);
 	}
