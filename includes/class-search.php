@@ -152,6 +152,20 @@ class Search {
 			}
 		}
 
+		$caption = $media->Description; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
+
+		if ( ! empty( $media->Credits ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+			if ( ! empty( $caption ) ) {
+				$caption = sprintf(
+					'%s (%s)',
+					$caption,
+					$media->Credits // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+				);
+			} else {
+				$caption = $media->Credits; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+			}
+		}
+
 		return (object) array(
 			'filename'    => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
 			'id'          => $wp_post_id,
@@ -167,13 +181,9 @@ class Search {
 			'title'       => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 			'url'         => $media->ListThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
 			'menuOrder'   => 0,
-			'alt'         => $media->Name,
-			'description' => $media->Description,
-			'caption'     => sprintf(
-				'%s (%s)',
-				$media->Description,
-				$media->Credits
-			),
+			'alt'         => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+			'description' => $media->Description, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
+			'caption'     => $caption,
 		);
 	}
 }
