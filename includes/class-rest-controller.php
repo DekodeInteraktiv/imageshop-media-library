@@ -160,24 +160,25 @@ class REST_Controller {
 	 * @return mixed
 	 */
 	public function get_permalink( $document_id, $width, $height ) {
-		$pyload = array(
-			'language'      => $this->language,
-			'documentid'    => $document_id,
-			'cropmode'      => 'ZOOM',
-			'width'         => $width,
-			'height'        => $height,
-			'x1'            => 0,
-			'y1'            => 0,
-			'x2'            => 100,
-			'y2'            => 100,
-			'previewwidth'  => 100,
-			'previewheight' => 100,
+		$payload = array(
+			'language'        => $this->language,
+			'documentid'      => $document_id,
+			'cropmode'        => 'ZOOM',
+			'width'           => $width,
+			'height'          => $height,
+			'x1'              => 0,
+			'y1'              => 0,
+			'x2'              => 100,
+			'y2'              => 100,
+			'previewwidth'    => 100,
+			'previewheight'   => 100,
+			'optionalurlhint' => site_url( '/' ),
 		);
 
 		$args = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => json_encode( $pyload ),
+			'body'    => json_encode( $payload ),
 		);
 		$ret  = $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_GET_PERMALINK, $args );
 		return $ret->permalinktoken;
