@@ -361,6 +361,7 @@ class REST_Controller {
 		$args    = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
+			'body'    => json_encode( $payload ),
 		);
 
 		return $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_DOWNLOAD, $args );

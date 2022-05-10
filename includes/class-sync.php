@@ -215,7 +215,7 @@ class Sync {
 				SELECT
 					pm.post_id
 				FROM
-					{$wpdb->prefix}postmeta pm
+					{$wpdb->postmeta} pm
 				WHERE
 					pm.meta_value = %d
 					AND
@@ -234,7 +234,13 @@ class Sync {
 	 * @param $document
 	 */
 	public function execute_import_to_wp( $url, $document ) {
-		$file     = $this->helpers->collect_file( $url );
+		$file = wp_remote_get( $url );
+
+		if ( is_wp_error( $file ) ) {
+			return $file;
+		}
+
+		$file     = wp_remote_retrieve_body( $file );
 		$filename = $document['FileName'];
 
 		$upload_file = wp_upload_bits( $filename, null, $file );
