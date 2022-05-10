@@ -57,6 +57,11 @@ class Sync {
 		);
 	}
 
+	/**
+	 * Capability-permission callback check to see if the user can perform sync operations.
+	 *
+	 * @return bool
+	 */
 	public function user_can_sync() {
 		return \current_user_can( 'manage_options' );
 	}
@@ -69,6 +74,11 @@ class Sync {
 		\add_action( self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
 	}
 
+	/**
+	 * Function to return the current status of pushign media from WordPress to Imageshop.
+	 *
+	 * @return array
+	 */
 	public function get_media_import_status() {
 		global $wpdb;
 
@@ -81,6 +91,11 @@ class Sync {
 		);
 	}
 
+	/**
+	 * Trigger an export from WordPress to Imageshop.
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function sync_remote() {
 		global $wpdb;
 
@@ -141,6 +156,11 @@ class Sync {
 		);
 	}
 
+	/**
+	 * Trigger an import from Imageshop to WordPress.
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function sync_local() {
 		if ( \wp_next_scheduled( self::HOOK_IMPORT_IMAGESHOP_TO_WP ) ) {
 			return new \WP_REST_Response(
@@ -307,7 +327,7 @@ class Sync {
 	}
 
 	/**
-	 *
+	 * Output an admin notice showing the progress on exporting data form WordPress to Imageshop.
 	 */
 	public function check_import_progress() {
 		if ( ! \current_user_can( 'manage_options' ) || ! \wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {

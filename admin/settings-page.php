@@ -1,3 +1,15 @@
+<?php
+/**
+ * Settings page.
+ */
+
+declare( strict_types = 1 );
+
+namespace Imageshop\WordPress;
+
+$imageshop = REST_Controller::get_instance();
+
+?>
 <div class="imageshop__loader">
 
 </div>
@@ -63,6 +75,20 @@
 						<input id="imageshop_api_key" name="imageshop_api_key" type="text" class="regular-text code"
 							value="<?php echo \esc_attr( \get_option( 'imageshop_api_key' ) ); ?>"
 						/>
+					</div>
+
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
+						<label for="imageshop_upload_interface">
+							<?php \esc_html_e( 'Default interface:', 'imageshop' ); ?>
+						</label>
+					</div>
+
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10">
+						<select id="imageshop_upload_interface" name="imageshop_upload_interface">
+							<?php
+
+							?>
+						</select>
 					</div>
 
 				</div>
