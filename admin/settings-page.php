@@ -90,7 +90,7 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<button type="button" name="test" class="button button-primary imageshop__sync_wp_to_imageshop">
-							<?php \esc_html_e( 'Sync local WP images to Imageshop clowd', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Sync WordPress images to the Imageshop cloud', 'imageshop' ); ?>
 						</button>
 					</div>
 
@@ -99,7 +99,7 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<button type="button" name="test" class="button button-primary imageshop__sync_imageshop_to_wp">
-							<?php \esc_html_e( 'Sync Imageshop clowd images to local WP ', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Sync Imageshop cloud images to WordPress', 'imageshop' ); ?>
 						</button>
 					</div>
 
