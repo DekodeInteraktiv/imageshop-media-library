@@ -1,4 +1,9 @@
 <?php
+/**
+ * REST Controller class.
+ */
+
+declare( strict_types = 1 );
 
 namespace Imageshop\WordPress;
 
@@ -36,7 +41,9 @@ class REST_Controller {
 
 
 	/**
-	 * @param string $api_token
+	 * Class constructor.
+	 *
+	 * @param string $api_token Optional. An Imageshop API token.
 	 */
 	public function __construct( $token = null ) {
 		if ( null !== $token ) {
@@ -48,6 +55,11 @@ class REST_Controller {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
+	/**
+	 * Register WordPress REST API endpoints.
+	 *
+	 * @return void
+	 */
 	public function register_routes() {
 		register_rest_route(
 			'imageshop/v1',
@@ -69,6 +81,13 @@ class REST_Controller {
 		);
 	}
 
+	/**
+	 * WordPress REST API endpoint for getting available Imageshop categories.
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function rest_get_categories( \WP_REST_Request $request ) {
 		$interface = $request->get_param( 'id' );
 
@@ -78,6 +97,8 @@ class REST_Controller {
 	}
 
 	/**
+	 * A collection of headers to be used with Imageshop API requests.
+	 *
 	 * @return array
 	 */
 	public function get_headers(): array {
@@ -89,8 +110,10 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param string $url
-	 * @param array  $args
+	 * Perform a request against the Imageshop API.
+	 *
+	 * @param string $url  The API endpoint to request.
+	 * @param array  $args A JSON encoded string of arguments for the API call.
 	 *
 	 * @return array|mixed
 	 */
@@ -116,6 +139,8 @@ class REST_Controller {
 	}
 
 	/**
+	 * Validate that the current API user can upload files to Imageshop.
+	 *
 	 * @return mixed|void
 	 */
 	public function can_upload() {
@@ -128,8 +153,13 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param $b64_file_content
-	 * @param $name
+	 * Create a new document with Imageshop.
+	 *
+	 * Creating a document is the same as uploading a file, and pushes a base64 encoded
+	 * version of the file to the Imageshop services for processing.
+	 *
+	 * @param string $b64_file_content Base64 encoded file content.
+	 * @param string $name             Name of the file.
 	 *
 	 * @return array|mixed
 	 */
@@ -153,9 +183,11 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param $document_id
-	 * @param $width
-	 * @param $height
+	 * Get the permalink for an image on the Imageshop CDN.
+	 *
+	 * @param int $document_id The Imageshop document ID.
+	 * @param int $width       The width of the image.
+	 * @param int $height      The height of the image.
 	 *
 	 * @return mixed
 	 */
@@ -185,7 +217,9 @@ class REST_Controller {
 	}
 
 	/**
-	 * @return array|mixed
+	 * Return a list of interfaces available to the given API user.
+	 *
+	 * @return array
 	 */
 	public function get_interfaces() {
 		if ( empty( $this->interfaces ) ) {
@@ -213,6 +247,14 @@ class REST_Controller {
 		return $this->interfaces;
 	}
 
+	/**
+	 * Get a list of available categories for the given interface and language.
+	 *
+	 * @param int|null $interface The interface to return categories from.
+	 * @param string   $lang      The language to return categories for.
+	 *
+	 * @return array
+	 */
 	public function get_categories( $interface = null, $lang = 'no' ) {
 		if ( null === $interface ) {
 			$interface = \get_option( 'imageshop_upload_interface' );
@@ -251,9 +293,11 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param array $attributes
+	 * Perform a document search on the Imageshop service.
 	 *
-	 * @return array|mixed
+	 * @param array $attributes An array of search criteria.
+	 *
+	 * @return array
 	 */
 	public function search( array $attributes ) {
 		$interface_ids  = array();
@@ -293,7 +337,9 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param $id
+	 * Get the details of a document from Imageshop by its ID.
+	 *
+	 * @param int $id The Imageshop document ID.
 	 *
 	 * @return array|mixed|object
 	 */
@@ -320,6 +366,8 @@ class REST_Controller {
 	}
 
 	/**
+	 * Test if the active API token is valid.
+	 *
 	 * @return bool
 	 */
 	public function test_valid_token() {
@@ -335,9 +383,9 @@ class REST_Controller {
 	}
 
 	/**
-	 * @param $api_token
+	 * Return a singleton instance of this class.
 	 *
-	 * @return REST_Controller
+	 * @return self
 	 */
 	public static function get_instance(): REST_Controller {
 		if ( ! self::$instance ) {
@@ -348,6 +396,8 @@ class REST_Controller {
 	}
 
 	/**
+	 * Request a download source for an Imageshop document.
+	 *
 	 * @param int $document_id The ID of the document to be downloaded.
 	 *
 	 * @return array|mixed

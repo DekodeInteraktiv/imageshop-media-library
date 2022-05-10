@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Search class.
  */
 
 declare(strict_types=1);
@@ -15,6 +15,9 @@ class Search {
 	private $imageshop;
 	private static $instance;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		$onboarding_completed = get_option( 'imageshop_onboarding_completed', true );
 
@@ -27,6 +30,7 @@ class Search {
 	}
 
 	/**
+	 * Return a singleton instance of this class.
 	 *
 	 * @return self
 	 */
@@ -39,9 +43,10 @@ class Search {
 	}
 
 	/**
+	 * Modify the attachment post object response.
 	 *
-	 * @param $response
-	 * @param $post
+	 * @param \WP_REST_Response $response The response object.
+	 * @param \WP_Post          $post     The original attachment post.
 	 *
 	 * @return mixed
 	 */
@@ -66,7 +71,7 @@ class Search {
 	}
 
 	/**
-	 *
+	 * Override WordPress normal media search with the Imageshop search behavior.
 	 */
 	public function search_media() {
 		$media = array();

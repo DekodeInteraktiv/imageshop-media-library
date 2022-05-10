@@ -13,14 +13,18 @@ namespace Imageshop\WordPress;
 class Attachment {
 	private static $instance;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'attachment_image_src' ), 10, 3 );
-		add_action( 'add_attachment', array( $this, 'import_to_imageshop' ), 10, 1 );
+		add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
 		add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
-		add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 3 );
+		add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
 	}
 
 	/**
+	 * Return a singleton instance of this class.
 	 *
 	 * @return self
 	 */
@@ -32,7 +36,14 @@ class Attachment {
 		return self::$instance;
 	}
 
-	public function import_to_imageshop( $post_id ) {
+	/**
+	 * Export an attachment to Imageshop.
+	 *
+	 * @param int $post_id The attachment ID to export to Imageshop.
+	 *
+	 * @return false|mixed
+	 */
+	public function export_to_imageshop( $post_id ) {
 		if ( true === wp_attachment_is_image( $post_id )
 			&& ! boolval( get_post_meta( $post_id, '_imageshop_document_id', true ) ) ) {
 			$rest_controller = REST_Controller::get_instance();
@@ -59,7 +70,11 @@ class Attachment {
 		return $post_id;
 	}
 
-
+	/**
+	 * Helper function to return image sizes registered in WordPress.
+	 *
+	 * @return array
+	 */
 	public static function get_wp_image_sizes() {
 		$image_sizes = array();
 
@@ -89,10 +104,12 @@ class Attachment {
 	}
 
 	/**
-	 * @param $image
-	 * @param $attachment_id
-	 * @param $size
+	 * Filter the image source attributes to replace with Imageshop resources.
 	 *
+	 * @param array|false  $image         Array of image data, or boolean false if no image is available.
+	 * @param int          $attachment_id Image attachment ID.
+	 * @param string|int[] $size          Requested image size. Can be any registered image size name, or
+	 *                                    an array of width and height values in pixels (in that order).
 	 * @return array|false
 	 */
 	public function attachment_image_src( $image, $attachment_id, $size ) {
@@ -180,8 +197,10 @@ class Attachment {
 	}
 
 	/**
-	 * @param $metadata
-	 * @param $attachment_id
+	 * Filter the metadata for an attachment after upload.
+	 *
+	 * @param array $metadata      An array of attachment meta data.
+	 * @param int   $attachment_id Current attachment ID.
 	 *
 	 * @return mixed
 	 */
@@ -228,7 +247,13 @@ class Attachment {
 		return $metadata;
 	}
 
-
+	/**
+	 * Generate WordPress-equivalent metadata for a pseudo-attachment post.
+	 *
+	 * @param \WP_Post $post The attachment post object.
+	 *
+	 * @return array|array[]
+	 */
 	public function generate_imageshop_metadata( $post ) {
 		$imageshop     = REST_Controller::get_instance();
 		$media_details = array(
@@ -301,7 +326,15 @@ class Attachment {
 		return $media_details;
 	}
 
-	public function media_send_to_editor( $html, $id, $attachment ) {
+	/**
+	 * Filter the media HTML markup sent ot the editor.
+	 *
+	 * @param string $html HTML markup for a media item sent to the editor.
+	 * @param int    $id   The first key from the $_POST['send'] data.
+	 *
+	 * @return string
+	 */
+	public function media_send_to_editor( $html, $id ) {
 		$media_details = get_post_meta( $id, '_imageshop_media_sizes', true );
 		$document_id   = get_post_meta( $id, '_imageshop_document_id', true );
 

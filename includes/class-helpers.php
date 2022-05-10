@@ -1,4 +1,8 @@
 <?php
+/**
+ * The class responsible for providing helper functions.
+ */
+
 declare(strict_types=1);
 
 namespace Imageshop\WordPress;
@@ -9,11 +13,15 @@ namespace Imageshop\WordPress;
 class Helpers {
 	private static $instance;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
 
 	/**
+	 * Return a singleton instance of this class.
 	 *
 	 * @return self
 	 */
@@ -25,6 +33,11 @@ class Helpers {
 		return self::$instance;
 	}
 
+	/**
+	 * Register WordPress REST API endpoints.
+	 *
+	 * @return void
+	 */
 	public function register_rest_routes() {
 		register_rest_route(
 			'imageshop/v1',
@@ -40,7 +53,9 @@ class Helpers {
 	}
 
 	/**
+	 * Test the connection to the Imageshop API, and validate the API token.
 	 *
+	 * @return \WP_REST_Response
 	 */
 	public function test_connection( \WP_REST_Request $request ) {
 		$api_key = $request->get_param( 'token' );

@@ -1,16 +1,17 @@
 <?php
+/**
+ * The Sync class.
+ */
+
 declare(strict_types=1);
 
 namespace Imageshop\WordPress;
-
-use ActionScheduler_Store;
 
 /**
  * Class Sync
  */
 class Sync {
 	private static $instance;
-	private $helpers;
 
 	const HOOK_IMPORT_WP_TO_IMAGESHOP = 'imageshop_import_wp_to_imageshop';
 	const HOOK_IMPORT_IMAGESHOP_TO_WP = 'imageshop_import_imageshop_to_wp';
@@ -19,8 +20,6 @@ class Sync {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$this->helpers = Helpers::get_instance();
-
 		add_action( 'plugin_loaded', array( $this, 'register_init_actions' ) );
 
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
@@ -279,7 +278,7 @@ class Sync {
 	public function do_import_batch_to_imageshop( $posts ) {
 		$imageshop = Attachment::get_instance();
 		foreach ( $posts as $post ) {
-			$imageshop->import_to_imageshop( (int) $post['ID'] );
+			$imageshop->export_to_imageshop( (int) $post['ID'] );
 		}
 
 	}

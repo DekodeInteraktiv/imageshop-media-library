@@ -1,4 +1,8 @@
 <?php
+/**
+ * The main plugin class.
+ */
+
 declare(strict_types=1);
 
 namespace Imageshop\WordPress;
@@ -10,6 +14,9 @@ class Imageshop {
 
 	private static $instance;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -17,6 +24,7 @@ class Imageshop {
 	}
 
 	/**
+	 * Return a singleton instance of this class.
 	 *
 	 * @return self
 	 */

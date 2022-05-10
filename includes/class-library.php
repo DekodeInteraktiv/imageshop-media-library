@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * The library class.
  */
 
 declare(strict_types=1);
@@ -13,6 +13,9 @@ namespace Imageshop\WordPress;
 class Library {
 	private static $instance;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_filter( 'get_user_option_media_library_mode', array( $this, 'force_grid_view' ) );
 		add_action( 'admin_init', array( $this, 'override_list_view_mode_url' ) );
@@ -22,6 +25,7 @@ class Library {
 	}
 
 	/**
+	 * Return a singleton instance of this class.
 	 *
 	 * @return self
 	 */
@@ -33,6 +37,11 @@ class Library {
 		return self::$instance;
 	}
 
+	/**
+	 * Register the scripts and styles needed for the Imageshop media library controls.
+	 *
+	 * @return void
+	 */
 	public function add_custom_media_modal_filters() {
 		$imageshop = REST_Controller::get_instance();
 
@@ -81,6 +90,11 @@ class Library {
 		);
 	}
 
+	/**
+	 * Custom wp-admin styles to disable the media list view.
+	 *
+	 * @return void
+	 */
 	public function hide_list_view_button() {
 		?>
 		<style>
@@ -99,6 +113,11 @@ class Library {
 		<?php
 	}
 
+	/**
+	 * Modify direct attempts at using the media library in list view.
+	 *
+	 * @return void
+	 */
 	public function override_list_view_mode_url() {
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
 			return;
@@ -109,6 +128,11 @@ class Library {
 		}
 	}
 
+	/**
+	 * Always set the media list in grid view.
+	 *
+	 * @return string
+	 */
 	public function force_grid_view() {
 		return 'grid';
 	}
