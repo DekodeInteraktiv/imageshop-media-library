@@ -36,34 +36,49 @@ class Library {
 	public function add_custom_media_modal_filters() {
 		$imageshop = REST_Controller::get_instance();
 
-		wp_enqueue_script( 'imageshop-media-library-filters', plugins_url( '/assets/scripts/media-library-modal.js', ISML_PLUGIN_BASE_NAME ), array( 'media-editor', 'media-views', 'wp-api-fetch' ) );
-		// Load 'terms' into a JavaScript variable that collection-filter.js has access to
-		wp_localize_script( 'imageshop-media-library-filters', 'ImageshopMediaLibrary', array(
-			'sources'           => array(
-				array(
-					'label' => __( 'Imageshop Media Library', 'imageshop' ),
-					'value' => 'imageshop',
+		wp_enqueue_script(
+			'imageshop-media-library-filters',
+			plugins_url( '/assets/scripts/media-library-modal.js', ISML_PLUGIN_BASE_NAME ),
+			array(
+				'media-editor',
+				'media-views',
+				'wp-api-fetch',
+			)
+		);
+
+		wp_localize_script(
+			'imageshop-media-library-filters',
+			'ImageshopMediaLibrary',
+			array(
+				'sources'           => array(
+					array(
+						'label' => __( 'Imageshop Media Library', 'imageshop' ),
+						'value' => 'imageshop',
+					),
+					array(
+						'label' => __( 'WordPress\'s Media Library', 'imageshop' ),
+						'value' => 'wordpress',
+					),
 				),
-				array(
-					'label' => __( 'WordPress\'s Media Library', 'imageshop' ),
-					'value' => 'wordpress',
-				),
-			),
-			'interfaces'        => $imageshop->get_interfaces(),
-			'default_interface' => (int) \get_option( 'imageshop_upload_interface' ),
-			'categories'        => $imageshop->get_categories(),
-		) );
+				'interfaces'        => $imageshop->get_interfaces(),
+				'default_interface' => (int) \get_option( 'imageshop_upload_interface' ),
+				'categories'        => $imageshop->get_categories(),
+			)
+		);
 		// Overrides code styling to accommodate for a third dropdown filter
-		add_action( 'admin_footer', function(){
-			?>
-			<style>
-				.media-modal-content .media-frame select.attachment-filters {
-					max-width: -webkit-calc(33% - 12px);
-					max-width: calc(33% - 12px);
-				}
-			</style>
-			<?php
-		});
+		add_action(
+			'admin_footer',
+			function() {
+				?>
+				<style>
+					.media-modal-content .media-frame select.attachment-filters {
+						max-width: -webkit-calc(33% - 12px);
+						max-width: calc(33% - 12px);
+					}
+				</style>
+				<?php
+			}
+		);
 	}
 
 	public function hide_list_view_button() {

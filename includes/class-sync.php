@@ -41,8 +41,8 @@ class Sync {
 			'imageshop/v1',
 			'sync/remote',
 			array(
-				'methods' => \WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'sync_remote' ),
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'sync_remote' ),
 				'permission_callback' => array( $this, 'user_can_sync' ),
 			)
 		);
@@ -51,8 +51,8 @@ class Sync {
 			'imageshop/v1',
 			'sync/local',
 			array(
-				'methods' => \WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'sync_local' ),
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'sync_local' ),
 				'permission_callback' => array( $this, 'user_can_sync' ),
 			)
 		);

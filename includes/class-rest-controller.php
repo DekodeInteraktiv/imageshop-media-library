@@ -247,7 +247,7 @@ class REST_Controller {
 			\set_transient( $transient_key, $categories, HOUR_IN_SECONDS );
 		}
 
-		return $categories->Root->Children;
+		return $categories->Root->Children; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$categories->Root->Children` is provided by the SaaS API.
 	}
 
 	/**

@@ -34,7 +34,7 @@ class Helpers {
 				'callback'            => array( $this, 'test_connection' ),
 				'permission_callback' => function() {
 					return current_user_can( 'manage_options' );
-				}
+				},
 			)
 		);
 	}
@@ -49,7 +49,7 @@ class Helpers {
 			'message' => sprintf(
 				'<div class="notice notice-success fade"><p>%s</p></div>',
 				esc_html__( 'Connection is successfully established. Save the settings.', 'imageshop' )
-			)
+			),
 		);
 
 		try {
