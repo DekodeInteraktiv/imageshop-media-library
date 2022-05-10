@@ -9,7 +9,7 @@ import Import from "./Steps/Import";
 import Completed from "./Steps/Completed";
 
 const Wizard = ( { setShowWizard, setShowNotice } ) => {
-	const [ step, setStep ] = useState( 4 );
+	const [ step, setStep ] = useState( 1 );
 
 	return (
 		<>
