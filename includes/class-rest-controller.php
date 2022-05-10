@@ -15,6 +15,7 @@ class REST_Controller {
 	private const ISML_API_GET_PERMALINK   = '/Permalink/GetPermalink';
 	private const ISML_API_GET_INTERFACE   = '/Interface/GetInterfaces';
 	private const ISML_API_GET_SEARCH      = '/Search2';
+	private const ISML_API_GET_CATEGORIES  = '/Category/GetCategoriesTree';
 
 	/**
 	 * @var REST_Controller
@@ -43,6 +44,37 @@ class REST_Controller {
 		} else {
 			$this->api_token = \get_option( 'isml_api_key' );
 		}
+
+		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+	}
+
+	public function register_routes() {
+		register_rest_route(
+			'imageshop/v1',
+			'/categories/(?P<id>\d+)',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_get_categories' ),
+				'args'                => array(
+					'id' => array(
+						'validate_callback' => function( $param ) {
+							return is_numeric( $param ) || 'all' === $param;
+						},
+					),
+				),
+				'permission_callback' => function() {
+					return current_user_can( 'upload_files' );
+				},
+			)
+		);
+	}
+
+	public function rest_get_categories( \WP_REST_Request $request ) {
+		$interface = $request->get_param( 'id' );
+
+		$categories = $this->get_categories( $interface );
+
+		return new \WP_REST_Response( $categories, 200 );
 	}
 
 	/**
@@ -178,6 +210,43 @@ class REST_Controller {
 		}
 
 		return $this->interfaces;
+	}
+
+	public function get_categories( $interface = null, $lang = 'no' ) {
+		if ( null === $interface ) {
+			$interface = \get_option( 'imageshop_upload_interface' );
+		}
+
+		$transient_key = 'imageshop_categories_' . $interface . '_' . $lang;
+
+		$categories = \get_transient( $transient_key );
+
+		if ( false === $categories ) {
+			$args    = array(
+				'method'  => 'GET',
+				'headers' => $this->get_headers(),
+			);
+			$request = $this->execute_request(
+				\add_query_arg(
+					array(
+						'interfacename' => $interface,
+						'language'      => $lang,
+					),
+					self::ISML_API_BASE_URL . self::ISML_API_GET_CATEGORIES
+				),
+				$args
+			);
+
+			if ( \is_wp_error( $request ) ) {
+				return array();
+			}
+
+			$categories = $request;
+
+			\set_transient( $transient_key, $categories, HOUR_IN_SECONDS );
+		}
+
+		return $categories->Root->Children;
 	}
 
 	/**

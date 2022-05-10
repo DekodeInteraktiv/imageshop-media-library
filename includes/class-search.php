@@ -87,6 +87,12 @@ class Search {
 			$search_attributes['Pagesize'] = $_POST['query']['posts_per_page'];
 			//              $search_attributes['Pagesize'] = 80;
 		}
+		if ( isset( $_POST['query']['imageshop_interface'] ) && ! empty( $_POST['query']['imageshop_interface'] ) ) {
+			$search_attributes['InterfaceIds'] = array( absint( $_POST['query']['imageshop_interface'] ) );
+		}
+		if ( isset( $_POST['query']['imageshop_category'] ) && ! empty( $_POST['query']['imageshop_category'] ) ) {
+			$search_attributes['CategoryIds'] = array( absint( $_POST['query']['imageshop_category'] ) );
+		}
 
 		$search_results = $this->imageshop->search( $search_attributes );
 
