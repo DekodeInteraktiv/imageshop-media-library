@@ -20,11 +20,11 @@ class Sync {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_action( 'plugin_loaded', array( $this, 'register_init_actions' ) );
+		\add_action( 'plugin_loaded', array( $this, 'register_init_actions' ) );
 
-		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		\add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
-		add_action( 'admin_notices', array( $this, 'check_import_progress' ) );
+		\add_action( 'admin_notices', array( $this, 'check_import_progress' ) );
 	}
 
 	public static function get_instance() {
@@ -36,7 +36,7 @@ class Sync {
 	}
 
 	public function register_rest_routes() {
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'sync/remote',
 			array(
@@ -46,7 +46,7 @@ class Sync {
 			)
 		);
 
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'sync/local',
 			array(
@@ -58,15 +58,15 @@ class Sync {
 	}
 
 	public function user_can_sync() {
-		return current_user_can( 'manage_options' );
+		return \current_user_can( 'manage_options' );
 	}
 
 	/**
 	 * Register actions for action scheduler.
 	 */
 	public function register_init_actions() {
-		add_action( self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $this, 'do_import_batch_to_imageshop' ) );
-		add_action( self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
+		\add_action( self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $this, 'do_import_batch_to_imageshop' ) );
+		\add_action( self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
 	}
 
 	public function get_media_import_status() {
@@ -76,20 +76,20 @@ class Sync {
 		$total_imported    = $wpdb->get_var( "SELECT COUNT( DISTINCT( p.ID ) ) AS total FROM {$wpdb->posts} AS p LEFT JOIN {$wpdb->postmeta} AS pm ON (p.ID = pm.post_id) WHERE p.post_type = 'attachment' AND pm.meta_key = '_imageshop_document_id' AND ( pm.meta_value IS NOT NULL AND pm.meta_value != '' )" );
 
 		return array(
-			'total'    => absint( $total_attachments ),
-			'imported' => absint( $total_imported ),
+			'total'    => \absint( $total_attachments ),
+			'imported' => \absint( $total_imported ),
 		);
 	}
 
 	public function sync_remote() {
 		global $wpdb;
 
-		if ( wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
+		if ( \wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
+					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
 				),
 				425
 			);
@@ -120,34 +120,34 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => esc_html__( 'No images were found in the local WordPress media library, that needs to be imported to Imageshop.', 'imageshop' ),
+					'message' => \esc_html__( 'No images were found in the local WordPress media library, that needs to be imported to Imageshop.', 'imageshop' ),
 				),
 				204
 			);
 		}
 
-		$batchs = array_chunk( $ret, 20 );
+		$batchs = \array_chunk( $ret, 20 );
 		foreach ( $batchs as $posts ) {
-			wp_schedule_single_event( time() - 1, self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $posts ) );
+			\wp_schedule_single_event( \time() - 1, self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $posts ) );
 		}
 
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
 				'status'  => 'success',
-				'message' => esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
+				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
 			),
 			200
 		);
 	}
 
 	public function sync_local() {
-		if ( wp_next_scheduled( self::HOOK_IMPORT_IMAGESHOP_TO_WP ) ) {
+		if ( \wp_next_scheduled( self::HOOK_IMPORT_IMAGESHOP_TO_WP ) ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
+					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
 				),
 				425
 			);
@@ -168,23 +168,23 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => esc_html__( 'No documents were found in the active Imageshop interface, that needs to be imported to the local WordPress install.', 'imageshop' ),
+					'message' => \esc_html__( 'No documents were found in the active Imageshop interface, that needs to be imported to the local WordPress install.', 'imageshop' ),
 				),
 				204
 			);
 		}
 
 		$response = $this->prepare_response( $ret->DocumentList ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->DocumentList` is defined by the SaaS API.
-		$batches  = array_chunk( $response, 5 );
+		$batches  = \array_chunk( $response, 5 );
 		foreach ( $batches as $documents ) {
-			wp_schedule_single_event( time() - 1, self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $documents ) );
+			\wp_schedule_single_event( \time() - 1, self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $documents ) );
 		}
 
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
 				'status'  => 'success',
-				'message' => esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
+				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
 			),
 			200
 		);
@@ -233,22 +233,22 @@ class Sync {
 	 * @param $document
 	 */
 	public function execute_import_to_wp( $url, $document ) {
-		$file = wp_remote_get( $url );
+		$file = \wp_remote_get( $url );
 
-		if ( is_wp_error( $file ) ) {
+		if ( \is_wp_error( $file ) ) {
 			return $file;
 		}
 
-		$file     = wp_remote_retrieve_body( $file );
+		$file     = \wp_remote_retrieve_body( $file );
 		$filename = $document['FileName'];
 
-		$upload_file = wp_upload_bits( $filename, null, $file );
+		$upload_file = \wp_upload_bits( $filename, null, $file );
 		if ( ! $upload_file['error'] ) {
-			$wp_filetype = wp_check_filetype( $filename, null );
+			$wp_filetype = \wp_check_filetype( $filename, null );
 			$attachment  = array(
 				'post_mime_type' => $wp_filetype['type'],
 				'post_parent'    => 0,
-				'post_title'     => preg_replace( '/\.[^.]+$/', '', $filename ),
+				'post_title'     => \preg_replace( '/\.[^.]+$/', '', $filename ),
 				'post_content'   => '',
 				'post_status'    => 'inherit',
 				'meta_input'     => array(
@@ -258,14 +258,14 @@ class Sync {
 
 			$ret = $this->get_post_id_by_document_id( $document['DocumentID'] );
 			if ( $ret ) {
-				$attachment = array_merge( array( 'ID' => $ret ), $attachment );
+				$attachment = \array_merge( array( 'ID' => $ret ), $attachment );
 			}
 
-			$attachment_id = wp_insert_attachment( $attachment, $upload_file['file'] );
-			if ( ! is_wp_error( $attachment_id ) ) {
+			$attachment_id = \wp_insert_attachment( $attachment, $upload_file['file'] );
+			if ( ! \is_wp_error( $attachment_id ) ) {
 				require_once( ABSPATH . 'wp-admin' . '/includes/image.php' );
-				$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
-				wp_update_attachment_metadata( $attachment_id, $attachment_data );
+				$attachment_data = \wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
+				\wp_update_attachment_metadata( $attachment_id, $attachment_data );
 			}
 		}
 	}
@@ -310,7 +310,7 @@ class Sync {
 	 *
 	 */
 	public function check_import_progress() {
-		if ( ! current_user_can( 'manage_options' ) || ! wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
+		if ( ! \current_user_can( 'manage_options' ) || ! \wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
 			return;
 		}
 
@@ -319,18 +319,18 @@ class Sync {
 		?>
 		<div class="notice notice-warning">
 			<h2>
-				<?php esc_html_e( 'Imageshop import status', 'imageshop' ); ?>
+				<?php \esc_html_e( 'Imageshop import status', 'imageshop' ); ?>
 			</h2>
 
 			<p>
-				<?php esc_html_e( 'An import job has been initiated, the current status of it can be seen below. This notice will go away once the import is completed.', 'imageshop' ); ?>
+				<?php \esc_html_e( 'An import job has been initiated, the current status of it can be seen below. This notice will go away once the import is completed.', 'imageshop' ); ?>
 			</p>
 
-			<progress max="<?php echo esc_attr( $status['total'] ); ?>" value="<?php echo esc_attr( $status['imported'] ); ?>">
+			<progress max="<?php echo \esc_attr( $status['total'] ); ?>" value="<?php echo \esc_attr( $status['imported'] ); ?>">
 				<?php
-					printf(
+					\printf(
 						// translators: 1: Current progress. 2: Total items to import.
-						esc_html__(
+						\esc_html__(
 							'%1$s of %2$s attachments imported to Imageshop',
 							'imageshop'
 						),

@@ -17,10 +17,10 @@ declare( strict_types = 1 );
 
 namespace Imageshop\WordPress;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
-define( 'IMAGESHOP_ABSPATH', __DIR__ );
-define( 'IMAGESHOP_PLUGIN_BASE_NAME', __FILE__ );
+\define( 'IMAGESHOP_ABSPATH', __DIR__ );
+\define( 'IMAGESHOP_PLUGIN_BASE_NAME', __FILE__ );
 
 require_once __DIR__ . '/includes/class-imageshop.php';
 require_once __DIR__ . '/includes/class-attachment.php';
@@ -33,18 +33,18 @@ require_once __DIR__ . '/includes/class-sync.php';
 
 function imageshop_incompatibile( $msg ) {
 	require_once ABSPATH . DIRECTORY_SEPARATOR . 'wp-admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'plugin.php';
-	deactivate_plugins( __FILE__ );
-	wp_die( $msg );
+	\deactivate_plugins( __FILE__ );
+	\wp_die( $msg );
 }
 
 // Validate that the plugin is compatible when being activated.
-register_activation_hook(
+\register_activation_hook(
 	__FILE__,
 	function() {
-		if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-			if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+		if ( \is_admin() && ( ! \defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+			if ( \version_compare( PHP_VERSION, '5.6', '<' ) ) {
 				imageshop_incompatibile(
-					sprintf(
+					\sprintf(
 						// translators: %s is the PHP version.
 						__(
 							'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
@@ -59,7 +59,7 @@ register_activation_hook(
 );
 
 // Clean up the database when the plugin is deactivated.
-register_deactivation_hook(
+\register_deactivation_hook(
 	__FILE__,
 	function() {
 		global $wpdb;
@@ -112,11 +112,11 @@ register_deactivation_hook(
 		$removable = array();
 
 		foreach ( $attachments as $attachment ) {
-			$removable[] = absint( $attachment->ID );
+			$removable[] = \absint( $attachment->ID );
 		}
 
-		$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN (" . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
-		$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN (" . implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
+		$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN (" . \implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
+		$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN (" . \implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
 	}
 );
 

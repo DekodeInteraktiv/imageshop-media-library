@@ -17,12 +17,12 @@ class Onboarding {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$onboarding_completed = get_option( 'imageshop_onboarding_completed', false );
+		$onboarding_completed = \get_option( 'imageshop_onboarding_completed', false );
 
 		if ( ! $onboarding_completed ) {
-			add_action( 'admin_notices', array( $this, 'onboarding_notice' ) );
-			add_action( 'admin_enqueue_scripts', array( $this, 'onboarding_styles' ) );
-			add_action( 'rest_api_init', array( $this, 'onboarding_rest_endpoints' ) );
+			\add_action( 'admin_notices', array( $this, 'onboarding_notice' ) );
+			\add_action( 'admin_enqueue_scripts', array( $this, 'onboarding_styles' ) );
+			\add_action( 'rest_api_init', array( $this, 'onboarding_rest_endpoints' ) );
 		}
 	}
 
@@ -45,7 +45,7 @@ class Onboarding {
 	 * @return bool
 	 */
 	public function user_can_setup_plugin(): bool {
-		return current_user_can( 'manage_options' );
+		return \current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Onboarding {
 	 * @return void
 	 */
 	public function onboarding_rest_endpoints() {
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'onboarding/token',
 			array(
@@ -64,7 +64,7 @@ class Onboarding {
 			)
 		);
 
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'onboarding/interfaces',
 			array(
@@ -81,7 +81,7 @@ class Onboarding {
 			)
 		);
 
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'onboarding/import',
 			array(
@@ -98,7 +98,7 @@ class Onboarding {
 			)
 		);
 
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'onboarding/completed',
 			array(
@@ -115,7 +115,7 @@ class Onboarding {
 	 * @return \WP_REST_Response
 	 */
 	function rest_completed() {
-		update_option( 'imageshop_onboarding_completed', true );
+		\update_option( 'imageshop_onboarding_completed', true );
 
 		return new \WP_REST_Response( true, 200 );
 	}
@@ -158,7 +158,7 @@ class Onboarding {
 		$imageshop = new REST_Controller( $token );
 
 		if ( $imageshop->test_valid_token() ) {
-			update_option( 'imageshop_api_key', $token );
+			\update_option( 'imageshop_api_key', $token );
 
 			return new \WP_REST_Response(
 				array(
@@ -204,7 +204,7 @@ class Onboarding {
 	public function rest_set_interface( \WP_REST_Request $request ) {
 		$interface = $request->get_param( 'interface' );
 
-		update_option( 'imageshop_upload_interface', $interface );
+		\update_option( 'imageshop_upload_interface', $interface );
 	}
 
 	/**
@@ -219,10 +219,10 @@ class Onboarding {
 
 		$asset = require_once IMAGESHOP_ABSPATH . '/build/onboarding.asset.php';
 
-		wp_enqueue_style( 'imageshop-onboarding', plugins_url( 'build/onboarding.css', IMAGESHOP_PLUGIN_BASE_NAME ), array(), $asset['version'] );
-		wp_enqueue_script(
+		\wp_enqueue_style( 'imageshop-onboarding', \plugins_url( 'build/onboarding.css', IMAGESHOP_PLUGIN_BASE_NAME ), array(), $asset['version'] );
+		\wp_enqueue_script(
 			'imageshop-onboarding',
-			plugins_url( 'build/onboarding.js', IMAGESHOP_PLUGIN_BASE_NAME ),
+			\plugins_url( 'build/onboarding.js', IMAGESHOP_PLUGIN_BASE_NAME ),
 			$asset['dependencies'],
 			$asset['version'],
 			true

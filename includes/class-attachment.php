@@ -17,10 +17,10 @@ class Attachment {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_filter( 'wp_get_attachment_image_src', array( $this, 'attachment_image_src' ), 10, 3 );
-		add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
-		add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
-		add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
+		\add_filter( 'wp_get_attachment_image_src', array( $this, 'attachment_image_src' ), 10, 3 );
+		\add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
+		\add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
+		\add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
 	}
 
 	/**
@@ -44,19 +44,19 @@ class Attachment {
 	 * @return false|mixed
 	 */
 	public function export_to_imageshop( $post_id ) {
-		if ( true === wp_attachment_is_image( $post_id )
-			&& ! boolval( get_post_meta( $post_id, '_imageshop_document_id', true ) ) ) {
+		if ( true === \wp_attachment_is_image( $post_id )
+			&& ! \boolval( \get_post_meta( $post_id, '_imageshop_document_id', true ) ) ) {
 			$rest_controller = REST_Controller::get_instance();
 			try {
-				$file = get_attached_file( $post_id );
-				if ( is_readable( $file ) ) {
+				$file = \get_attached_file( $post_id );
+				if ( \is_readable( $file ) ) {
 					// create file in storage
-					$meta = get_post_meta( $post_id, '_wp_attached_file', true );
+					$meta = \get_post_meta( $post_id, '_wp_attached_file', true );
 					$ret  = $rest_controller->create_document(
-						base64_encode( file_get_contents( $file ) ),
+						\base64_encode( \file_get_contents( $file ) ),
 						$meta
 					);
-					update_post_meta( $post_id, '_imageshop_document_id', $ret->docId ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->docId` is defined by the SaaS API.
+					\update_post_meta( $post_id, '_imageshop_document_id', $ret->docId ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->docId` is defined by the SaaS API.
 
 					return $post_id;
 				}
@@ -78,16 +78,16 @@ class Attachment {
 	public static function get_wp_image_sizes() {
 		$image_sizes = array();
 
-		$size_data        = wp_get_additional_image_sizes();
-		$registered_sizes = get_intermediate_image_sizes();
+		$size_data        = \wp_get_additional_image_sizes();
+		$registered_sizes = \get_intermediate_image_sizes();
 
 		foreach ( $registered_sizes as $size ) {
 			// If the size data is empty, this is likely a core size, so look them up via the database.
 			if ( ! isset( $size_data[ $size ] ) ) {
 				$size_data[ $size ] = array(
-					'width'  => (int) get_option( $size . '_size_w' ),
-					'height' => (int) get_option( $size . '_size_h' ),
-					'crop'   => (bool) get_option( $size . '_crop' ),
+					'width'  => (int) \get_option( $size . '_size_w' ),
+					'height' => (int) \get_option( $size . '_size_h' ),
+					'crop'   => (bool) \get_option( $size . '_crop' ),
 				);
 			}
 
@@ -113,18 +113,18 @@ class Attachment {
 	 * @return array|false
 	 */
 	public function attachment_image_src( $image, $attachment_id, $size ) {
-		$media_details = get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
-		$document_id   = get_post_meta( $attachment_id, '_imageshop_document_id', true );
+		$media_details = \get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
+		$document_id   = \get_post_meta( $attachment_id, '_imageshop_document_id', true );
 
 		if ( empty( $media_details ) && $document_id ) {
 			$att           = Attachment::get_instance();
-			$media_details = $att->generate_imageshop_metadata( get_post( $attachment_id ) );
+			$media_details = $att->generate_imageshop_metadata( \get_post( $attachment_id ) );
 		}
 
 		if ( 'full' === $size ) {
 			$size = 'original';
 		}
-		if ( is_array( $size ) ) {
+		if ( \is_array( $size ) ) {
 
 			$candidates = array();
 
@@ -144,9 +144,9 @@ class Attachment {
 				if ( $data['width'] >= $size[0] && $data['height'] >= $size[1] ) {
 					// If '0' is passed to either size, we test ratios against the original file.
 					if ( 0 === $size[0] || 0 === $size[1] ) {
-						$same_ratio = wp_image_matches_ratio( $data['width'], $data['height'], $media_details['width'], $media_details['height'] );
+						$same_ratio = \wp_image_matches_ratio( $data['width'], $data['height'], $media_details['width'], $media_details['height'] );
 					} else {
-						$same_ratio = wp_image_matches_ratio( $data['width'], $data['height'], $size[0], $size[1] );
+						$same_ratio = \wp_image_matches_ratio( $data['width'], $data['height'], $size[0], $size[1] );
 					}
 
 					if ( $same_ratio ) {
@@ -157,11 +157,11 @@ class Attachment {
 
 			if ( ! empty( $candidates ) ) {
 				// Sort the array by size if we have more than one candidate.
-				if ( 1 < count( $candidates ) ) {
-					ksort( $candidates );
+				if ( 1 < \count( $candidates ) ) {
+					\ksort( $candidates );
 				}
 
-				$data = array_shift( $candidates );
+				$data = \array_shift( $candidates );
 				/*
 				* When the size requested is smaller than the thumbnail dimensions, we
 				* fall back to the thumbnail size to maintain backward compatibility with
@@ -185,7 +185,7 @@ class Attachment {
 			return false;
 		}
 
-		return array_merge(
+		return \array_merge(
 			array(
 				0 => $data['source_url'],
 				1 => $data['width'],
@@ -205,12 +205,12 @@ class Attachment {
 	 * @return mixed
 	 */
 	public function filter_wp_generate_attachment_metadata( $metadata, $attachment_id ) {
-		if ( false === wp_attachment_is_image( $attachment_id ) ) {
+		if ( false === \wp_attachment_is_image( $attachment_id ) ) {
 			return $metadata;
 		}
 
 		$paths      = array();
-		$upload_dir = wp_upload_dir();
+		$upload_dir = \wp_upload_dir();
 
 		// collect original file path
 		if ( isset( $metadata['file'] ) ) {
@@ -218,9 +218,9 @@ class Attachment {
 			$paths['full'] = $path;
 
 			// set basepath for other sizes
-			$file_info = pathinfo( $path );
+			$file_info = \pathinfo( $path );
 			$basepath  = isset( $file_info['extension'] )
-				? str_replace( $file_info['filename'] . '.' . $file_info['extension'], '', $path )
+				? \str_replace( $file_info['filename'] . '.' . $file_info['extension'], '', $path )
 				: $path;
 		}
 
@@ -240,7 +240,7 @@ class Attachment {
 				! empty( $metadata['sizes'][ $key ]['imageshop_permalink'] )
 				|| ( 'full' === $key ) && ! empty( $metadata['imageshop_permalink'] )
 			) {
-				unlink( $filepath );
+				\unlink( $filepath );
 			}
 		}
 
@@ -282,10 +282,10 @@ class Attachment {
 			}
 
 			if ( 0 === $image_width ) {
-				$image_width = (int) floor( ( $image_height / $original_image->Height ) * $original_image->Width ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				$image_width = (int) \floor( ( $image_height / $original_image->Height ) * $original_image->Width ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
 			}
 			if ( 0 === $image_height ) {
-				$image_height = (int) floor( ( $image_width / $original_image->Width ) * $original_image->Height ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				$image_height = (int) \floor( ( $image_width / $original_image->Width ) * $original_image->Height ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
 			}
 
 			if ( $size['crop'] ) {
@@ -322,7 +322,7 @@ class Attachment {
 				);
 			}
 		}
-		update_post_meta( $post->ID, '_imageshop_media_sizes', $media_details );
+		\update_post_meta( $post->ID, '_imageshop_media_sizes', $media_details );
 		return $media_details;
 	}
 
@@ -335,12 +335,12 @@ class Attachment {
 	 * @return string
 	 */
 	public function media_send_to_editor( $html, $id ) {
-		$media_details = get_post_meta( $id, '_imageshop_media_sizes', true );
-		$document_id   = get_post_meta( $id, '_imageshop_document_id', true );
+		$media_details = \get_post_meta( $id, '_imageshop_media_sizes', true );
+		$document_id   = \get_post_meta( $id, '_imageshop_document_id', true );
 
 		if ( empty( $media_details ) && $document_id ) {
 			$att           = Attachment::get_instance();
-			$media_details = $att->generate_imageshop_metadata( get_post( $id ) );
+			$media_details = $att->generate_imageshop_metadata( \get_post( $id ) );
 
 		}
 		if ( isset( $media_details['sizes']['original'] ) ) {

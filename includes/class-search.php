@@ -19,13 +19,13 @@ class Search {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$onboarding_completed = get_option( 'imageshop_onboarding_completed', true );
+		$onboarding_completed = \get_option( 'imageshop_onboarding_completed', true );
 
 		if ( $onboarding_completed ) {
 			$this->imageshop = REST_Controller::get_instance();
 
-			add_action( 'wp_ajax_query-attachments', array( $this, 'search_media' ), 0 );
-			add_filter( 'rest_prepare_attachment', array( $this, 'rest_image_override' ), 10, 2 );
+			\add_action( 'wp_ajax_query-attachments', array( $this, 'search_media' ), 0 );
+			\add_filter( 'rest_prepare_attachment', array( $this, 'rest_image_override' ), 10, 2 );
 		}
 	}
 
@@ -93,24 +93,24 @@ class Search {
 			//              $search_attributes['Pagesize'] = 80;
 		}
 		if ( isset( $_POST['query']['imageshop_interface'] ) && ! empty( $_POST['query']['imageshop_interface'] ) ) {
-			$search_attributes['InterfaceIds'] = array( absint( $_POST['query']['imageshop_interface'] ) );
+			$search_attributes['InterfaceIds'] = array( \absint( $_POST['query']['imageshop_interface'] ) );
 		}
 		if ( isset( $_POST['query']['imageshop_category'] ) && ! empty( $_POST['query']['imageshop_category'] ) ) {
-			$search_attributes['CategoryIds'] = array( absint( $_POST['query']['imageshop_category'] ) );
+			$search_attributes['CategoryIds'] = array( \absint( $_POST['query']['imageshop_category'] ) );
 		}
 
 		$search_results = $this->imageshop->search( $search_attributes );
 
-		header( 'X-WP-Total: ' . (int) $search_results->NumberOfDocuments ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_Results->NumberOfDocuments` is provided by the SaaS API.
-		header( 'X-WP-TotalPages: ' . (int) $search_attributes['Pagesize'] );
+		\header( 'X-WP-Total: ' . (int) $search_results->NumberOfDocuments ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_Results->NumberOfDocuments` is provided by the SaaS API.
+		\header( 'X-WP-TotalPages: ' . (int) $search_attributes['Pagesize'] );
 
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 			$media[] = $this->imageshop_pseudo_post( $result );
 		}
 
-		wp_send_json_success( $media );
+		\wp_send_json_success( $media );
 
-		wp_die();
+		\wp_die();
 	}
 
 	/**
@@ -125,7 +125,7 @@ class Search {
 	 * @return object
 	 */
 	private function imageshop_pseudo_post( $media ) {
-		$wp_post = get_posts(
+		$wp_post = \get_posts(
 			array(
 				'posts_per_page' => 1,
 				'meta_key'       => '_imageshop_document_id',
@@ -135,14 +135,14 @@ class Search {
 		);
 
 		if ( ! $wp_post ) {
-			$a          = wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
-			$wp_post_id = wp_insert_post(
+			$a          = \wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
+			$wp_post_id = \wp_insert_post(
 				array(
 					'post_type'      => 'attachment',
 					'post_title'     => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 					'comment_status' => 'closed',
 					'ping_status'    => 'closed',
-					'post_date_gmt'  => gmdate( 'Y-m-d H:i:s', strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+					'post_date_gmt'  => \gmdate( 'Y-m-d H:i:s', \strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
 					'post_mime_type' => $a,
 					'meta_input'     => array(
 						'_imageshop_document_id' => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
@@ -150,7 +150,7 @@ class Search {
 				)
 			);
 		} else {
-			if ( is_array( $wp_post ) ) {
+			if ( \is_array( $wp_post ) ) {
 				$wp_post_id = $wp_post[0]->ID;
 			} else {
 				$wp_post_id = $wp_post->ID;
@@ -161,7 +161,7 @@ class Search {
 
 		if ( ! empty( $media->Credits ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
 			if ( ! empty( $caption ) ) {
-				$caption = sprintf(
+				$caption = \sprintf(
 					'%s (%s)',
 					$caption,
 					$media->Credits // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.

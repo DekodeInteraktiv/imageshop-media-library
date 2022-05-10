@@ -17,11 +17,11 @@ class Library {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_filter( 'get_user_option_media_library_mode', array( $this, 'force_grid_view' ) );
-		add_action( 'admin_init', array( $this, 'override_list_view_mode_url' ) );
-		add_action( 'admin_head', array( $this, 'hide_list_view_button' ) );
+		\add_filter( 'get_user_option_media_library_mode', array( $this, 'force_grid_view' ) );
+		\add_action( 'admin_init', array( $this, 'override_list_view_mode_url' ) );
+		\add_action( 'admin_head', array( $this, 'hide_list_view_button' ) );
 
-		add_action( 'wp_enqueue_media', array( $this, 'add_custom_media_modal_filters' ) );
+		\add_action( 'wp_enqueue_media', array( $this, 'add_custom_media_modal_filters' ) );
 	}
 
 	/**
@@ -45,9 +45,9 @@ class Library {
 	public function add_custom_media_modal_filters() {
 		$imageshop = REST_Controller::get_instance();
 
-		wp_enqueue_script(
+		\wp_enqueue_script(
 			'imageshop-media-library-filters',
-			plugins_url( '/assets/scripts/media-library-modal.js', IMAGESHOP_PLUGIN_BASE_NAME ),
+			\plugins_url( '/assets/scripts/media-library-modal.js', IMAGESHOP_PLUGIN_BASE_NAME ),
 			array(
 				'media-editor',
 				'media-views',
@@ -55,7 +55,7 @@ class Library {
 			)
 		);
 
-		wp_localize_script(
+		\wp_localize_script(
 			'imageshop-media-library-filters',
 			'ImageshopMediaLibrary',
 			array(
@@ -75,7 +75,7 @@ class Library {
 			)
 		);
 		// Overrides code styling to accommodate for a third dropdown filter
-		add_action(
+		\add_action(
 			'admin_footer',
 			function() {
 				?>
@@ -123,7 +123,7 @@ class Library {
 			return;
 		}
 
-		if ( stristr( $_SERVER['REQUEST_URI'], 'upload.php?mode=' ) ) {
+		if ( \stristr( $_SERVER['REQUEST_URI'], 'upload.php?mode=' ) ) {
 			$_GET['mode'] = 'grid';
 		}
 	}

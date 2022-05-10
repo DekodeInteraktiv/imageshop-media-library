@@ -52,7 +52,7 @@ class REST_Controller {
 			$this->api_token = \get_option( 'imageshop_api_key' );
 		}
 
-		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+		\add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
 	/**
@@ -61,7 +61,7 @@ class REST_Controller {
 	 * @return void
 	 */
 	public function register_routes() {
-		register_rest_route(
+		\register_rest_route(
 			'imageshop/v1',
 			'/categories/(?P<id>\d+)',
 			array(
@@ -70,12 +70,12 @@ class REST_Controller {
 				'args'                => array(
 					'id' => array(
 						'validate_callback' => function( $param ) {
-							return is_numeric( $param ) || 'all' === $param;
+							return \is_numeric( $param ) || 'all' === $param;
 						},
 					),
 				),
 				'permission_callback' => function() {
-					return current_user_can( 'upload_files' );
+					return \current_user_can( 'upload_files' );
 				},
 			)
 		);
@@ -119,17 +119,17 @@ class REST_Controller {
 	 */
 	public function execute_request( string $url, array $args ) {
 		try {
-			$response      = wp_remote_request( $url, $args );
-			$response_code = wp_remote_retrieve_response_code( $response );
+			$response      = \wp_remote_request( $url, $args );
+			$response_code = \wp_remote_retrieve_response_code( $response );
 
-			if ( ! in_array( $response_code, array( 200, 201 ), true ) ) {
+			if ( ! \in_array( $response_code, array( 200, 201 ), true ) ) {
 				return array(
-					'code'    => wp_remote_retrieve_response_code( $response ),
-					'message' => wp_remote_retrieve_response_message( $response ),
+					'code'    => \wp_remote_retrieve_response_code( $response ),
+					'message' => \wp_remote_retrieve_response_message( $response ),
 				);
 			}
 
-			return json_decode( wp_remote_retrieve_body( $response ) );
+			return \json_decode( \wp_remote_retrieve_body( $response ) );
 		} catch ( \Exception $e ) {
 			return array(
 				'code'    => $e->getCode(),
@@ -166,8 +166,8 @@ class REST_Controller {
 	public function create_document( $b64_file_content, $name ) {
 		$pyload = array(
 			'bFile'         => $b64_file_content,
-			'fileName'      => str_replace( '/', '_', $name ),
-			'interfaceName' => get_option( 'imageshop_upload_interface' ),
+			'fileName'      => \str_replace( '/', '_', $name ),
+			'interfaceName' => \get_option( 'imageshop_upload_interface' ),
 			'doc'           => array(
 				'Active' => true,
 			),
@@ -176,7 +176,7 @@ class REST_Controller {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => json_encode( $pyload ),
+			'body'    => \json_encode( $pyload ),
 		);
 
 		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_CREATE_DOCUMENT, $args );
@@ -204,13 +204,13 @@ class REST_Controller {
 			'y2'              => 100,
 			'previewwidth'    => 100,
 			'previewheight'   => 100,
-			'optionalurlhint' => site_url( '/' ),
+			'optionalurlhint' => \site_url( '/' ),
 		);
 
 		$args = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => json_encode( $payload ),
+			'body'    => \json_encode( $payload ),
 		);
 		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK, $args );
 		return $ret->permalinktoken;
@@ -325,7 +325,7 @@ class REST_Controller {
 		$args    = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => json_encode( $attributes ),
+			'body'    => \json_encode( $attributes ),
 		);
 		$results = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_SEARCH, $args );
 
@@ -411,7 +411,7 @@ class REST_Controller {
 		$args    = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => json_encode( $payload ),
+			'body'    => \json_encode( $payload ),
 		);
 
 		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_DOWNLOAD, $args );
