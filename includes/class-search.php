@@ -153,20 +153,27 @@ class Search {
 		}
 
 		return (object) array(
-			'filename'  => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
-			'id'        => $wp_post_id,
-			'meta'      => false,
-			'date'      => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
-			'name'      => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
-			'sizes'     => array(
+			'filename'    => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
+			'id'          => $wp_post_id,
+			'meta'        => false,
+			'date'        => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+			'name'        => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+			'sizes'       => array(
 				'medium' => array(
 					'url' => $media->DetailThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DetailThumbUrl` is provided by the SaaS API.
 				),
 			),
-			'status'    => 'inherit',
-			'title'     => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
-			'url'       => $media->ListThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
-			'menuOrder' => 0,
+			'status'      => 'inherit',
+			'title'       => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+			'url'         => $media->ListThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
+			'menuOrder'   => 0,
+			'alt'         => $media->Name,
+			'description' => $media->Description,
+			'caption'     => sprintf(
+				'%s (%s)',
+				$media->Description,
+				$media->Credits
+			),
 		);
 	}
 }
