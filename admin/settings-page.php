@@ -9,6 +9,9 @@ namespace Imageshop\WordPress;
 
 $imageshop = REST_Controller::get_instance();
 
+$api_key           = \get_option( 'imageshop_api_key' );
+$default_interface = \get_option( 'imageshop_upload_interface' );
+
 ?>
 <div class="imageshop__loader">
 
@@ -73,7 +76,7 @@ $imageshop = REST_Controller::get_instance();
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10">
 						<input id="imageshop_api_key" name="imageshop_api_key" type="text" class="regular-text code"
-							value="<?php echo \esc_attr( \get_option( 'imageshop_api_key' ) ); ?>"
+							value="<?php echo \esc_attr( $api_key ); ?>"
 						/>
 					</div>
 
@@ -84,11 +87,31 @@ $imageshop = REST_Controller::get_instance();
 					</div>
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10">
+						<?php if ( ! empty( $api_key ) && $imageshop->test_valid_token() ) : ?>
+
 						<select id="imageshop_upload_interface" name="imageshop_upload_interface">
 							<?php
+							$interfaces = $imageshop->get_interfaces();
 
+							foreach ( $interfaces as $interface ) {
+								\printf(
+								'<option value="%d"%s>%s</option>',
+									\esc_attr( $interface->Id ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->ID` is defined by the SaaS API.
+									\selected( $default_interface, $interface->Id, false ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Id` is defined by the SaaS API.
+									\esc_html( $interface->Name ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Name` is defined by the SaaS API.
+								);
+							}
 							?>
 						</select>
+
+						<?php else : ?>
+
+						<em>
+							<?php \esc_html_e( 'To see available interfaces, please save a valid Imageshop key first..', 'imageshop' ); ?>
+						</em>
+
+						<?php endif; ?>
+
 					</div>
 
 				</div>
