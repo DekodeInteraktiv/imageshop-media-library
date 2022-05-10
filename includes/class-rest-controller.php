@@ -176,7 +176,7 @@ class REST_Controller {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => \json_encode( $pyload ),
+			'body'    => \wp_json_encode( $pyload ),
 		);
 
 		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_CREATE_DOCUMENT, $args );
@@ -210,7 +210,7 @@ class REST_Controller {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => \json_encode( $payload ),
+			'body'    => \wp_json_encode( $payload ),
 		);
 		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK, $args );
 		return $ret->permalinktoken;
@@ -325,7 +325,7 @@ class REST_Controller {
 		$args    = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => \json_encode( $attributes ),
+			'body'    => \wp_json_encode( $attributes ),
 		);
 		$results = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_SEARCH, $args );
 
@@ -411,7 +411,7 @@ class REST_Controller {
 		$args    = array(
 			'method'  => 'POST',
 			'headers' => $this->get_headers(),
-			'body'    => \json_encode( $payload ),
+			'body'    => \wp_json_encode( $payload ),
 		);
 
 		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_DOWNLOAD, $args );
