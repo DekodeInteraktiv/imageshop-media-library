@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Imageshop\WordPress;
 
 /**
- * Class ISML_Search
+ * Class Search
  */
 class Search {
 

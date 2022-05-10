@@ -1,12 +1,12 @@
-<div class="isml__loader">
+<div class="imageshop__loader">
 
 </div>
 
-<div class="isml__page row">
+<div class="imageshop__page row">
 
 	<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
 
-		<div class="isml__message"></div>
+		<div class="imageshop__message"></div>
 
 		<div class="row">
 
@@ -37,7 +37,7 @@
 		</div>
 
 		<form method="POST" action="options.php">
-			<?php settings_fields( 'isml_settings' ); ?>
+			<?php settings_fields( 'imageshop_settings' ); ?>
 
 			<div class="row">
 
@@ -49,19 +49,19 @@
 
 			</div>
 
-			<div class="isml__block">
+			<div class="imageshop__block">
 
 				<div class="row">
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
-						<label for="isml_api_key">
+						<label for="imageshop_api_key">
 							<?php esc_html_e( 'Imageshop Key:', 'imageshop' ); ?>
 						</label>
 					</div>
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10">
-						<input id="isml_api_key" name="isml_api_key" type="text" class="regular-text code"
-							value="<?php echo esc_attr( get_option( 'isml_api_key' ) ); ?>"
+						<input id="imageshop_api_key" name="imageshop_api_key" type="text" class="regular-text code"
+							value="<?php echo esc_attr( get_option( 'imageshop_api_key' ) ); ?>"
 						/>
 					</div>
 
@@ -70,13 +70,13 @@
 				<div class="row">
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
-						<button type="button" name="test" class="button button-primary isml__test__connection">
+						<button type="button" name="test" class="button button-primary imageshop__test__connection">
 							<?php esc_html_e( 'Check the connection', 'imageshop' ); ?>
 						</button>
 					</div>
 				</div>
 			</div>
-			<div class="isml__block">
+			<div class="imageshop__block">
 				<div class="row">
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -89,7 +89,7 @@
 
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
-						<button type="button" name="test" class="button button-primary isml__sync_wp_to_imageshop">
+						<button type="button" name="test" class="button button-primary imageshop__sync_wp_to_imageshop">
 							<?php esc_html_e( 'Sync local WP images to Imageshop clowd', 'imageshop' ); ?>
 						</button>
 					</div>
@@ -98,7 +98,7 @@
 
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
-						<button type="button" name="test" class="button button-primary isml__sync_imageshop_to_wp">
+						<button type="button" name="test" class="button button-primary imageshop__sync_imageshop_to_wp">
 							<?php esc_html_e( 'Sync Imageshop clowd images to local WP ', 'imageshop' ); ?>
 						</button>
 					</div>

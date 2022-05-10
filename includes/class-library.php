@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Imageshop\WordPress;
 
 /**
- * Class ISML_Library
+ * Class Library
  */
 class Library {
 	private static $instance;
@@ -38,7 +38,7 @@ class Library {
 
 		wp_enqueue_script(
 			'imageshop-media-library-filters',
-			plugins_url( '/assets/scripts/media-library-modal.js', ISML_PLUGIN_BASE_NAME ),
+			plugins_url( '/assets/scripts/media-library-modal.js', IMAGESHOP_PLUGIN_BASE_NAME ),
 			array(
 				'media-editor',
 				'media-views',

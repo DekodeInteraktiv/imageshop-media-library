@@ -53,8 +53,8 @@ class Helpers {
 		);
 
 		try {
-			$isml_rest_controller = new REST_Controller( $api_key );
-			$can_upload           = $isml_rest_controller->can_upload();
+			$rest_controller = new REST_Controller( $api_key );
+			$can_upload      = $rest_controller->can_upload();
 
 			if ( ! $can_upload ) {
 				$response['message'] = sprintf(

@@ -19,9 +19,8 @@ namespace Imageshop\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ISML_ABSPATH', __DIR__ );
-define( 'ISML_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
-define( 'ISML_PLUGIN_BASE_NAME', __FILE__ );
+define( 'IMAGESHOP_ABSPATH', __DIR__ );
+define( 'IMAGESHOP_PLUGIN_BASE_NAME', __FILE__ );
 
 require_once __DIR__ . '/includes/class-imageshop.php';
 require_once __DIR__ . '/includes/class-attachment.php';
@@ -32,7 +31,7 @@ require_once __DIR__ . '/includes/class-rest-controller.php';
 require_once __DIR__ . '/includes/class-search.php';
 require_once __DIR__ . '/includes/class-sync.php';
 
-function isml_incompatibile( $msg ) {
+function imageshop_incompatibile( $msg ) {
 	require_once ABSPATH . DIRECTORY_SEPARATOR . 'wp-admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'plugin.php';
 	deactivate_plugins( __FILE__ );
 	wp_die( $msg );
@@ -44,7 +43,7 @@ register_activation_hook(
 	function() {
 		if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 			if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
-				isml_incompatibile(
+				imageshop_incompatibile(
 					sprintf(
 						// translators: %s is the PHP version.
 						__(

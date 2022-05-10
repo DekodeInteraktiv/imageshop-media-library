@@ -119,7 +119,7 @@ class Onboarding {
 		$imageshop = new REST_Controller( $token );
 
 		if ( $imageshop->test_valid_token() ) {
-			update_option( 'isml_api_key', $token );
+			update_option( 'imageshop_api_key', $token );
 
 			return new \WP_REST_Response(
 				array(
@@ -161,12 +161,12 @@ class Onboarding {
 			return;
 		}
 
-		$asset = require_once ISML_ABSPATH . '/build/onboarding.asset.php';
+		$asset = require_once IMAGESHOP_ABSPATH . '/build/onboarding.asset.php';
 
-		wp_enqueue_style( 'imageshop-onboarding', plugins_url( 'build/onboarding.css', ISML_PLUGIN_BASE_NAME ), array(), $asset['version'] );
+		wp_enqueue_style( 'imageshop-onboarding', plugins_url( 'build/onboarding.css', IMAGESHOP_PLUGIN_BASE_NAME ), array(), $asset['version'] );
 		wp_enqueue_script(
 			'imageshop-onboarding',
-			plugins_url( 'build/onboarding.js', ISML_PLUGIN_BASE_NAME ),
+			plugins_url( 'build/onboarding.js', IMAGESHOP_PLUGIN_BASE_NAME ),
 			$asset['dependencies'],
 			$asset['version'],
 			true

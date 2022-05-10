@@ -8,14 +8,12 @@ declare(strict_types=1);
 namespace Imageshop\WordPress;
 
 /**
- * Class ISML_Attachment
+ * Class Attachment
  */
 class Attachment {
 	private static $instance;
-	private bool $storage_file_only;
 
 	public function __construct() {
-		$this->storage_file_only = boolval( get_option( 'isml_storage_file_only' ) );
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'attachment_image_src' ), 10, 3 );
 		add_action( 'add_attachment', array( $this, 'import_to_imageshop' ), 10, 1 );
 		add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
@@ -37,13 +35,13 @@ class Attachment {
 	public function import_to_imageshop( $post_id ) {
 		if ( true === wp_attachment_is_image( $post_id )
 			&& ! boolval( get_post_meta( $post_id, '_imageshop_document_id', true ) ) ) {
-			$isml_rest_controller = REST_Controller::get_instance();
+			$rest_controller = REST_Controller::get_instance();
 			try {
 				$file = get_attached_file( $post_id );
 				if ( is_readable( $file ) ) {
 					// create file in storage
 					$meta = get_post_meta( $post_id, '_wp_attached_file', true );
-					$ret  = $isml_rest_controller->create_document(
+					$ret  = $rest_controller->create_document(
 						base64_encode( file_get_contents( $file ) ),
 						$meta
 					);
@@ -53,7 +51,7 @@ class Attachment {
 				}
 
 				return $post_id;
-			} catch ( Exception $e ) {
+			} catch ( \Exception $e ) {
 				return false;
 			}
 		}
@@ -216,15 +214,12 @@ class Attachment {
 			}
 		}
 
-		// process paths
+		// process paths.
 		foreach ( $paths as $key => $filepath ) {
-			// remove fisical file.
+			// remove physical file.
 			if (
-				1 === $this->storage_file_only
-				&& (
-					! empty( $metadata['sizes'][ $key ]['imageshop_permalink'] )
-					|| ( 'full' === $key ) && ! empty( $metadata['imageshop_permalink'] )
-				)
+				! empty( $metadata['sizes'][ $key ]['imageshop_permalink'] )
+				|| ( 'full' === $key ) && ! empty( $metadata['imageshop_permalink'] )
 			) {
 				unlink( $filepath );
 			}

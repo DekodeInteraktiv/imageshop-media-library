@@ -1,31 +1,31 @@
-.isml__loader {
+.imageshop__loader {
 	display: none;
 }
 
-.isml__page {
+.imageshop__page {
 	max-width: 1200px;
 }
 
-.isml__page .isml__block {
+.imageshop__page .imageshop__block {
 	padding-bottom: 25px;
 	margin-bottom: 25px;
 	border-bottom: 1px #0080FF solid;
 }
 
-.isml__page .isml__block .row {
+.imageshop__page .imageshop__block .row {
 	height: 75px;
 	align-items: center;
 }
 
-.isml__page .isml__block .row.larger {
+.imageshop__page .imageshop__block .row.larger {
 	height: 150px;
 }
 
-.isml__page label {
+.imageshop__page label {
 	font-weight: bold;
 }
 
-.isml__page h2 {
+.imageshop__page h2 {
 	text-transform: uppercase;
 	letter-spacing: 1px;
 }

@@ -12,8 +12,8 @@ class Sync {
 	private static $instance;
 	private $helpers;
 
-	const HOOK_ISML_IMPORT_WP_TO_IMAGESHOP = 'isml_import_wp_to_imageshop';
-	const HOOK_ISML_IMPORT_IMAGESHOP_TO_WP = 'isml_import_imageshop_to_wp';
+	const HOOK_IMPORT_WP_TO_IMAGESHOP = 'imageshop_import_wp_to_imageshop';
+	const HOOK_IMPORT_IMAGESHOP_TO_WP = 'imageshop_import_imageshop_to_wp';
 
 	/**
 	 * Class constructor.
@@ -66,8 +66,8 @@ class Sync {
 	 * Register actions for action scheduler.
 	 */
 	public function register_init_actions() {
-		add_action( self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP, array( $this, 'do_import_batch_to_imageshop' ) );
-		add_action( self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
+		add_action( self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $this, 'do_import_batch_to_imageshop' ) );
+		add_action( self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $this, 'do_import_batch_to_wp' ) );
 	}
 
 	public function get_media_import_status() {
@@ -85,7 +85,7 @@ class Sync {
 	public function sync_remote() {
 		global $wpdb;
 
-		if ( wp_next_scheduled( self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP ) ) {
+		if ( wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
@@ -129,7 +129,7 @@ class Sync {
 
 		$batchs = array_chunk( $ret, 20 );
 		foreach ( $batchs as $posts ) {
-			wp_schedule_single_event( time() - 1, self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP, array( $posts ) );
+			wp_schedule_single_event( time() - 1, self::HOOK_IMPORT_WP_TO_IMAGESHOP, array( $posts ) );
 		}
 
 		return new \WP_REST_Response(
@@ -143,7 +143,7 @@ class Sync {
 	}
 
 	public function sync_local() {
-		if ( wp_next_scheduled( self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP ) ) {
+		if ( wp_next_scheduled( self::HOOK_IMPORT_IMAGESHOP_TO_WP ) ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
@@ -178,7 +178,7 @@ class Sync {
 		$response = $this->prepare_response( $ret->DocumentList ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$ret->DocumentList` is defined by the SaaS API.
 		$batches  = array_chunk( $response, 5 );
 		foreach ( $batches as $documents ) {
-			wp_schedule_single_event( time() - 1, self::HOOK_ISML_IMPORT_IMAGESHOP_TO_WP, array( $documents ) );
+			wp_schedule_single_event( time() - 1, self::HOOK_IMPORT_IMAGESHOP_TO_WP, array( $documents ) );
 		}
 
 		return new \WP_REST_Response(
@@ -277,9 +277,9 @@ class Sync {
 	 * @param $posts
 	 */
 	public function do_import_batch_to_imageshop( $posts ) {
-		$isml = Attachment::get_instance();
+		$imageshop = Attachment::get_instance();
 		foreach ( $posts as $post ) {
-			$isml->import_to_imageshop( (int) $post['ID'] );
+			$imageshop->import_to_imageshop( (int) $post['ID'] );
 		}
 
 	}
@@ -311,7 +311,7 @@ class Sync {
 	 *
 	 */
 	public function check_import_progress() {
-		if ( ! current_user_can( 'manage_options' ) || ! wp_next_scheduled( self::HOOK_ISML_IMPORT_WP_TO_IMAGESHOP ) ) {
+		if ( ! current_user_can( 'manage_options' ) || ! wp_next_scheduled( self::HOOK_IMPORT_WP_TO_IMAGESHOP ) ) {
 			return;
 		}
 

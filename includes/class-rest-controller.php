@@ -3,19 +3,19 @@
 namespace Imageshop\WordPress;
 
 /**
- * Class ISML_REST_Controller
+ * Class REST_Controller
  */
 class REST_Controller {
-	private const ISML_API_BASE_URL        = 'https://api.imageshop.no';
-	private const ISML_API_CAN_UPLOAD      = '/Login/CanUpload';
-	private const ISML_API_WHOAMI          = '/Login/WhoAmI';
-	private const ISML_API_CREATE_DOCUMENT = '/Document/CreateDocument';
-	private const ISML_API_GET_DOCUMENT    = '/Document/GetDocumentById';
-	private const ISML_API_DOWNLOAD        = '/Download';
-	private const ISML_API_GET_PERMALINK   = '/Permalink/GetPermalink';
-	private const ISML_API_GET_INTERFACE   = '/Interface/GetInterfaces';
-	private const ISML_API_GET_SEARCH      = '/Search2';
-	private const ISML_API_GET_CATEGORIES  = '/Category/GetCategoriesTree';
+	private const IMAGESHOP_API_BASE_URL        = 'https://api.imageshop.no';
+	private const IMAGESHOP_API_CAN_UPLOAD      = '/Login/CanUpload';
+	private const IMAGESHOP_API_WHOAMI          = '/Login/WhoAmI';
+	private const IMAGESHOP_API_CREATE_DOCUMENT = '/Document/CreateDocument';
+	private const IMAGESHOP_API_GET_DOCUMENT    = '/Document/GetDocumentById';
+	private const IMAGESHOP_API_DOWNLOAD        = '/Download';
+	private const IMAGESHOP_API_GET_PERMALINK   = '/Permalink/GetPermalink';
+	private const IMAGESHOP_API_GET_INTERFACE   = '/Interface/GetInterfaces';
+	private const IMAGESHOP_API_GET_SEARCH      = '/Search2';
+	private const IMAGESHOP_API_GET_CATEGORIES  = '/Category/GetCategoriesTree';
 
 	/**
 	 * @var REST_Controller
@@ -42,7 +42,7 @@ class REST_Controller {
 		if ( null !== $token ) {
 			$this->api_token = $token;
 		} else {
-			$this->api_token = \get_option( 'isml_api_key' );
+			$this->api_token = \get_option( 'imageshop_api_key' );
 		}
 
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
@@ -124,7 +124,7 @@ class REST_Controller {
 			'headers' => $this->get_headers(),
 		);
 
-		return $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_CAN_UPLOAD, $args );
+		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_CAN_UPLOAD, $args );
 	}
 
 	/**
@@ -149,7 +149,7 @@ class REST_Controller {
 			'body'    => json_encode( $pyload ),
 		);
 
-		return $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_CREATE_DOCUMENT, $args );
+		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_CREATE_DOCUMENT, $args );
 	}
 
 	/**
@@ -180,7 +180,7 @@ class REST_Controller {
 			'headers' => $this->get_headers(),
 			'body'    => json_encode( $payload ),
 		);
-		$ret  = $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_GET_PERMALINK, $args );
+		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK, $args );
 		return $ret->permalinktoken;
 	}
 
@@ -196,7 +196,7 @@ class REST_Controller {
 					'method'  => 'GET',
 					'headers' => $this->get_headers(),
 				);
-				$request = $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_GET_INTERFACE, $args );
+				$request = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_INTERFACE, $args );
 
 				if ( \is_wp_error( $request ) ) {
 					return $this->interfaces;
@@ -233,7 +233,7 @@ class REST_Controller {
 						'interfacename' => $interface,
 						'language'      => $lang,
 					),
-					self::ISML_API_BASE_URL . self::ISML_API_GET_CATEGORIES
+					self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_CATEGORIES
 				),
 				$args
 			);
@@ -283,7 +283,7 @@ class REST_Controller {
 			'headers' => $this->get_headers(),
 			'body'    => json_encode( $attributes ),
 		);
-		$results = $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_GET_SEARCH, $args );
+		$results = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_SEARCH, $args );
 
 		if ( \is_wp_error( $results ) ) {
 			return array();
@@ -303,7 +303,7 @@ class REST_Controller {
 				'language'   => 'no',
 				'DocumentID' => $id,
 			),
-			self::ISML_API_BASE_URL . self::ISML_API_GET_DOCUMENT
+			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_DOCUMENT
 		);
 		$args = array(
 			'method'  => 'GET',
@@ -329,7 +329,7 @@ class REST_Controller {
 			'headers' => $this->get_headers(),
 		);
 
-		$ret = $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_WHOAMI, $args );
+		$ret = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_WHOAMI, $args );
 
 		return ( ! \is_wp_error( $ret ) && ! isset( $ret['code'] ) );
 	}
@@ -364,6 +364,6 @@ class REST_Controller {
 			'body'    => json_encode( $payload ),
 		);
 
-		return $this->execute_request( self::ISML_API_BASE_URL . self::ISML_API_DOWNLOAD, $args );
+		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_DOWNLOAD, $args );
 	}
 }
