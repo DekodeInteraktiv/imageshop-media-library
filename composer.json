@@ -1,4 +1,5 @@
 {
+	"type": "wordpress-plugin",
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
