@@ -1,18 +1,19 @@
 === Imageshop ===
-Tags: media library, media cdn
-Requires at least: 5.0
+Tags: media library, media cdn, DAM
+Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 5.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Imageshop provides a single source for all your company media needs.
+Cloud based DAM Solution
 
 == Description ==
 
-The Imageshop plugin will integrate with your sites media library, providing you with the same interface you are already familiar with, while providing media from your own image bank.
+Imageshop is a cloud-based [http://www.imageshop.org Digital Asset Management system) (image bank /DAM system) that makes it easier than ever to organize, search, share and use your digital files, internally and with the outside world and partners.
 
-This helps your business maintain one source of truth for all your media needs.
+Drag & drop uploading and ultra-efficient image tagging enable your files are always available in the DAM system when and where they are needed, in the right format and the best quality. Read more about Imageshop here: http://www.imageshop.org
+
 
 == Frequently Asked Questions ==
 
@@ -20,6 +21,6 @@ This helps your business maintain one source of truth for all your media needs.
 
 The plugin will let you add it to any multisite, but each individual site will need to do their own configuration.
 
-= What if I no longer wihs to use Imageshop for my files? =
+= What if I no longer wish to use Imageshop for my files? =
 
 If you at any point wish to stop using Imageshop for your files, you can export any files that have been used in content on your site to your local media library again, before deactivating the plugin.
