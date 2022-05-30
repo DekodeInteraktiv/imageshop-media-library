@@ -219,13 +219,15 @@ class REST_Controller {
 	/**
 	 * Return a list of interfaces available to the given API user.
 	 *
+	 * @param bool $ignore_cache Default `false`. Define if the cached interfaces should be ignored, and a
+	 *                           fresh copy be gotten via the API.
 	 * @return array
 	 */
-	public function get_interfaces() {
+	public function get_interfaces( $ignore_cache = false ) {
 		if ( empty( $this->interfaces ) ) {
 			$interfaces = \get_transient( 'imageshop_interfaces' );
 
-			if ( false === $interfaces ) {
+			if ( false === $interfaces || $ignore_cache ) {
 				$args    = array(
 					'method'  => 'GET',
 					'headers' => $this->get_headers(),

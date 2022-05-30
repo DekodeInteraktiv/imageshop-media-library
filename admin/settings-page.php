@@ -91,11 +91,11 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 						<select id="imageshop_upload_interface" name="imageshop_upload_interface">
 							<?php
-							$interfaces = $imageshop->get_interfaces();
+							$interfaces = $imageshop->get_interfaces( true );
 
 							foreach ( $interfaces as $interface ) {
 								\printf(
-								'<option value="%d"%s>%s</option>',
+									'<option value="%d"%s>%s</option>',
 									\esc_attr( $interface->Id ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->ID` is defined by the SaaS API.
 									\selected( $default_interface, $interface->Id, false ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Id` is defined by the SaaS API.
 									\esc_html( $interface->Name ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Name` is defined by the SaaS API.

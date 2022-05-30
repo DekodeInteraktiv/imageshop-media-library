@@ -188,7 +188,7 @@ class Onboarding {
 
 		return new \WP_REST_Response(
 			array(
-				'interfaces' => $imageshop->get_interfaces(),
+				'interfaces' => $imageshop->get_interfaces( true ),
 			),
 			200
 		);
