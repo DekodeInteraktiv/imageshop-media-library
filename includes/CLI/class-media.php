@@ -155,7 +155,6 @@ class Media {
 		            	spm.meta_value != ''
 			    	)
 				)
-			LIMIT 1
 		    "
 		);
 
