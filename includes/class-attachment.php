@@ -281,11 +281,31 @@ class Attachment {
 				continue;
 			}
 
-			if ( 0 === $image_width ) {
-				$image_width = (int) \floor( ( $image_height / $original_image->Height ) * $original_image->Width ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+			// No sizes should ever exceed the original image sizes, make it so.
+			if ( $image_width > $original_image->Width ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is defined by the SaaS API.
+				$image_width = $original_image->Width; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is defined by the SaaS API.
 			}
-			if ( 0 === $image_height ) {
-				$image_height = (int) \floor( ( $image_width / $original_image->Width ) * $original_image->Height ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+			if ( $image_height > $original_image->Height ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is defined by the SaaS API.
+				$image_height = $original_image->Height; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is defined by the SaaS API.
+			}
+
+			if ( 0 === $image_width || 0 === $image_height ) {
+				if ( 0 === $image_width ) {
+					$image_width = (int) \floor( ( $image_height / $original_image->Height ) * $original_image->Width ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				}
+				if ( 0 === $image_height ) {
+					$image_height = (int) \floor( ( $image_width / $original_image->Width ) * $original_image->Height ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				}
+			} else if ( $original_image->Width > $image_width || $original_image->Height > $image_height ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				// Calculate the aspect ratios for use in getting the appropriate dimension height/width wise for this image.
+				$original_ratio = ( $original_image->Width / $original_image->Height ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are defined by the SaaS API.
+				$image_ratio = ( $image_width / $image_height );
+
+				if ( $image_ratio > $original_ratio ) {
+					$image_width = round( $image_height * $original_ratio );
+				} else {
+					$image_height = round( $image_width / $original_ratio );
+				}
 			}
 
 			if ( $size['crop'] ) {
