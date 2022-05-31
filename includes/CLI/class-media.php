@@ -88,7 +88,7 @@ class Media {
 		$attachments = $wpdb->get_results(
 			"
 			SELECT
-		       p.ID
+		       DISTINCT( p.ID )
 			FROM
 				{$wpdb->posts} AS p
 		    LEFT JOIN
@@ -130,7 +130,7 @@ class Media {
 		$attachments = $wpdb->get_results(
 			"
 			SELECT
-		       p.ID
+		       DISTINCT( p.ID )
 			FROM
 				{$wpdb->posts} AS p
 		    LEFT JOIN
