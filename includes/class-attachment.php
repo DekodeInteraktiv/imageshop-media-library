@@ -18,6 +18,7 @@ class Attachment {
 	 */
 	public function __construct() {
 		\add_filter( 'wp_get_attachment_image_src', array( $this, 'attachment_image_src' ), 10, 3 );
+		\add_filter( 'wp_get_attachment_url', array( $this, 'attachment_url' ), 10, 2 );
 		\add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
 		\add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
 		\add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
@@ -370,5 +371,24 @@ class Attachment {
 
 		return $html;
 
+	}
+
+	/**
+	 * Filter the attachment URL.
+	 *
+	 * The URL to an attachment may be called directly at various points in the process, so filter it as well.
+	 *
+	 * @param string $url     The URL to the full sized image.
+	 * @param int    $post_id The ID for the attachment post.
+	 * @return string
+	 */
+	public function attachment_url( $url, $post_id ) {
+		$media_meta = get_post_meta( $post_id, '_imageshop_media_sizes', true );
+
+		if ( ! isset( $media_meta['sizes']['original'] ) ) {
+			return $url;
+		}
+
+		return $media_meta['sizes']['original']['source_url'];
 	}
 }
