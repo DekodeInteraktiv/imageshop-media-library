@@ -11,16 +11,17 @@ namespace Imageshop\WordPress;
  * Class REST_Controller
  */
 class REST_Controller {
-	private const IMAGESHOP_API_BASE_URL        = 'https://api.imageshop.no';
-	private const IMAGESHOP_API_CAN_UPLOAD      = '/Login/CanUpload';
-	private const IMAGESHOP_API_WHOAMI          = '/Login/WhoAmI';
-	private const IMAGESHOP_API_CREATE_DOCUMENT = '/Document/CreateDocument';
-	private const IMAGESHOP_API_GET_DOCUMENT    = '/Document/GetDocumentById';
-	private const IMAGESHOP_API_DOWNLOAD        = '/Download';
-	private const IMAGESHOP_API_GET_PERMALINK   = '/Permalink/GetPermalink';
-	private const IMAGESHOP_API_GET_INTERFACE   = '/Interface/GetInterfaces';
-	private const IMAGESHOP_API_GET_SEARCH      = '/Search2';
-	private const IMAGESHOP_API_GET_CATEGORIES  = '/Category/GetCategoriesTree';
+	private const IMAGESHOP_API_BASE_URL          = 'https://api.imageshop.no';
+	private const IMAGESHOP_API_CAN_UPLOAD        = '/Login/CanUpload';
+	private const IMAGESHOP_API_WHOAMI            = '/Login/WhoAmI';
+	private const IMAGESHOP_API_CREATE_DOCUMENT   = '/Document/CreateDocument';
+	private const IMAGESHOP_API_GET_DOCUMENT      = '/Document/GetDocumentById';
+	private const IMAGESHOP_API_DOWNLOAD          = '/Download';
+	private const IMAGESHOP_API_GET_PERMALINK     = '/Permalink/GetPermalink';
+	private const IMAGESHOP_API_GET_INTERFACE     = '/Interface/GetInterfaces';
+	private const IMAGESHOP_API_GET_SEARCH        = '/Search2';
+	private const IMAGESHOP_API_GET_CATEGORIES    = '/Category/GetCategoriesTree';
+	private const IMAGESHOP_API_GET_DOCUMENT_LINK = '/Document/GetDocumentLink';
 
 	/**
 	 * @var REST_Controller
@@ -250,6 +251,44 @@ class REST_Controller {
 	}
 
 	/**
+	 * Get an interface by its ID.
+	 *
+	 * @param int $id
+	 *
+	 * @return object|null
+	 */
+	public function get_interface_by_id( $id ) {
+		$interfaces = $this->get_interfaces();
+
+		foreach ( $interfaces as $interface ) {
+			if ( $id === $interface->Id ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Id` is provided by the SaaS API.
+				return $interface;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get an interface by its name.
+	 *
+	 * @param string $name
+	 *
+	 * @return object|null
+	 */
+	public function get_interface_by_name( $name ) {
+		$interfaces = $this->get_interfaces();
+
+		foreach ( $interfaces as $interface ) {
+			if ( $name === $interface->Name ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$interface->Name` is provided by the SaaS API.
+				return $interface;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get a list of available categories for the given interface and language.
 	 *
 	 * @param int|null $interface The interface to return categories from.
@@ -362,6 +401,40 @@ class REST_Controller {
 
 		if ( \is_wp_error( $ret ) ) {
 			return (object) array();
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Get a sub-documents temporary URL for downloading a file off S3.
+	 *
+	 * This is a fail-safe method, used to grab an original image, and generate the file sizes when they,
+	 * for whatever reason, are missing form the primary media object.
+	 *
+	 * @param string $interface_name    Name of the interface the media belongs to.
+	 * @param string $sub_document_path The sub document path for the specific media size.
+	 *
+	 * @return string|null
+	 */
+	public function get_document_link( $interface_name, $sub_document_path ) {
+		$url = \add_query_arg(
+			array(
+				'interfacename'   => $interface_name,
+				'subdocumentpath' => $sub_document_path,
+			),
+			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_DOCUMENT_LINK
+		);
+
+		$args = array(
+			'method'  => 'GET',
+			'headers' => $this->get_headers(),
+		);
+
+		$ret = $this->execute_request( $url, $args );
+
+		if ( \is_wp_error( $ret ) ) {
+			return null;
 		}
 
 		return $ret;
