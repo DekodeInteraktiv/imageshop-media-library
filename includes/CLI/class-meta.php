@@ -13,12 +13,20 @@ class Meta {
 
 	private $verbose = false;
 
+	private $delay = 5;
+
 	public function __construct() {
 
 	}
 
 	/**
 	 * Update the metadata for an attachment.
+	 *
+	 * This will allow you to refresh, or add, the meta value references for media between WordPress and
+	 * the Imageshop SaaS.
+	 *
+	 * By default, when performing mass-operations, you will need to wait 5 seconds
+	 * between each activity.
 	 *
 	 * ## OPTIONS
 	 *
@@ -30,6 +38,12 @@ class Meta {
 	 *
 	 * [--verbose]
 	 * : Provide more verbose details during export operations.
+	 *
+	 * [--reduced-delay]
+	 * : Only wait 2 seconds between each operation when mass-updating meta values.
+	 *
+	 * [--no-delay]
+	 * : Remove the delay between operations when mass-updating meta values.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -46,6 +60,14 @@ class Meta {
 	public function update( $args, $assoc_args ) {
 		if ( isset( $assoc_args['verbose'] ) ) {
 			$this->verbose = true;
+		}
+
+		if ( isset( $assoc_args['reduced-delay'] ) ) {
+			$this->delay = 2;
+		}
+
+		if ( isset( $assoc_args['no-delay'] ) ) {
+			$this->delay = 0;
 		}
 
 		if ( isset( $assoc_args['all'] ) ) {
@@ -151,6 +173,11 @@ class Meta {
 				\WP_CLI::log( sprintf( 'Processing attachment with ID %d', $attachment->ID ) );
 			}
 			$imageshop_attachment->generate_imageshop_metadata( get_post( $attachment->ID ) );
+
+			if ( 0 !== $this->delay ) {
+				sleep( $this->delay );
+			}
+
 			$progress->tick();
 		}
 
