@@ -22,6 +22,7 @@ class REST_Controller {
 	private const IMAGESHOP_API_GET_SEARCH        = '/Search2';
 	private const IMAGESHOP_API_GET_CATEGORIES    = '/Category/GetCategoriesTree';
 	private const IMAGESHOP_API_GET_DOCUMENT_LINK = '/Document/GetDocumentLink';
+	private const IMAGESHOP_API_DELETE_DOCUMENT   = '/Document/DeleteDocument';
 
 	/**
 	 * @var REST_Controller
@@ -445,6 +446,35 @@ class REST_Controller {
 		if ( \is_wp_error( $ret ) ) {
 			return null;
 		}
+
+		return $ret;
+	}
+
+	/**
+	 * Delete an attachment from the Imageshop database.
+	 *
+	 * This is a destructive action, and as such is not enabled on accounts by default.
+	 * If there are needs for this feature, please have it unlocked by your Imageshop
+	 * contact first.
+	 *
+	 * @param int $document_id Imageshop ID of the document to delete.
+	 *
+	 * @return \WP_Error|string
+	 */
+	public function delete_document( $document_id ) {
+		$url = \add_query_arg(
+			array(
+				'documentId' => $document_id,
+			),
+			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_DELETE_DOCUMENT
+		);
+
+		$args = array(
+			'method'  => 'GET',
+			'headers' => $this->get_headers(),
+		);
+
+		$ret = $this->execute_request( $url, $args );
 
 		return $ret;
 	}
