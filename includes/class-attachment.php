@@ -288,7 +288,7 @@ class Attachment {
 
 		$media = $imageshop->get_document( $post->_imageshop_document_id );
 
-		$original_image = array();
+		$original_image = null;
 		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
 			// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
 			if ( 'Original' === $document->VersionName && null === $original_image ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is provided by the SaaS API.
