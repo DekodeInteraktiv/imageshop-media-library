@@ -80,10 +80,13 @@ class Search {
 
 		// Querying for posts specifically attached ot a page does nothing, so do not process them.
 		if ( isset( $_POST['query']['post__in'] ) ) {
-			return array();
+			\wp_send_json_success( array() );
+			\wp_die();
 		}
 
-		$search_attributes = array();
+		$search_attributes = array(
+			'Pagesize' => 10,
+		);
 
 		if ( isset( $_POST['query']['s'] ) ) {
 			$search_attributes['Querystring'] = $_POST['query']['s'];
@@ -96,8 +99,12 @@ class Search {
 			$search_attributes['Page'] = ( $_POST['query']['paged'] - 1 );
 		}
 		if ( isset( $_POST['query']['posts_per_page'] ) ) {
+			// The default value is too heavy at this time, so discard and rely on the next request.
+			if ( 80 === (int) $_POST['query']['posts_per_page'] ) {
+				\wp_send_json_success( array() );
+				\wp_die();
+			}
 			$search_attributes['Pagesize'] = $_POST['query']['posts_per_page'];
-			//$search_attributes['Pagesize'] = 5;
 		}
 		if ( isset( $_POST['query']['imageshop_interface'] ) && ! empty( $_POST['query']['imageshop_interface'] ) ) {
 			$search_attributes['InterfaceIds'] = array( \absint( $_POST['query']['imageshop_interface'] ) );
@@ -109,7 +116,7 @@ class Search {
 		$search_results = $this->imageshop->search( $search_attributes );
 
 		\header( 'X-WP-Total: ' . (int) $search_results->NumberOfDocuments ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_Results->NumberOfDocuments` is provided by the SaaS API.
-		\header( 'X-WP-TotalPages: ' . (int) $search_attributes['Pagesize'] );
+		\header( 'X-WP-TotalPages: ' . (int) ceil( ( $search_results->NumberOfDocuments / $search_attributes['Pagesize'] ) ) );
 
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 			$media[] = $this->imageshop_pseudo_post( $result, $search_attributes['InterfaceIds'][0] );

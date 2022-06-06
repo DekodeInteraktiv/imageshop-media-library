@@ -98,6 +98,7 @@ class Library {
 	public function hide_list_view_button() {
 		?>
 		<style>
+			.wp-admin #imageshop-posts-per-page,
 			.wp-admin.upload-php #media-attachment-filters,
 			.wp-admin.upload-php #media-attachment-date-filters,
 			.wp-admin.post-php #media-attachment-date-filters,

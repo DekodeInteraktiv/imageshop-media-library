@@ -38,6 +38,25 @@
 		}
 	});
 
+	let ImageshopPostsPerPageFilter = wp.media.view.AttachmentFilters.extend({
+		id: 'imageshop-posts-per-page',
+
+		createFilters: function() {
+			var filters = {};
+
+			filters.all = {
+				// Change this: use whatever default label you'd like
+				text:  '10 results per page',
+				props: {
+					// Change this: key needs to be the WP_Query var for the taxonomy
+					posts_per_page: 10
+				},
+				priority: 10
+			};
+			this.filters = filters;
+		}
+	});
+
 	let ImageshopCategoryFilters = wp.media.view.AttachmentFilters.extend({
 		id: 'imageshop-media-library-category',
 
@@ -115,13 +134,28 @@
 				priority: -75
 			}).render() );
 
+			this.toolbar.set( 'ImageshopPostsPerPageFilterLabel', new wp.media.view.Label({
+				value: 'Results per page',
+				attributes: {
+					'for': 'imageshop-posts-per-page'
+				},
+				priority: -75
+			}).render() );
+			this.toolbar.set( 'ImageshopPostsPerPageFilter', new ImageshopPostsPerPageFilter({
+				controller: this.controller,
+				model:      this.collection.props,
+				priority: -75
+			}).render() );
+
 			let ImageshopInterfaceDOM,
 				ImageshopCategoryDOM,
-				ImageshopSelectorTimer;
+				ImageshopSelectorTimer,
+				ImageshopSelectPostsPerPageDOM;
 
 			const setSelectors = () => {
 				ImageshopInterfaceDOM = document.getElementById( 'imageshop-media-library-interface' );
 				ImageshopCategoryDOM = document.getElementById( 'imageshop-media-library-category' );
+				ImageshopSelectPostsPerPageDOM = document.getElementById( 'imageshop-posts-per-page' );
 			}
 
 			setSelectors()
@@ -143,6 +177,7 @@
 
 			if ( ImageshopInterfaceDOM && ImageshopCategoryDOM ) {
 				ImageshopInterfaceDOM.value = ImageshopMediaLibrary.default_interface;
+				ImageshopSelectPostsPerPageDOM.dispatchEvent( new Event( 'change' ) );
 			} else {
 				ImageshopSelectorTimer = setInterval( () => {
 					setSelectors();
@@ -151,6 +186,8 @@
 						clearInterval( ImageshopSelectorTimer );
 
 						ImageshopInterfaceDOM.value = ImageshopMediaLibrary.default_interface;
+
+						ImageshopSelectPostsPerPageDOM.dispatchEvent( new Event( 'change' ) );
 					}
 				}, 500 );
 			}
