@@ -39,7 +39,7 @@ class Duplicates {
 	 *
 	 * @when after_wp_load
 	 */
-	public function report( $args, $assoc_args) {
+	public function report( $args, $assoc_args ) {
 		global $wpdb;
 
 		$fields = array(
@@ -198,12 +198,12 @@ class Duplicates {
 					continue;
 				}
 
-				if ( ! isset( $results->DocumentList ) ) {
+				if ( ! isset( $results->DocumentList ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$results->DocumentList` is provided by the SaaS API.
 					\WP_CLI::error( 'No document list found in the search results' );
 					return false;
 				}
 
-				if ( count( $results->DocumentList ) < 2 ) {
+				if ( count( $results->DocumentList ) < 2 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$results->DocumentList` is provided by the SaaS API.
 					if ( $this->verbose ) {
 						\WP_CLI::log( sprintf( 'Only one entry matching the title `%s`.', $attachment->post_title ) );
 						$has_more_items = false;
@@ -211,19 +211,19 @@ class Duplicates {
 					}
 				}
 
-				foreach( $results->DocumentList as $document ) {
-					if ( (int) $document->DocumentID !== (int) $attachment->meta_value && (string) $document->Name === (string) $attachment->post_title ) {
+				foreach ( $results->DocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$results->DocumentList` is provided by the SaaS API.
+					if ( (int) $document->DocumentID !== (int) $attachment->meta_value && (string) $document->Name === (string) $attachment->post_title ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` and `$document->Name` are provided by the SaaS API.
 						if ( $this->verbose ) {
-							\WP_CLI::log( sprintf( 'Sending delete request for Imageshop ID %d - Name `%s` with original ID %d', $document->DocumentID, $document->Name, $attachment->meta_value ) );
+							\WP_CLI::log( sprintf( 'Sending delete request for Imageshop ID %d - Name `%s` with original ID %d', $document->DocumentID, $document->Name, $attachment->meta_value ) ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` and `$document->Name` are provided by the SaaS API.
 						}
 
-						$imageshop->delete_document( $document->DocumentID );
+						$imageshop->delete_document( $document->DocumentID ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` is provided by the SaaS API.
 						$deleted++;
 					}
 				}
 
 				if ( null === $total_pages ) {
-					$total_pages = ceil( ( isset( $results->NumberOfDocuments ) ? $results->NumberOfDocuments : 0 ) / $per_page );
+					$total_pages = ceil( ( isset( $results->NumberOfDocuments ) ? $results->NumberOfDocuments : 0 ) / $per_page ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$results->NumberOfDocuments` is provided by the SaaS API.
 				}
 
 				$page++;
