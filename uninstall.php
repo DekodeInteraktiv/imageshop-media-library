@@ -67,3 +67,4 @@ foreach ( $attachments as $attachment ) {
 
 $wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN (" . \implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
 $wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN (" . \implode( ',', $removable ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We need to implode a variable to use the `IN` SQL operator.
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '%imageshop%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We are doing a non-variable query.

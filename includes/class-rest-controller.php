@@ -208,12 +208,21 @@ class REST_Controller {
 			'optionalurlhint' => \site_url( '/' ),
 		);
 
-		$args = array(
-			'method'  => 'POST',
-			'headers' => $this->get_headers(),
-			'body'    => \wp_json_encode( $payload ),
-		);
-		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK, $args );
+		$payload_hash = \md5( \wp_json_encode( $payload ) );
+
+		$ret = \get_transient( 'imageshop_permalink_' . $payload_hash );
+
+		if ( false === $ret ) {
+			$args = array(
+				'method'  => 'POST',
+				'headers' => $this->get_headers(),
+				'body'    => \wp_json_encode( $payload ),
+			);
+			$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK, $args );
+
+			\set_transient( 'imageshop_permalink_' . $payload_hash, $ret );
+		}
+
 		return $ret->permalinktoken;
 	}
 
