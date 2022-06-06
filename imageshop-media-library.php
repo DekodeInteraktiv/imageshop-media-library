@@ -61,6 +61,7 @@ function imageshop_incompatibile( $msg ) {
 if ( \class_exists( 'WP_CLI' ) ) {
 	require_once __DIR__ . '/includes/CLI/class-meta.php';
 	require_once __DIR__ . '/includes/CLI/class-media.php';
+	require_once __DIR__ . '/includes/CLI/class-duplicates.php';
 }
 
 $isml = Imageshop::get_instance();
