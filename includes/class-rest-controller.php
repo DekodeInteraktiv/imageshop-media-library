@@ -493,7 +493,7 @@ class REST_Controller {
 
 		$ret = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_WHOAMI, $args );
 
-		return ( ! \is_wp_error( $ret ) && ! isset( $ret['code'] ) );
+		return ( ! \is_wp_error( $ret ) && ! isset( $ret['code'] ) && ! empty( $ret ) );
 	}
 
 	/**
