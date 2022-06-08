@@ -5,6 +5,36 @@
  */
 
 (function(){
+	let ImageshopOriginFilters = wp.media.view.AttachmentFilters.extend({
+		id: 'imageshop-media-library-origin',
+
+		createFilters: function() {
+			var filters = {};
+
+			filters.all = {
+				// Change this: use whatever default label you'd like
+				text:  'Search Imageshop',
+				props: {
+					// Change this: key needs to be the WP_Query var for the taxonomy
+					imageshop_origin: 'imageshop'
+				},
+				priority: 10
+			}
+
+			filters.wp = {
+				// Change this: use whatever default label you'd like
+				text:  'Search WordPress library',
+				props: {
+					// Change this: key needs to be the WP_Query var for the taxonomy
+					imageshop_origin: 'wordpress'
+				},
+				priority: 10
+			}
+
+			this.filters = filters;
+		}
+	})
+
 	/**
 	 * Create a new MediaLibraryTaxonomyFilter we later will instantiate
 	 */
@@ -107,6 +137,19 @@
 		createToolbar: function() {
 			// Make sure to load the original toolbar
 			AttachmentsBrowser.prototype.createToolbar.call( this );
+
+			this.toolbar.set( 'ImageshopOriginFiltersLabel', new wp.media.view.Label({
+				value: 'Media library source origin',
+				attributes: {
+					'for': 'imageshop-media-library-origin'
+				},
+				priority: -75
+			}).render() );
+			this.toolbar.set( 'ImageshopOriginFilters', new ImageshopOriginFilters({
+				controller: this.controller,
+				model:      this.collection.props,
+				priority: -75
+			}).render() );
 
 			this.toolbar.set( 'ImageshopInterfaceFiltersLabel', new wp.media.view.Label({
 				value: 'Imageshop Interface',

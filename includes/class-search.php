@@ -76,6 +76,11 @@ class Search {
 	public function search_media() {
 		$media = array();
 
+		// If Imageshop isn't the search origin, return early and let something else handle the process.
+		if ( isset( $_POST['query']['imageshop_origin'] ) && 'imageshop' !== $_POST['query']['imageshop_origin'] ) {
+			return;
+		}
+
 		// Querying for posts specifically attached ot a page does nothing, so do not process them.
 		if ( isset( $_POST['query']['post__in'] ) ) {
 			\wp_send_json_success( array() );
