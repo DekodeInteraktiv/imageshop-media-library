@@ -17,11 +17,13 @@ class Library {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		\add_filter( 'get_user_option_media_library_mode', array( $this, 'force_grid_view' ) );
-		\add_action( 'admin_init', array( $this, 'override_list_view_mode_url' ) );
-		\add_action( 'admin_head', array( $this, 'hide_list_view_button' ) );
+		if ( Imageshop::get_instance()->onboarding_completed() ) {
+			\add_filter( 'get_user_option_media_library_mode', array( $this, 'force_grid_view' ) );
+			\add_action( 'admin_init', array( $this, 'override_list_view_mode_url' ) );
+			\add_action( 'admin_head', array( $this, 'hide_list_view_button' ) );
 
-		\add_action( 'wp_enqueue_media', array( $this, 'add_custom_media_modal_filters' ) );
+			\add_action( 'wp_enqueue_media', array( $this, 'add_custom_media_modal_filters' ) );
+		}
 	}
 
 	/**

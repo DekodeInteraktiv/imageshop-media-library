@@ -17,9 +17,7 @@ class Onboarding {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$onboarding_completed = \get_option( 'imageshop_onboarding_completed', false );
-
-		if ( ! $onboarding_completed ) {
+		if ( ! Imageshop::get_instance()->onboarding_completed() ) {
 			\add_action( 'admin_notices', array( $this, 'onboarding_notice' ) );
 			\add_action( 'admin_enqueue_scripts', array( $this, 'onboarding_styles' ) );
 			\add_action( 'rest_api_init', array( $this, 'onboarding_rest_endpoints' ) );

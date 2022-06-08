@@ -14,6 +14,8 @@ class Imageshop {
 
 	private static $instance;
 
+	public $onboarding_completed = null;
+
 	/**
 	 * Class constructor.
 	 */
@@ -21,6 +23,28 @@ class Imageshop {
 		\add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		\add_action( 'admin_init', array( $this, 'register_settings' ) );
 		\add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
+	}
+
+	/**
+	 * Check the onboarding state, and if required settings are in place.
+	 *
+	 * @return bool
+	 */
+	public function onboarding_completed() {
+		if ( null === $this->onboarding_completed ) {
+			$completed = false;
+
+			$interface = \get_option( 'imageshop_upload_interface', '' );
+			$api_key   = \get_option( 'imageshop_api_key', '' );
+
+			if ( ! empty( $interface ) && ! empty( $api_key ) ) {
+				$completed = true;
+			}
+
+			$this->onboarding_completed = $completed;
+		}
+
+		return $this->onboarding_completed;
 	}
 
 	/**

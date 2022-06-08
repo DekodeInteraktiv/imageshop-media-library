@@ -20,9 +20,7 @@ class Search {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$onboarding_completed = \get_option( 'imageshop_onboarding_completed', true );
-
-		if ( $onboarding_completed ) {
+		if ( Imageshop::get_instance()->onboarding_completed() ) {
 			$this->imageshop  = REST_Controller::get_instance();
 			$this->attachment = Attachment::get_instance();
 
