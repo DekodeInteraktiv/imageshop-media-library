@@ -51,7 +51,7 @@ class REST_Controller {
 		if ( null !== $token ) {
 			$this->api_token = $token;
 		} else {
-			$this->api_token = \get_option( 'imageshop_api_key' );
+			$this->api_token = \get_option( 'imageshop_api_key', '' );
 		}
 
 		\add_action( 'rest_api_init', array( $this, 'register_routes' ) );
