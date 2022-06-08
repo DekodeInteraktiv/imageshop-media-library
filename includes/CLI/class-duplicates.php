@@ -16,6 +16,10 @@ class Duplicates {
 
 	private $delay = 5;
 
+	private $dry_run = false;
+
+	private $end_log = array();
+
 	public function __construct() {}
 
 	/**
@@ -73,6 +77,23 @@ class Duplicates {
 				    pm.meta_value != ''
 			    )
 			)
+			AND
+		        EXISTS (
+		            SELECT
+						1
+					FROM
+					     {$wpdb->postmeta} as spm
+		            WHERE
+						spm.post_id = p.ID
+					AND
+				        spm.meta_key = '_wp_attached_file'
+				    AND
+					(
+					    spm.meta_value IS NOT NULL
+					        AND
+					    spm.meta_value != ''
+					)
+				)
 		    "
 		);
 
@@ -109,6 +130,9 @@ class Duplicates {
 	 * [--no-delay]
 	 * : Do not have any delay between operations.
 	 *
+	 * [--dry-run]
+	 * : Simulate the actions, without performing the delete sequence.
+	 *
 	 * @when after_wp_load
 	 */
 	public function delete( $args, $assoc_args ) {
@@ -118,6 +142,10 @@ class Duplicates {
 
 		if ( isset( $assoc_args['verbose'] ) ) {
 			$this->verbose = true;
+		}
+
+		if ( isset( $assoc_args['dry-run'] ) ) {
+			$this->dry_run = true;
 		}
 
 		if ( isset( $assoc_args['reduced-delay'] ) ) {
@@ -154,7 +182,7 @@ class Duplicates {
 			    )
 			)
 			AND
-		        (
+		        EXISTS (
 		            SELECT
 						1
 					FROM
@@ -214,10 +242,16 @@ class Duplicates {
 				foreach ( $results->DocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$results->DocumentList` is provided by the SaaS API.
 					if ( (int) $document->DocumentID !== (int) $attachment->meta_value && (string) $document->Name === (string) $attachment->post_title ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` and `$document->Name` are provided by the SaaS API.
 						if ( $this->verbose ) {
-							\WP_CLI::log( sprintf( 'Sending delete request for Imageshop ID %d - Name `%s` with original ID %d', $document->DocumentID, $document->Name, $attachment->meta_value ) ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` and `$document->Name` are provided by the SaaS API.
+							$notice = sprintf( 'Sending delete request for Imageshop ID %d - Name `%s` with original ID %d', $document->DocumentID, $document->Name, $attachment->meta_value ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` and `$document->Name` are provided by the SaaS API.
+
+							\WP_CLI::log( $notice );
+							$this->end_log[] = $notice;
 						}
 
-						$imageshop->delete_document( $document->DocumentID ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` is provided by the SaaS API.
+						if ( ! $this->dry_run ) {
+							$imageshop->delete_document( $document->DocumentID ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->DocumentID` is provided by the SaaS API.
+						}
+
 						$deleted++;
 					}
 				}
@@ -241,6 +275,14 @@ class Duplicates {
 		}
 
 		$progress->finish();
+
+		if ( ! empty( $this->end_log ) && $this->verbose ) {
+			\WP_CLI::log( '## Begin report of deleted files' );
+			foreach ( $this->end_log as $log ) {
+				\WP_CLI::log( $log );
+			}
+			\WP_CLI::log( '## End report on deleted files' );
+		}
 
 		\WP_CLI::success( sprintf( 'Finished removing duplicates. A total of %d media items were deleted.', $deleted ) );
 		return true;
