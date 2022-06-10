@@ -71,6 +71,27 @@ class Search {
 	}
 
 	/**
+	 * Filter out unneccesary Imageshop data when doing a direct WordPress library search.
+	 *
+	 * @param \WP_Query $query The query being performed.
+	 * @return void
+	 */
+	public function skip_imageshop_items( $query ) {
+		$meta = $query->get( 'meta_query' );
+
+		if ( ! is_array( $meta ) ) {
+			$meta = array();
+		}
+
+		$meta[] = array(
+			'key'     => '_wp_attached_file',
+			'compare' => 'EXISTS',
+		);
+
+		$query->set( 'meta_query', $meta );
+	}
+
+	/**
 	 * Override WordPress normal media search with the Imageshop search behavior.
 	 */
 	public function search_media() {
@@ -78,6 +99,7 @@ class Search {
 
 		// If Imageshop isn't the search origin, return early and let something else handle the process.
 		if ( isset( $_POST['query']['imageshop_origin'] ) && 'imageshop' !== $_POST['query']['imageshop_origin'] ) {
+			\add_action( 'pre_get_posts', array( $this, 'skip_imageshop_items' ) );
 			return;
 		}
 
