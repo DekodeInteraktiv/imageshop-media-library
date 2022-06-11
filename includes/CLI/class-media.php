@@ -15,6 +15,8 @@ class Media {
 
 	private $delay = 5;
 
+	private $force = false;
+
 	public function __construct() {
 
 	}
@@ -35,6 +37,9 @@ class Media {
 	 *
 	 * [--missing]
 	 * : Export any content found in the media library that does not have an Imageshop reference.
+	 *
+	 * [--force]
+	 * : Force export a file, even if it is marked as exported already.
 	 *
 	 * [--verbose]
 	 * : Provide more verbose details during export operations.
@@ -66,6 +71,10 @@ class Media {
 			$this->delay = 0;
 		}
 
+		if ( isset( $assoc_args['force'] ) ) {
+			$this->force = true;
+		}
+
 		if ( isset( $assoc_args['all'] ) ) {
 			return $this->all();
 		}
@@ -90,7 +99,7 @@ class Media {
 	private function single( $post_id ) {
 		$imageshop = Attachment::get_instance();
 
-		$export = $imageshop->export_to_imageshop( (int) $post_id );
+		$export = $imageshop->export_to_imageshop( (int) $post_id, $this->force );
 
 		if ( false === $export ) {
 			\WP_CLI::error( 'An error occurred while exporting the media item, please try again, or check your error log.' );
@@ -133,7 +142,7 @@ class Media {
 			if ( $this->verbose ) {
 				\WP_CLI::log( sprintf( 'Processing attachment with ID %d', $attachment->ID ) );
 			}
-			$imageshop_attachment->export_to_imageshop( (int) $attachment->ID );
+			$imageshop_attachment->export_to_imageshop( (int) $attachment->ID, $this->force );
 
 			if ( 0 !== $this->delay ) {
 				sleep( $this->delay );
