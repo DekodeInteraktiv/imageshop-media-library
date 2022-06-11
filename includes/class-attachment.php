@@ -42,13 +42,14 @@ class Attachment {
 	/**
 	 * Export an attachment to Imageshop.
 	 *
-	 * @param int $post_id The attachment ID to export to Imageshop.
+	 * @param int  $post_id The attachment ID to export to Imageshop.
+	 * @param bool $force   Allow the forceful re-export of an attachment.
 	 *
 	 * @return false|mixed
 	 */
-	public function export_to_imageshop( $post_id ) {
+	public function export_to_imageshop( $post_id, $force = false ) {
 		if ( true === \wp_attachment_is_image( $post_id )
-			&& ! \boolval( \get_post_meta( $post_id, '_imageshop_document_id', true ) ) ) {
+			&& ( ! \boolval( \get_post_meta( $post_id, '_imageshop_document_id', true ) ) || true === $force ) ) {
 			$rest_controller = REST_Controller::get_instance();
 			try {
 				$file = \get_attached_file( $post_id );
