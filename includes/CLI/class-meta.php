@@ -121,7 +121,7 @@ class Meta {
 		$attachments = $wpdb->get_results(
 			"
 			SELECT
-		       p.ID
+		       DISTINCT( p.ID )
 			FROM
 				{$wpdb->posts} AS p
 		    LEFT JOIN
@@ -140,7 +140,7 @@ class Meta {
 			    )
 			)
 			AND
-		        NOT EXISTS (
+		        EXISTS (
 		            SELECT
 						1
 					FROM
