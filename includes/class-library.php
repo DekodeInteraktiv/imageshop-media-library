@@ -85,6 +85,7 @@ class Library {
 					.media-modal-content .media-frame select.attachment-filters {
 						max-width: -webkit-calc(33% - 12px);
 						max-width: calc(33% - 12px);
+						width: initial;
 					}
 				</style>
 				<?php
