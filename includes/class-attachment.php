@@ -291,6 +291,11 @@ class Attachment {
 
 		$media = $imageshop->get_document( $post->_imageshop_document_id );
 
+		// If no valid media object is returned for any reason, bail early.
+		if ( empty( $media ) || ! isset( $media->SubDocumentList ) ) {
+			return $media_details;
+		}
+
 		$original_image = null;
 		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
 			// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
