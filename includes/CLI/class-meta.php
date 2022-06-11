@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Imageshop\WordPress\CLI;
 
 use Imageshop\WordPress\Attachment;
+use Imageshop\WordPress\REST_Controller;
 
 class Meta {
 
@@ -102,6 +103,8 @@ class Meta {
 
 		$imageshop_attachment = Attachment::get_instance();
 
+		$this->validate_file( $id );
+
 		$media_details = $imageshop_attachment->generate_imageshop_metadata( $attachment );
 
 		if ( empty( $media_details['sizes'] ) ) {
@@ -172,6 +175,9 @@ class Meta {
 			if ( $this->verbose ) {
 				\WP_CLI::log( sprintf( 'Processing attachment with ID %d', $attachment->ID ) );
 			}
+
+			$this->validate_file( $attachment->ID );
+
 			$imageshop_attachment->generate_imageshop_metadata( get_post( $attachment->ID ) );
 
 			if ( 0 !== $this->delay ) {
@@ -185,6 +191,30 @@ class Meta {
 
 		\WP_CLI::success( 'All metadata has been updated' );
 		return true;
+	}
+
+	private function validate_file( $post_id ) {
+		$imageshop = Attachment::get_instance();
+		$imageshop_api = REST_Controller::get_instance();
+		$imageshop_id = get_post_meta( $post_id, '_imageshop_document_id', true );
+
+		if ( empty( $imageshop_id ) ) {
+			if ( $this->verbose ) {
+				\WP_CLI::log( 'Missing Imageshop reference for the attachment, exporting now...' );
+			}
+
+			$imageshop->export_to_imageshop( (int) $post_id, true );
+		} else {
+			$validate = $imageshop_api->get_document( $imageshop_id );
+
+			if ( empty( $validate ) || ! isset( $validate->SubDocumentList ) ) {
+				if ( $this->verbose ) {
+					\WP_CLI::log( sprintf( 'No valid media reference returned from Imageshop under attachment ID %d, regenerating...', $imageshop_id ) );
+				}
+
+				$imageshop->export_to_imageshop( (int) $post_id, true );
+			}
+		}
 	}
 
 }
