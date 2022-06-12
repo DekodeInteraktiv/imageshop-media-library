@@ -404,12 +404,32 @@ class Attachment {
 			return null;
 		}
 
+		if ( $original_image && ( 0 === $original_image->Width || 0 === $original_image->Height ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are provided by the SaaS API.
+			$dimensions = $this->get_original_dimensions( $media->InterfaceList, $original_image ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->InterfaceList` is provided by the SaaS API.
+
+			$original_image->Width  = $dimensions['width']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is provided by the SaaS API.
+			$original_image->Height = $dimensions['height']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is provided by the SaaS API.
+		}
+
 		// No sizes should ever exceed the original image sizes, make it so.
 		if ( $width > $original_image->Width ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is defined by the SaaS API.
 			$width = $original_image->Width; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is defined by the SaaS API.
 		}
 		if ( $height > $original_image->Height ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is defined by the SaaS API.
 			$height = $original_image->Height; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is defined by the SaaS API.
+		}
+
+		/*
+		 * There us no obvious reason why this check should  ever be needed, yet here we are.
+		 *
+		 * For whatever reason, there are scenarios where an image size is reporting both with, and without
+		 * any sensible sizes, leading to division by zero errors in both directions.
+		 *
+		 * This check will catch such a scenario, and return a `null` value, as if an original is missing,
+		 * this is done so as not to break any behavior elsewhere, but this is bad mojo all around.
+		 */
+		if ( 0 === $width && 0 === $height ) {
+			return null;
 		}
 
 		if ( 0 === $width || 0 === $height ) {
