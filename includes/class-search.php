@@ -248,9 +248,6 @@ class Search {
 			}
 
 			$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
-			$medium_url    = $this->attachment->get_permalink_for_size_slug( $media->DocumentID, $media->FileName, 'medium' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
-
-			$medium_dimension = $this->attachment->get_image_dimensions( 'medium' );
 
 			$image_sizes = array(
 				'full'      => array(
@@ -259,18 +256,15 @@ class Search {
 					'height'      => $original_media->Height, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` is provided by the SaaS API.
 					'orientation' => ( $original_media->Height > $original_media->Width ? 'portrait' : 'landscape' ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` and `$original_media->Width` are provided by the SaaS API.
 				),
-				'medium'    => array(
-					'url'         => $medium_url['source_url'],
-					'width'       => $medium_dimension['width'],
-					'height'      => $medium_dimension['height'],
-					'orientation' => $medium_dimension['orientation'],
-				)
 			);
 		}
 
 		$image_sizes = array_merge(
 			$image_sizes,
 			array(
+				'medium'    => array(
+					'url' => $media->FullscreenThumbUrl,
+				),
 				'thumbnail' => array(
 					'url' => $media->DetailThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
 				),
