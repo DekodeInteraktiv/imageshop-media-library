@@ -177,8 +177,9 @@ class Search {
 			)
 		);
 
+		$media_file_type = \wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
+
 		if ( ! $wp_post ) {
-			$a          = \wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
 			$wp_post_id = \wp_insert_post(
 				array(
 					'post_type'      => 'attachment',
@@ -186,7 +187,7 @@ class Search {
 					'comment_status' => 'closed',
 					'ping_status'    => 'closed',
 					'post_date_gmt'  => \gmdate( 'Y-m-d H:i:s', \strtotime( $media->Created ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
-					'post_mime_type' => $a,
+					'post_mime_type' => $media_file_type,
 					'meta_input'     => array(
 						'_imageshop_document_id' => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
 					),
@@ -214,49 +215,44 @@ class Search {
 			}
 		}
 
-		$original_media = null;
+		$image_sizes = array();
 
-		foreach ( $media->SubDocumentList as $sub ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is provided by the SaaS API.
-			// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
-			if ( 'Original' === $sub->VersionName && null === $original_media ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->VersionName` is provided by the SaaS API.
-				$original_media = $sub;
+		if ( $media_file_type && \stristr( $media_file_type, 'image' ) ) {
+			$original_media = null;
+
+			foreach ( $media->SubDocumentList as $sub ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is provided by the SaaS API.
+				// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
+				if ( 'Original' === $sub->VersionName && null === $original_media ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->VersionName` is provided by the SaaS API.
+					$original_media = $sub;
+				}
+
+				// An actually declared original should always take priority.
+				if ( 1 === $sub->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->IsOriginal` is provided by the SaaS API.
+					$original_media = $sub;
+					break;
+				}
 			}
 
-			// An actually declared original should always take priority.
-			if ( 1 === $sub->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->IsOriginal` is provided by the SaaS API.
-				$original_media = $sub;
-				break;
+			if ( null === $original_media ) {
+				$original_media = (object) array(
+					'Width'         => 0,
+					'Height'        => 0,
+					'FileSize'      => 0,
+					'FileExtension' => 'jpg',
+				);
+			} elseif ( $original_media && ( 0 === $original_media->Width || 0 === $original_media->Height ) && count( $media->InterfaceList ) >= 1 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width`, `$original_media->Height`, and `$media->InterfaceList` are provided by the SaaS API.
+				$dimensions = $this->attachment->get_original_dimensions( $interface, $original_media );
+
+				$original_media->Width  = $dimensions['width']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width` is provided by the SaaS API.
+				$original_media->Height = $dimensions['height']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` is provided by the SaaS API.
 			}
-		}
 
-		if ( null === $original_media ) {
-			$original_media = (object) array(
-				'Width'         => 0,
-				'Height'        => 0,
-				'FileSize'      => 0,
-				'FileExtension' => 'jpg',
-			);
-		} elseif ( $original_media && ( 0 === $original_media->Width || 0 === $original_media->Height ) && count( $media->InterfaceList ) >= 1 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width`, `$original_media->Height`, and `$media->InterfaceList` are provided by the SaaS API.
-			$dimensions = $this->attachment->get_original_dimensions( $interface, $original_media );
+			$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
+			$medium_url    = $this->attachment->get_permalink_for_size_slug( $media->DocumentID, $media->FileName, 'medium' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
 
-			$original_media->Width  = $dimensions['width']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width` is provided by the SaaS API.
-			$original_media->Height = $dimensions['height']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` is provided by the SaaS API.
-		}
+			$medium_dimension = $this->attachment->get_image_dimensions( 'medium' );
 
-		$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
-		$medium_url    = $this->attachment->get_permalink_for_size_slug( $media->DocumentID, $media->FileName, 'medium' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
-		$thumb_url     = $media->DetailThumbUrl; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
-
-		$medium_dimension = $this->attachment->get_image_dimensions( 'medium' );
-
-		return (object) array(
-			'filename'              => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
-			'id'                    => $wp_post_id,
-			'meta'                  => false,
-			'date'                  => strtotime( $media->Created ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
-			'dateFormatted'         => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
-			'name'                  => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
-			'sizes'                 => array(
+			$image_sizes = array(
 				'full'      => array(
 					'url'         => $full_size_url['source_url'],
 					'width'       => $original_media->Width, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width` is provided by the SaaS API.
@@ -268,11 +264,27 @@ class Search {
 					'width'       => $medium_dimension['width'],
 					'height'      => $medium_dimension['height'],
 					'orientation' => $medium_dimension['orientation'],
-				),
+				)
+			);
+		}
+
+		$image_sizes = array_merge(
+			$image_sizes,
+			array(
 				'thumbnail' => array(
-					'url' => $thumb_url,
+					'url' => $media->DetailThumbUrl, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
 				),
-			),
+			)
+		);
+
+		return (object) array(
+			'filename'              => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
+			'id'                    => $wp_post_id,
+			'meta'                  => false,
+			'date'                  => strtotime( $media->Created ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+			'dateFormatted'         => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
+			'name'                  => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+			'sizes'                 => $image_sizes,
 			'status'                => 'inherit',
 			'title'                 => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 			'url'                   => ( $full_size_url ? $full_size_url['source_url'] : $media->ListThumbUrl ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
