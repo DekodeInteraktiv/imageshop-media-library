@@ -244,7 +244,8 @@ class Search {
 			$original_media->Height = $dimensions['height']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` is provided by the SaaS API.
 		}
 
-		$image_sizes = array();
+		$full_size_url = null;
+		$image_sizes   = array();
 
 		if ( $media_file_type && \stristr( $media_file_type, 'image' ) ) {
 
@@ -253,7 +254,7 @@ class Search {
 			// Fallback to generating a custom permalink if no original can be made by Imageshop.
 			if ( ! is_string( $full_size_url ) ) {
 				$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
-				$full_size_url = $full_size_url['url'];
+				$full_size_url = $full_size_url['source_url'];
 			}
 
 			$image_sizes = array(
@@ -288,7 +289,7 @@ class Search {
 			'sizes'                 => $image_sizes,
 			'status'                => 'inherit',
 			'title'                 => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
-			'url'                   => ( $full_size_url ? $full_size_url : $media->ListThumbUrl ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
+			'url'                   => ( null !== $full_size_url ? $full_size_url : '' ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
 			'menuOrder'             => 0,
 			'alt'                   => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 			'description'           => $media->Description, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
