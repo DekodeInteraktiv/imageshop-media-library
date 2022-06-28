@@ -194,9 +194,9 @@ class Meta {
 	}
 
 	private function validate_file( $post_id ) {
-		$imageshop = Attachment::get_instance();
+		$imageshop     = Attachment::get_instance();
 		$imageshop_api = REST_Controller::get_instance();
-		$imageshop_id = get_post_meta( $post_id, '_imageshop_document_id', true );
+		$imageshop_id  = get_post_meta( $post_id, '_imageshop_document_id', true );
 
 		if ( empty( $imageshop_id ) ) {
 			if ( $this->verbose ) {
@@ -207,7 +207,7 @@ class Meta {
 		} else {
 			$validate = $imageshop_api->get_document( $imageshop_id );
 
-			if ( empty( $validate ) || ! isset( $validate->SubDocumentList ) ) {
+			if ( empty( $validate ) || ! isset( $validate->SubDocumentList ) ) { // / phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$validate->SubDocumentList` are provided by the SaaS API.
 				if ( $this->verbose ) {
 					\WP_CLI::log( sprintf( 'No valid media reference returned from Imageshop under attachment ID %d, regenerating...', $imageshop_id ) );
 				}

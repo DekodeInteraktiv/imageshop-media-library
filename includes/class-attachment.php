@@ -294,7 +294,7 @@ class Attachment {
 		$media = $this->get_document( $post->_imageshop_document_id );
 
 		// If no valid media object is returned for any reason, bail early.
-		if ( empty( $media ) || ! isset( $media->SubDocumentList ) ) {
+		if ( empty( $media ) || ! isset( $media->SubDocumentList ) ) { // / phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` are provided by the SaaS API.
 			return $media_details;
 		}
 
@@ -389,13 +389,15 @@ class Attachment {
 	}
 
 	public function save_local_permalink_for_size( $document_id, $size_key, $filename, $url, $width, $height, $crop = false ) {
-		$attachment = get_posts( array(
-			'post_type'   => 'attachment',
-			'post_status' => 'inherit',
-			'meta_key'    => '_imageshop_document_id',
-			'meta_value'  => $document_id,
-			'numberposts' => 1,
-		) );
+		$attachment = get_posts(
+			array(
+				'post_type'   => 'attachment',
+				'post_status' => 'inherit',
+				'meta_key'    => '_imageshop_document_id',
+				'meta_value'  => $document_id,
+				'numberposts' => 1,
+			)
+		);
 
 		if ( ! $attachment ) {
 			return null;
@@ -425,13 +427,15 @@ class Attachment {
 	}
 
 	public function get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
-		$attachment = get_posts( array(
-			'post_type'   => 'attachment',
-			'post_status' => 'inherit',
-			'meta_key'    => '_imageshop_document_id',
-			'meta_value'  => $document_id,
-			'numberposts' => 1,
-		) );
+		$attachment = get_posts(
+			array(
+				'post_type'   => 'attachment',
+				'post_status' => 'inherit',
+				'meta_key'    => '_imageshop_document_id',
+				'meta_value'  => $document_id,
+				'numberposts' => 1,
+			)
+		);
 
 		if ( ! $attachment ) {
 			return null;
@@ -560,7 +564,7 @@ class Attachment {
 			$height
 		);
 
-		$this->save_local_permalink_for_size( $media->DocumentID, $size_key, $filename, $url, $width, $height, $crop );
+		$this->save_local_permalink_for_size( $media->DocumentID, $size_key, $filename, $url, $width, $height, $crop ); // / phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `media->DocumentID` are provided by the SaaS API.
 
 		return array(
 			'height'     => $height,
