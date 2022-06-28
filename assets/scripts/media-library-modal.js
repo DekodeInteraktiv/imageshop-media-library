@@ -79,7 +79,7 @@
 				text:  '10 results per page',
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
-					posts_per_page: 10
+					posts_per_page: 25
 				},
 				priority: 10
 			};
