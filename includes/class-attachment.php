@@ -386,7 +386,92 @@ class Attachment {
 		);
 	}
 
+	public function save_local_permalink_for_size( $document_id, $size_key, $filename, $url, $width, $height, $crop = false ) {
+		$attachment = get_posts( array(
+			'post_type'   => 'attachment',
+			'post_status' => 'inherit',
+			'meta_key'    => '_imageshop_document_id',
+			'meta_value'  => $document_id,
+			'numberposts' => 1,
+		) );
+
+		if ( ! $attachment ) {
+			return null;
+		}
+
+		if ( is_array( $attachment ) ) {
+			$attachment = $attachment[0];
+		}
+
+		$image_sizes = get_post_meta( $attachment->ID, '_imageshop_permalinks', true );
+
+		if ( empty( $image_sizes ) ) {
+			$image_sizes = array();
+		}
+		if ( ! is_array( $image_sizes ) ) {
+			$image_sizes = (array) $image_sizes;
+		}
+
+		$image_sizes[ $size_key ] = array(
+			'height'     => $height,
+			'width'      => $width,
+			'source_url' => $url,
+			'file'       => $filename,
+		);
+
+		update_post_meta( $attachment->ID, '_imageshop_permalinks', $image_sizes );
+	}
+
+	public function get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
+		$attachment = get_posts( array(
+			'post_type'   => 'attachment',
+			'post_status' => 'inherit',
+			'meta_key'    => '_imageshop_document_id',
+			'meta_value'  => $document_id,
+			'numberposts' => 1,
+		) );
+
+		if ( ! $attachment ) {
+			return null;
+		}
+
+		if ( is_array( $attachment ) ) {
+			$attachment = $attachment[0];
+		}
+
+		$size_key = $this->get_permalink_size_key( $filename, $width, $height, $crop );
+
+		$image_sizes = get_post_meta( $attachment->ID, '_imageshop_permalinks', true );
+
+		if ( ! isset( $image_sizes[ $size_key ] ) ) {
+			return null;
+		}
+
+		return $image_sizes[ $size_key ];
+	}
+
+	public function get_permalink_size_key( $filename, $width, $height, $crop ) {
+		return sprintf(
+			'%s-%s',
+			$filename,
+			sprintf(
+				'%s-%s-%s',
+				$width,
+				$height,
+				$crop ? '1' : '0'
+			)
+		);
+	}
+
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
+		// Check for a local copy of the permalink first.
+		$local_sizes = $this->get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop );
+		if ( null !== $local_sizes ) {
+			return $local_sizes;
+		}
+
+		$size_key = $this->get_permalink_size_key( $filename, $width, $height, $crop );
+
 		$imageshop = REST_Controller::get_instance();
 
 		$media = $imageshop->get_document( $document_id );
@@ -462,6 +547,8 @@ class Attachment {
 			$width,
 			$height
 		);
+
+		$this->save_local_permalink_for_size( $media->DocumentID, $size_key, $filename, $url, $width, $height, $crop );
 
 		return array(
 			'height'     => $height,
