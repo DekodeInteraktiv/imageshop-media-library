@@ -13,6 +13,8 @@ namespace Imageshop\WordPress;
 class Attachment {
 	private static $instance;
 
+	private $documents = array();
+
 	/**
 	 * Class constructor.
 	 */
@@ -289,7 +291,7 @@ class Attachment {
 
 		$image_sizes = Attachment::get_wp_image_sizes();
 
-		$media = $imageshop->get_document( $post->_imageshop_document_id );
+		$media = $this->get_document( $post->_imageshop_document_id );
 
 		// If no valid media object is returned for any reason, bail early.
 		if ( empty( $media ) || ! isset( $media->SubDocumentList ) ) {
@@ -463,6 +465,16 @@ class Attachment {
 		);
 	}
 
+	public function get_document( $document_id ) {
+		if ( ! isset( $this->documents[ $document_id ] ) ) {
+			$imageshop = REST_Controller::get_instance();
+
+			$this->documents[ $document_id ] = $imageshop->get_document( $document_id );
+		}
+
+		return $this->documents[ $document_id ];
+	}
+
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
 		// Check for a local copy of the permalink first.
 		$local_sizes = $this->get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop );
@@ -474,7 +486,7 @@ class Attachment {
 
 		$imageshop = REST_Controller::get_instance();
 
-		$media = $imageshop->get_document( $document_id );
+		$media = $this->get_document( $document_id );
 
 		$original_image = array();
 		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
