@@ -245,10 +245,9 @@ class Search {
 
 		$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
 		$medium_url    = $this->attachment->get_permalink_for_size_slug( $media->DocumentID, $media->FileName, 'medium' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
-		$thumb_url     = $this->attachment->get_permalink_for_size_slug( $media->DocumentID, $media->FileName, 'thumbnail' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
+		$thumb_url     = $media->DetailThumbUrl; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` and `$media->FileName` are provided by the SaaS API.
 
 		$medium_dimension = $this->attachment->get_image_dimensions( 'medium' );
-		$thumb_dimension  = $this->attachment->get_image_dimensions( 'thumbnail' );
 
 		return (object) array(
 			'filename'              => $media->FileName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
@@ -271,10 +270,7 @@ class Search {
 					'orientation' => $medium_dimension['orientation'],
 				),
 				'thumbnail' => array(
-					'url'         => $thumb_url['source_url'],
-					'width'       => $thumb_dimension['width'],
-					'height'      => $thumb_dimension['height'],
-					'orientation' => $thumb_dimension['orientation'],
+					'url' => $thumb_url,
 				),
 			),
 			'status'                => 'inherit',
