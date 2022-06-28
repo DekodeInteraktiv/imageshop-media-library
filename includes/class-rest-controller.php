@@ -11,18 +11,19 @@ namespace Imageshop\WordPress;
  * Class REST_Controller
  */
 class REST_Controller {
-	private const IMAGESHOP_API_BASE_URL          = 'https://api.imageshop.no';
-	private const IMAGESHOP_API_CAN_UPLOAD        = '/Login/CanUpload';
-	private const IMAGESHOP_API_WHOAMI            = '/Login/WhoAmI';
-	private const IMAGESHOP_API_CREATE_DOCUMENT   = '/Document/CreateDocument';
-	private const IMAGESHOP_API_GET_DOCUMENT      = '/Document/GetDocumentById';
-	private const IMAGESHOP_API_DOWNLOAD          = '/Download';
-	private const IMAGESHOP_API_GET_PERMALINK     = '/Permalink/GetPermalink';
-	private const IMAGESHOP_API_GET_INTERFACE     = '/Interface/GetInterfaces';
-	private const IMAGESHOP_API_GET_SEARCH        = '/Search2';
-	private const IMAGESHOP_API_GET_CATEGORIES    = '/Category/GetCategoriesTree';
-	private const IMAGESHOP_API_GET_DOCUMENT_LINK = '/Document/GetDocumentLink';
-	private const IMAGESHOP_API_DELETE_DOCUMENT   = '/Document/DeleteDocument';
+	private const IMAGESHOP_API_BASE_URL               = 'https://api.imageshop.no';
+	private const IMAGESHOP_API_CAN_UPLOAD             = '/Login/CanUpload';
+	private const IMAGESHOP_API_WHOAMI                 = '/Login/WhoAmI';
+	private const IMAGESHOP_API_CREATE_DOCUMENT        = '/Document/CreateDocument';
+	private const IMAGESHOP_API_GET_DOCUMENT           = '/Document/GetDocumentById';
+	private const IMAGESHOP_API_DOWNLOAD               = '/Download';
+	private const IMAGESHOP_API_GET_PERMALINK          = '/Permalink/GetPermalink';
+	private const IMAGESHOP_API_GET_ORIGINAL_PERMALINK = '/Permalink/CreatePermalinkFromOriginal';
+	private const IMAGESHOP_API_GET_INTERFACE          = '/Interface/GetInterfaces';
+	private const IMAGESHOP_API_GET_SEARCH             = '/Search2';
+	private const IMAGESHOP_API_GET_CATEGORIES         = '/Category/GetCategoriesTree';
+	private const IMAGESHOP_API_GET_DOCUMENT_LINK      = '/Document/GetDocumentLink';
+	private const IMAGESHOP_API_DELETE_DOCUMENT        = '/Document/DeleteDocument';
 
 	/**
 	 * @var REST_Controller
@@ -225,6 +226,42 @@ class REST_Controller {
 		}
 
 		return $ret->permalinktoken;
+	}
+
+	/**
+	 * Return a permalink to the original image.
+	 *
+	 * @param int $document_id Imageshop Document ID.
+	 *
+	 * @return string
+	 */
+	public function get_original_permalink( $document_id ) {
+		$url = \add_query_arg(
+			array(
+				'language'   => 'no',
+				'documentId' => $document_id,
+			),
+			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_ORIGINAL_PERMALINK
+		);
+
+		$payload_hash = \md5( \wp_json_encode( $url ) );
+
+		$ret = \get_transient( 'imageshop_original_permalink_' . $payload_hash );
+
+		if ( false === $ret ) {
+			$args = array(
+				'method'  => 'GET',
+				'headers' => $this->get_headers(),
+			);
+
+			$ret = $this->execute_request( $url, $args );
+
+			if ( ! empty( $ret ) ) {
+				\set_transient( 'imageshop_original_permalink_' . $payload_hash, $ret );
+			}
+		}
+
+		return $ret;
 	}
 
 	/**
