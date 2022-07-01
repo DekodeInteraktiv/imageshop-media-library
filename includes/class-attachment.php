@@ -103,9 +103,7 @@ class Attachment {
 				'crop'   => $size_data[ $size ]['crop'],
 			);
 		}
-		if ( isset( $image_sizes['post-thumbnail'] ) ) {
-			unset( $image_sizes['post-thumbnail'] );
-		}
+
 		return $image_sizes;
 	}
 
