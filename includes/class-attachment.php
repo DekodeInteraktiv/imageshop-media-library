@@ -43,6 +43,11 @@ class Attachment {
 			$media_details = \get_post_meta( $attachment->ID, '_imageshop_media_sizes', true );
 			$document_id   = \get_post_meta( $attachment->ID, '_imageshop_document_id', true );
 
+			// If this isn't an Imageshop item, break out early.
+			if ( empty( $document_id ) ) {
+				return $attr;
+			}
+
 			if ( isset( $media_details['sizes'][ $size ] ) ) {
 				$size_array = array(
 					$media_details['sizes'][ $size ]['width'],
