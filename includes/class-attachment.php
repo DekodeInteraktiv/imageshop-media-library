@@ -25,7 +25,73 @@ class Attachment {
 			\add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
 			\add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
 			\add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
+			\add_filter( 'wp_get_attachment_image_attributes', array( $this, 'validate_srcset' ), 10, 3 );
 		}
+	}
+
+	/**
+	 * Validate that images being output have been given the appropriate srcset data when possible.
+	 *
+	 * @param array    $attr       An array of all attributes for this attachment item.
+	 * @param \WP_Post $attachment The attachment post object.
+	 * @param string   $size       The chosen size for the attachment.
+	 *
+	 * @return array
+	 */
+	public function validate_srcset( $attr, $attachment, $size ) {
+		if ( ! isset( $attr['srcset'] ) ) {
+			$media_details = \get_post_meta( $attachment->ID, '_imageshop_media_sizes', true );
+			$document_id   = \get_post_meta( $attachment->ID, '_imageshop_document_id', true );
+
+			if ( isset( $media_details['sizes'][ $size ] ) ) {
+				$size_array = array(
+					$media_details['sizes'][ $size ]['width'],
+					$media_details['sizes'][ $size ]['height'],
+				);
+			} else {
+				$size_array = array(
+					$media_details['sizes']['original']['width'],
+					$media_details['sizes']['original']['height'],
+				);
+			}
+
+			$max_srcset_image_width = apply_filters( 'max_srcset_image_width', 2048, $size_array );
+			$widest = 0;
+
+			$srcset_entries = array();
+
+			foreach ( $media_details['sizes'] as $size => $data ) {
+				if ( $data['width'] > $max_srcset_image_width ) {
+					continue;
+				}
+
+				if ( empty( $data['source_url'] ) ) {
+					$new_source = $this->get_permalink_for_size( $document_id, $data['file'], $data['width'], $data['height'], false );
+					$data['source_url'] = $new_source['source_url'];
+				}
+
+				$srcset_entries[] = sprintf(
+					'%s %dw',
+					$data['source_url'],
+					$data['width']
+				);
+
+				if ( $data['width'] > $widest ) {
+					$widest = $data['width'];
+				}
+			}
+
+			$attr['srcset'] = implode( ', ', $srcset_entries );
+
+			if ( ! isset( $attr['sizes'] ) || empty( $attr['sizes'] ) ) {
+				$attr['sizes'] = sprintf(
+					'(max-width: %1$dpx) 100vw, %1$dpx',
+					$widest
+				);
+			}
+		}
+
+		return $attr;
 	}
 
 	/**
