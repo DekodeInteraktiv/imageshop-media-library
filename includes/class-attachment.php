@@ -255,6 +255,12 @@ class Attachment {
 			return false;
 		}
 
+		// If, for whatever reason, the original image is missing, get a permalink for the original as a fallback.
+		if ( empty( $data['source_url'] ) ) {
+			$new_source = $this->get_permalink_for_size( $document_id, $media_details['sizes']['original']['file'], $media_details['sizes']['original']['width'], $media_details['sizes']['original']['height'], false );
+			$data['source_url'] = $new_source['source_url'];
+		}
+
 		return \array_merge(
 			array(
 				0 => $data['source_url'],
