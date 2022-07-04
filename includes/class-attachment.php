@@ -191,6 +191,11 @@ class Attachment {
 		$media_details = \get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
 		$document_id   = \get_post_meta( $attachment_id, '_imageshop_document_id', true );
 
+		// Don't override if there is no Imageshop ID association.
+		if ( ! $document_id ) {
+			return $image;
+		}
+
 		if ( empty( $media_details ) && $document_id ) {
 			$att           = Attachment::get_instance();
 			$media_details = $att->generate_imageshop_metadata( \get_post( $attachment_id ) );
@@ -685,7 +690,13 @@ class Attachment {
 	 * @return string
 	 */
 	public function attachment_url( $url, $post_id ) {
-		$media_meta = get_post_meta( $post_id, '_imageshop_media_sizes', true );
+		$media_meta  = \get_post_meta( $post_id, '_imageshop_media_sizes', true );
+		$document_id = \get_post_meta( $post_id, '_imageshop_document_id', true );
+
+		// Don't override if there is no Imageshop ID assocaition.
+		if ( ! $document_id ) {
+			return $url;
+		}
 
 		if ( ! isset( $media_meta['sizes']['original'] ) ) {
 			return $url;
