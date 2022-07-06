@@ -75,6 +75,11 @@ class Attachment {
 					$data['source_url'] = $new_source['source_url'];
 				}
 
+				// If the source URL is still not found, then Imageshop was unable to create the file, and we should skip it.
+				if ( empty( $data['source_url'] ) ) {
+					continue;
+				}
+
 				$srcset_entries[] = sprintf(
 					'%s %dw',
 					$data['source_url'],
