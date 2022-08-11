@@ -1,5 +1,5 @@
 {
-	"name": "dekode/imageshop",
+	"name": "imageshop/imageshop",
 	"description": "Use the Imageshop media library as your companys one source for all media.",
 	"type": "wordpress-plugin",
 	"config": {
