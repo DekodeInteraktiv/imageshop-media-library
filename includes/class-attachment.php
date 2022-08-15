@@ -353,6 +353,18 @@ class Attachment {
 			);
 		}
 
+		// Make a HEAD request to validate the resource first.
+		$response = \wp_remote_head( $url );
+		$content_type = \wp_remote_retrieve_header( $response, 'content-type' );
+
+		// Validate file types before remotely fetching dimensions.
+		if ( empty( $content_type ) || ! stristr( $content_type, 'image' ) ) {
+			return array(
+				'width'  => 0,
+				'height' => 0,
+			);
+		}
+
 		$sizes = \getimagesize( $url );
 
 		return array(
