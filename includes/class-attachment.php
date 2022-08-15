@@ -61,7 +61,7 @@ class Attachment {
 			}
 
 			$max_srcset_image_width = apply_filters( 'max_srcset_image_width', 2048, $size_array );
-			$widest = 0;
+			$widest                 = 0;
 
 			$srcset_entries = array();
 
@@ -71,7 +71,7 @@ class Attachment {
 				}
 
 				if ( empty( $data['source_url'] ) ) {
-					$new_source = $this->get_permalink_for_size( $document_id, $data['file'], $data['width'], $data['height'], false );
+					$new_source         = $this->get_permalink_for_size( $document_id, $data['file'], $data['width'], $data['height'], false );
 					$data['source_url'] = $new_source['source_url'];
 				}
 
@@ -272,7 +272,7 @@ class Attachment {
 
 		// If, for whatever reason, the original image is missing, get a permalink for the original as a fallback.
 		if ( empty( $data['source_url'] ) ) {
-			$new_source = $this->get_permalink_for_size( $document_id, $media_details['sizes']['original']['file'], $media_details['sizes']['original']['width'], $media_details['sizes']['original']['height'], false );
+			$new_source         = $this->get_permalink_for_size( $document_id, $media_details['sizes']['original']['file'], $media_details['sizes']['original']['width'], $media_details['sizes']['original']['height'], false );
 			$data['source_url'] = $new_source['source_url'];
 		}
 
@@ -354,7 +354,7 @@ class Attachment {
 		}
 
 		// Make a HEAD request to validate the resource first.
-		$response = \wp_remote_head( $url );
+		$response     = \wp_remote_head( $url );
 		$content_type = \wp_remote_retrieve_header( $response, 'content-type' );
 
 		// Validate file types before remotely fetching dimensions.
