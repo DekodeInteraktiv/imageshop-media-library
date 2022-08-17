@@ -118,6 +118,49 @@ class Attachment {
 	}
 
 	/**
+	 * Create a unique permalink token for this attachment
+	 *
+	 * @param int $attachment_id The WordPress attachment ID for the image.
+	 *
+	 * @return string
+	 */
+	public function get_attachment_permalink_token_base( $attachment_id ) {
+		$token = \get_post_meta( $attachment_id, '_imageshop_permalink_token', true );
+
+		if ( empty( $token ) ) {
+			$domain = \get_site_url();
+
+			// Strip off domain prefixes.
+			$domain = str_ireplace( array( 'http://', 'https://', 'www.' ), '', $domain );
+
+			// Remove TLD, we only care about the domain name.
+			$domain = explode( '.', $domain, 2 );
+			$domain = $domain[0];
+
+			// In the case of internal links (or testing), strip port numbers as well.
+			$domain = explode( ':', $domain, 2 );
+			$domain = $domain[0];
+
+			$token = sprintf(
+				'%s-%d-%s',
+				$domain,
+				$attachment_id,
+				md5(
+					sprintf(
+						'%s-%s',
+						date( \get_the_date( 'Y-m-d H:i:s', $attachment_id ) ),
+						\get_the_title( $attachment_id )
+					)
+				)
+			);
+
+			\update_post_meta( $attachment_id, '_imageshop_permalink_token', $token );
+		}
+
+		return $token;
+	}
+
+	/**
 	 * Export an attachment to Imageshop.
 	 *
 	 * @param int  $post_id The attachment ID to export to Imageshop.
@@ -381,7 +424,6 @@ class Attachment {
 	 * @return array|array[]
 	 */
 	public function generate_imageshop_metadata( $post ) {
-		$imageshop     = REST_Controller::get_instance();
 		$media_details = array(
 			'sizes' => array(),
 		);
@@ -436,7 +478,7 @@ class Attachment {
 		}
 
 		if ( ! isset( $media_details['size']['original'] ) ) {
-			$url = $imageshop->get_permalink(
+			$url = $this->preloaded_url(
 				$media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
 				$original_image->Width, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` is defined by the SaaS API.
 				$original_image->Height // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Height` is defined by the SaaS API.
@@ -585,8 +627,6 @@ class Attachment {
 
 		$size_key = $this->get_permalink_size_key( $filename, $width, $height, $crop );
 
-		$imageshop = REST_Controller::get_instance();
-
 		$media = $this->get_document( $document_id );
 
 		$original_image = array();
@@ -655,8 +695,8 @@ class Attachment {
 			}
 		}
 
-		$url = $imageshop->get_permalink(
-			$media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+		$url = $this->preloaded_url(
+			$media,
 			$width,
 			$height
 		);
@@ -669,6 +709,39 @@ class Attachment {
 			'source_url' => $url,
 			'file'       => $filename,
 		);
+	}
+
+	public function preloaded_url( $media, $width, $height ) {
+		$imageshop = REST_Controller::get_instance();
+
+		$attachment = \get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'meta_key'       => '_imageshop_document_id',
+				'meta_value'     => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+				'posts_per_page' => 1,
+			)
+		);
+
+		if ( is_array( $attachment ) ) {
+			$attachment = $attachment[0];
+		}
+
+		\wp_schedule_single_event( ( time() - 5 ), 'imageshop_cron_create_permalink', array( $attachment->ID, $width, $height ) );
+
+		return sprintf(
+			'%s/%s',
+			\untrailingslashit( $imageshop->create_permalinks_url( $media->DocumentID, $width, $height, $this->get_attachment_permalink_token_base( $attachment->ID ) ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+			urlencode( $this->get_attachment_filename( $attachment->ID ) )
+		);
+	}
+
+	private function get_attachment_filename( $attach_id ) {
+		$filename = \get_post_meta( $attach_id, '_wp_attached_file', true );
+		$filename = basename( $filename );
+
+		return $filename;
 	}
 
 	/**

@@ -67,6 +67,15 @@ class Search {
 
 		$response->data['media_details'] = $media_details;
 
+		/*
+		 * Trigger WP_Cron.
+		 *
+		 * Any new image sizes that may be needed should have been scheduled at this point
+		 * so instructing WordPress to run the cron system should generate image sizes in
+		 * the most timely manner for the editorial needs.
+		 */
+		\spawn_cron();
+
 		return $response;
 	}
 
@@ -146,6 +155,15 @@ class Search {
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 			$media[] = $this->imageshop_pseudo_post( $result, $search_attributes['InterfaceIds'][0] );
 		}
+
+		/*
+		 * Trigger WP_Cron.
+		 *
+		 * Any new image sizes that may be needed should have been scheduled at this point
+		 * so instructing WordPress to run the cron system should generate image sizes in
+		 * the most timely manner for the editorial needs.
+		 */
+		\spawn_cron();
 
 		\wp_send_json_success( $media );
 

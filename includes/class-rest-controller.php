@@ -18,12 +18,14 @@ class REST_Controller {
 	private const IMAGESHOP_API_GET_DOCUMENT           = '/Document/GetDocumentById';
 	private const IMAGESHOP_API_DOWNLOAD               = '/Download';
 	private const IMAGESHOP_API_GET_PERMALINK          = '/Permalink/GetPermalink';
+	private const IMAGESHOP_API_CREATE_PERMALINK       = '/Permalink/CreatePermaLink2';
 	private const IMAGESHOP_API_GET_ORIGINAL_PERMALINK = '/Permalink/CreatePermalinkFromOriginal';
 	private const IMAGESHOP_API_GET_INTERFACE          = '/Interface/GetInterfaces';
 	private const IMAGESHOP_API_GET_SEARCH             = '/Search2';
 	private const IMAGESHOP_API_GET_CATEGORIES         = '/Category/GetCategoriesTree';
 	private const IMAGESHOP_API_GET_DOCUMENT_LINK      = '/Document/GetDocumentLink';
 	private const IMAGESHOP_API_DELETE_DOCUMENT        = '/Document/DeleteDocument';
+	private const IMAGESHOP_API_GET_PERMALINK_URL      = '/Permalink/CreatePermaLinks';
 
 	/**
 	 * @var REST_Controller
@@ -186,15 +188,16 @@ class REST_Controller {
 	}
 
 	/**
-	 * Get the permalink for an image on the Imageshop CDN.
+	 * Get the permalink token for an image on the Imageshop CDN.
 	 *
-	 * @param int $document_id The Imageshop document ID.
-	 * @param int $width       The width of the image.
-	 * @param int $height      The height of the image.
+	 * @param int    $document_id     The Imageshop document ID.
+	 * @param int    $width           The width of the image.
+	 * @param int    $height          The height of the image.
+	 * @param string $permalink_token Optional. The token used for the permalink URL
 	 *
 	 * @return mixed
 	 */
-	public function get_permalink( $document_id, $width, $height ) {
+	public function get_permalink_token( $document_id, $width, $height, $permalink_token = null ) {
 		$payload = array(
 			'language'        => $this->language,
 			'documentid'      => $document_id,
@@ -209,6 +212,16 @@ class REST_Controller {
 			'previewheight'   => 100,
 			'optionalurlhint' => \site_url( '/' ),
 		);
+
+		// A permalink token may not always be supplied, so append it where needed.
+		if ( null !== $permalink_token ) {
+			$payload['permalinktoken'] = sprintf(
+				'%s-%dx%d',
+				$permalink_token,
+				$width,
+				$height
+			);
+		}
 
 		$payload_hash = \md5( \wp_json_encode( $payload ) );
 
@@ -226,6 +239,113 @@ class REST_Controller {
 		}
 
 		return $ret->permalinktoken;
+	}
+
+	/**
+	 * Get the permalink for an image on the Imageshop CDN.
+	 *
+	 * @param int    $document_id     The Imageshop document ID.
+	 * @param int    $width           The width of the image.
+	 * @param int    $height          The height of the image.
+	 * @param string $permalink_token Optional. The token used for the permalink URL
+	 *
+	 * @return mixed
+	 */
+	public function get_permalink( $document_id, $width, $height, $permalink_token = null ) {
+		$payload = array(
+			'language'        => $this->language,
+			'documentid'      => $document_id,
+			'cropmode'        => 'ZOOM',
+			'width'           => $width,
+			'height'          => $height,
+			'x1'              => 0,
+			'y1'              => 0,
+			'x2'              => 100,
+			'y2'              => 100,
+			'previewwidth'    => 100,
+			'previewheight'   => 100,
+			'optionalurlhint' => \site_url( '/' ),
+		);
+
+		// A permalink token may not always be supplied, so append it where needed.
+		if ( null !== $permalink_token ) {
+			$payload['permalinktoken'] = sprintf(
+				'%s-%dx%d',
+				$permalink_token,
+				$width,
+				$height
+			);
+		}
+
+		$payload_hash = \md5( \wp_json_encode( $payload ) );
+
+		$ret = \get_transient( 'imageshop_permalink_' . $payload_hash );
+
+		if ( false === $ret ) {
+			$args = array(
+				'method'  => 'POST',
+				'headers' => $this->get_headers(),
+				'body'    => \wp_json_encode( $payload ),
+			);
+			$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_CREATE_PERMALINK, $args );
+
+			\set_transient( 'imageshop_permalink_' . $payload_hash, $ret );
+		}
+
+		return $ret->url;
+	}
+
+	/**
+	 * Generate the link that will hold our image ahead of time.
+	 *
+	 * @param int    $document_id     The Imageshop document ID.
+	 * @param int    $width           The width of the image.
+	 * @param int    $height          The height of the image.
+	 * @param string $permalink_token The generated GUID for this permalink.
+	 *
+	 * @return string
+	 */
+	public function create_permalinks_url( $document_id, $width, $height, $permalink_token ) {
+		$payload = array(
+			array(
+				'language'        => $this->language,
+				'documentid'      => $document_id,
+				'width'           => $width,
+				'height'          => $height,
+				'x1'              => 0,
+				'y1'              => 0,
+				'x2'              => 100,
+				'y2'              => 100,
+				'previewwidth'    => 100,
+				'previewheight'   => 100,
+				'optionalurlhint' => \site_url( '/' ),
+				'permalinktoken'  => sprintf(
+					'%s-%dx%d',
+					$permalink_token,
+					$width,
+					$height
+				)
+			)
+		);
+
+		$args = array(
+			'method'  => 'POST',
+			'headers' => $this->get_headers(),
+			'body'    => \wp_json_encode( $payload ),
+		);
+		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK_URL, $args );
+
+		$return_url = $ret[0]->url;
+
+		if ( ! strstr( $return_url, $permalink_token ) ) {
+			$return_url = sprintf(
+				'%s/%s',
+				\untrailingslashit( $return_url ),
+				$permalink_token
+			);
+		}
+
+		return $return_url;
 	}
 
 	/**
