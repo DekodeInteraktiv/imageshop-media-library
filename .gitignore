@@ -7,3 +7,5 @@
 
 # Allow local environment overrides.
 .wp-env.override.json
+
+imageshop.zip
