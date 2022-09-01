@@ -25,12 +25,72 @@ class Attachment {
 			\add_action( 'add_attachment', array( $this, 'export_to_imageshop' ), 10, 1 );
 			\add_filter( 'wp_generate_attachment_metadata', array( $this, 'filter_wp_generate_attachment_metadata' ), 20, 2 );
 			\add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
-			\add_filter( 'wp_get_attachment_image_attributes', array( $this, 'validate_srcset' ), 10, 3 );
+			\add_filter( 'wp_get_attachment_image_attributes', array( $this, 'validate_post_thumbnail_srcset' ), 10, 3 );
+			\add_filter( 'wp_content_img_tag', array( $this, 'validate_post_content_image_srcset' ), 10, 3 );
 		}
 	}
 
 	/**
-	 * Validate that images being output have been given the appropriate srcset data when possible.
+	 * Validate that post-content images being output have been given the appropriate srcset data when possible.
+	 *
+	 * @param string $filtered_image The HTML markup for the `img` tag.
+	 * @param string $context        The context where the filter was triggered from.
+	 * @param int    $attachment_id  Attachment post ID.
+	 *
+	 * @return string The HTML markup with `srcset` and `sizes` attributes added if applicable.
+	 */
+	public function validate_post_content_image_srcset( $filtered_image, $context, $attachment_id ) {
+		$dimensions = array();
+
+		// Extract the image size slug.
+		preg_match( '/class=".+?size-(\S*)/si', $filtered_image, $size_slug );
+		$size_slug = ( isset( $size_slug[1] ) ? $size_slug[1] : 'full' );
+
+		// Generate a fallback max width for images with no size defined.
+		preg_match( '/src=".+?-([0-9]+?)x([0-9]+?)\/?"/si', $filtered_image, $src_dimensions );
+		if ( 3 === count( $src_dimensions ) ) {
+			$dimensions = array(
+				'width'  => $src_dimensions[1],
+				'height' => $src_dimensions[2],
+			);
+		}
+
+		$srcset_meta = $this->generate_attachment_srcset( $attachment_id, $size_slug );
+
+		if ( ! empty( $dimensions ) && $srcset_meta['widest'] > $dimensions['width'] ) {
+			$srcset_meta['widest'] = $dimensions['width'];
+		}
+
+		if ( ! stristr( $filtered_image, 'srcset=' ) ) {
+			$filtered_image = str_replace(
+				'src=',
+				sprintf(
+					'srcset="%s" src=',
+					implode( ', ', $srcset_meta['entries'] )
+				),
+				$filtered_image
+			);
+		}
+
+		if ( ! stristr( $filtered_image, 'sizes=' ) ) {
+			$filtered_image = str_replace(
+				'src=',
+				sprintf(
+					'sizes="%s" src=',
+					sprintf(
+						'(max-width: %1$dpx) 100vw, %1$dpx',
+						$srcset_meta['widest']
+					)
+				),
+				$filtered_image
+			);
+		}
+
+		return $filtered_image;
+	}
+
+	/**
+	 * Validate that featured images being output have been given the appropriate srcset data when possible.
 	 *
 	 * @param array    $attr       An array of all attributes for this attachment item.
 	 * @param \WP_Post $attachment The attachment post object.
@@ -38,70 +98,89 @@ class Attachment {
 	 *
 	 * @return array
 	 */
-	public function validate_srcset( $attr, $attachment, $size ) {
+	public function validate_post_thumbnail_srcset( $attr, $attachment, $size ) {
 		if ( ! isset( $attr['srcset'] ) ) {
-			$media_details = \get_post_meta( $attachment->ID, '_imageshop_media_sizes', true );
-			$document_id   = \get_post_meta( $attachment->ID, '_imageshop_document_id', true );
+			$srcset_meta = $this->generate_attachment_srcset( $attachment->ID, $size );
 
-			// If this isn't an Imageshop item, break out early.
-			if ( empty( $document_id ) ) {
-				return $attr;
-			}
+			if ( ! empty( $srcset_meta ) ) {
+				$attr['srcset'] = implode( ', ', $srcset_meta['entries'] );
 
-			if ( isset( $media_details['sizes'][ $size ] ) ) {
-				$size_array = array(
-					$media_details['sizes'][ $size ]['width'],
-					$media_details['sizes'][ $size ]['height'],
-				);
-			} else {
-				$size_array = array(
-					$media_details['sizes']['original']['width'],
-					$media_details['sizes']['original']['height'],
-				);
-			}
-
-			$max_srcset_image_width = apply_filters( 'max_srcset_image_width', 2048, $size_array );
-			$widest                 = 0;
-
-			$srcset_entries = array();
-
-			foreach ( $media_details['sizes'] as $size => $data ) {
-				if ( $data['width'] > $max_srcset_image_width ) {
-					continue;
+				if ( ! isset( $attr['sizes'] ) || empty( $attr['sizes'] ) ) {
+					$attr['sizes'] = sprintf(
+						'(max-width: %1$dpx) 100vw, %1$dpx',
+						$srcset_meta['widest']
+					);
 				}
-
-				if ( empty( $data['source_url'] ) ) {
-					$new_source         = $this->get_permalink_for_size( $document_id, $data['file'], $data['width'], $data['height'], false );
-					$data['source_url'] = $new_source['source_url'];
-				}
-
-				// If the source URL is still not found, then Imageshop was unable to create the file, and we should skip it.
-				if ( empty( $data['source_url'] ) ) {
-					continue;
-				}
-
-				$srcset_entries[] = sprintf(
-					'%s %dw',
-					$data['source_url'],
-					$data['width']
-				);
-
-				if ( $data['width'] > $widest ) {
-					$widest = $data['width'];
-				}
-			}
-
-			$attr['srcset'] = implode( ', ', $srcset_entries );
-
-			if ( ! isset( $attr['sizes'] ) || empty( $attr['sizes'] ) ) {
-				$attr['sizes'] = sprintf(
-					'(max-width: %1$dpx) 100vw, %1$dpx',
-					$widest
-				);
 			}
 		}
 
 		return $attr;
+	}
+
+	/**
+	 * Generate the `srcset` and related attribute data for an `img` tag.
+	 *
+	 * @param int    $attachment_id Attachment post ID.
+	 * @param string $size          The size slug for the size requested.
+	 *
+	 * @return array
+	 */
+	private function generate_attachment_srcset( $attachment_id, $size ) {
+		$srcset_meta = array(
+			'entries' => array(),
+			'widest'  => 0,
+		);
+
+		$media_details = \get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
+		$document_id   = \get_post_meta( $attachment_id, '_imageshop_document_id', true );
+
+		// If this isn't an Imageshop item, break out early.
+		if ( empty( $document_id ) ) {
+			return array();
+		}
+
+		if ( isset( $media_details['sizes'][ $size ] ) ) {
+			$size_array = array(
+				$media_details['sizes'][ $size ]['width'],
+				$media_details['sizes'][ $size ]['height'],
+			);
+		} else {
+			$size_array = array(
+				$media_details['sizes']['original']['width'],
+				$media_details['sizes']['original']['height'],
+			);
+		}
+
+		$max_srcset_image_width = apply_filters( 'max_srcset_image_width', 2048, $size_array );
+		$srcset_meta['widest']  = 0;
+
+		foreach ( $media_details['sizes'] as $size => $data ) {
+			if ( $data['width'] > $max_srcset_image_width ) {
+				continue;
+			}
+
+			if ( empty( $data['source_url'] ) ) {
+				$new_source         = $this->get_permalink_for_size( $document_id, $data['file'], $data['width'], $data['height'], false );
+				$data['source_url'] = $new_source['source_url'];
+			}
+
+			// If the source URL is still not found, then Imageshop was unable to create the file, and we should skip it.
+			if ( empty( $data['source_url'] ) ) {
+				continue;
+			}
+
+			$srcset_meta['entries'][] = sprintf(
+				'%s %dw',
+				$data['source_url'],
+				$data['width']
+			);
+
+			if ( $data['width'] > $srcset_meta['widest'] ) {
+				$srcset_meta['widest'] = $data['width'];
+			}
+		}
+
+		return $srcset_meta;
 	}
 
 	/**
