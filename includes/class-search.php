@@ -157,15 +157,6 @@ class Search {
 			$media[] = $this->imageshop_pseudo_post( $result, $search_attributes['InterfaceIds'][0] );
 		}
 
-		/*
-		 * Trigger WP_Cron.
-		 *
-		 * Any new image sizes that may be needed should have been scheduled at this point
-		 * so instructing WordPress to run the cron system should generate image sizes in
-		 * the most timely manner for the editorial needs.
-		 */
-		\spawn_cron();
-
 		\wp_send_json_success( $media );
 
 		\wp_die();
