@@ -64,9 +64,5 @@ if ( \class_exists( 'WP_CLI' ) ) {
 	require_once __DIR__ . '/includes/CLI/class-duplicates.php';
 }
 
-if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-	require_once __DIR__ . '/includes/Cron/class-create-permalink.php';
-}
-
 $isml = Imageshop::get_instance();
 $isml->start();

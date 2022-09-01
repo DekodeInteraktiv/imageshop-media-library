@@ -153,6 +153,7 @@ class Search {
 		\header( 'X-WP-TotalPages: ' . (int) ceil( ( $search_results->NumberOfDocuments / $search_attributes['Pagesize'] ) ) ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->NumberOfDocuments` and `$search_attributes['Pagesize']` are provided by the SaaS API.
 
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
+			$this->attachment->append_document( $result->DocumentID, $result ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$result->DocumentID` is provided by the SaaS API.
 			$media[] = $this->imageshop_pseudo_post( $result, $search_attributes['InterfaceIds'][0] );
 		}
 
@@ -267,13 +268,8 @@ class Search {
 
 		if ( $media_file_type && \stristr( $media_file_type, 'image' ) ) {
 
-			$full_size_url = $this->imageshop->get_original_permalink( $media->DocumentID ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` are provided by the SaaS API.
-
-			// Fallback to generating a custom permalink if no original can be made by Imageshop.
-			if ( ! is_string( $full_size_url ) ) {
-				$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
-				$full_size_url = $full_size_url['source_url'];
-			}
+			$full_size_url = $this->attachment->get_permalink_for_size( $media->DocumentID, $media->FileName, $original_media->Width, $original_media->Height, false ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID`, `$media->FileName`, `$original_media->Width`, and `$oreiginal_media->Height` are provided by the SaaS API.
+			$full_size_url = $full_size_url['source_url'];
 
 			$image_sizes = array(
 				'full' => array(

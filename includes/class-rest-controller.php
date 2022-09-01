@@ -12,6 +12,7 @@ namespace Imageshop\WordPress;
  */
 class REST_Controller {
 	private const IMAGESHOP_API_BASE_URL               = 'https://api.imageshop.no';
+	private const IMAGESHOP_CDN_PREFIX                 = '	https://v.imgi.no';
 	private const IMAGESHOP_API_CAN_UPLOAD             = '/Login/CanUpload';
 	private const IMAGESHOP_API_WHOAMI                 = '/Login/WhoAmI';
 	private const IMAGESHOP_API_CREATE_DOCUMENT        = '/Document/CreateDocument';
@@ -42,6 +43,11 @@ class REST_Controller {
 	 */
 	private string $language = 'en';
 
+	/**
+	 * @var array
+	 */
+	private $queued_permalinks = array();
+
 	public $interfaces;
 
 
@@ -58,6 +64,17 @@ class REST_Controller {
 		}
 
 		\add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+	}
+
+	/**
+	 * Class destructor.
+	 *
+	 * Runs bulk operations that have been collected to reduce network load.
+	 */
+	public function __destruct() {
+		if ( ! empty( $this->queued_permalinks ) ) {
+			$this->generate_permalinks_url( $this->queued_permalinks );
+		}
 	}
 
 	/**
@@ -296,6 +313,24 @@ class REST_Controller {
 	}
 
 	/**
+	 * Generate permalinks for the already prepared links from `self::create_peramlinks_url`.
+	 *
+	 * @param array $payloads An array of payloads to request asynchronous permalinks for at once.
+	 *
+	 * @return void
+	 */
+	public function generate_permalinks_url( $payloads ) {
+		$payload = $payloads;
+
+		$args = array(
+			'method'  => 'POST',
+			'headers' => $this->get_headers(),
+			'body'    => \wp_json_encode( $payload ),
+		);
+		$this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK_URL, $args );
+	}
+
+	/**
 	 * Generate the link that will hold our image ahead of time.
 	 *
 	 * @param int    $document_id     The Imageshop document ID.
@@ -306,46 +341,34 @@ class REST_Controller {
 	 * @return string
 	 */
 	public function create_permalinks_url( $document_id, $width, $height, $permalink_token ) {
-		$payload = array(
-			array(
-				'language'        => $this->language,
-				'documentid'      => $document_id,
-				'width'           => $width,
-				'height'          => $height,
-				'x1'              => 0,
-				'y1'              => 0,
-				'x2'              => 100,
-				'y2'              => 100,
-				'previewwidth'    => 100,
-				'previewheight'   => 100,
-				'optionalurlhint' => \site_url( '/' ),
-				'permalinktoken'  => sprintf(
-					'%s-%dx%d',
-					$permalink_token,
-					$width,
-					$height
-				)
-			)
+		$generated_uuid = sprintf(
+			'%s-%dx%d',
+			$permalink_token,
+			$width,
+			$height
 		);
 
-		$args = array(
-			'method'  => 'POST',
-			'headers' => $this->get_headers(),
-			'body'    => \wp_json_encode( $payload ),
+		$this->queued_permalinks[] = array(
+			'language'        => $this->language,
+			'documentid'      => $document_id,
+			'width'           => $width,
+			'height'          => $height,
+			'cropmode'        => 'ZOOM',
+			'x1'              => 0,
+			'y1'              => 0,
+			'x2'              => 100,
+			'y2'              => 100,
+			'previewwidth'    => 100,
+			'previewheight'   => 100,
+			'optionalurlhint' => \site_url( '/' ),
+			'permalinktoken'  => $generated_uuid,
 		);
-		$ret  = $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_PERMALINK_URL, $args );
 
-		$return_url = $ret[0]->url;
-
-		if ( ! strstr( $return_url, $permalink_token ) ) {
-			$return_url = sprintf(
-				'%s/%s',
-				\untrailingslashit( $return_url ),
-				$permalink_token
-			);
-		}
-
-		return $return_url;
+		return sprintf(
+			'%s/%s',
+			\untrailingslashit( self::IMAGESHOP_CDN_PREFIX ),
+			$generated_uuid
+		);
 	}
 
 	/**

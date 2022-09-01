@@ -148,7 +148,7 @@ class Attachment {
 				md5(
 					sprintf(
 						'%s-%s',
-						date( \get_the_date( 'Y-m-d H:i:s', $attachment_id ) ),
+						gmdate( \get_the_date( 'Y-m-d H:i:s', $attachment_id ) ),
 						\get_the_title( $attachment_id )
 					)
 				)
@@ -618,6 +618,10 @@ class Attachment {
 		return $this->documents[ $document_id ];
 	}
 
+	public function append_document( $document_id, $document_details ) {
+		$this->documents[ $document_id ] = $document_details;
+	}
+
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
 		// Check for a local copy of the permalink first.
 		$local_sizes = $this->get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop );
@@ -728,12 +732,12 @@ class Attachment {
 			$attachment = $attachment[0];
 		}
 
-		\wp_schedule_single_event( ( time() - 5 ), 'imageshop_cron_create_permalink', array( $attachment->ID, $width, $height ) );
-
-		return sprintf(
-			'%s/%s',
-			\untrailingslashit( $imageshop->create_permalinks_url( $media->DocumentID, $width, $height, $this->get_attachment_permalink_token_base( $attachment->ID ) ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
-			urlencode( $this->get_attachment_filename( $attachment->ID ) )
+		return trim(
+			sprintf(
+				'%s/%s',
+				\untrailingslashit( $imageshop->create_permalinks_url( $media->DocumentID, $width, $height, $this->get_attachment_permalink_token_base( $attachment->ID ) ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+				urlencode( $this->get_attachment_filename( $attachment->ID ) )
+			)
 		);
 	}
 
