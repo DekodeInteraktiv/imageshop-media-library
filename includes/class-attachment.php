@@ -57,6 +57,10 @@ class Attachment {
 
 		$srcset_meta = $this->generate_attachment_srcset( $attachment_id, $size_slug );
 
+		if ( empty( $srcset_meta ) ) {
+			return $filtered_image;
+		}
+
 		if ( ! empty( $dimensions ) && $srcset_meta['widest'] > $dimensions['width'] ) {
 			$srcset_meta['widest'] = $dimensions['width'];
 		}
