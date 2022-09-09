@@ -24,3 +24,7 @@ The plugin will let you add it to any multisite, but each individual site will n
 = What if I no longer wish to use Imageshop for my files? =
 
 If you at any point wish to stop using Imageshop for your files, you can export any files that have been used in content on your site to your local media library again, before deactivating the plugin.
+
+== Changelog ==
+
+* Bete release
