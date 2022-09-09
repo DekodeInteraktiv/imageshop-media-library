@@ -42,7 +42,7 @@ jobs:
               run: |
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "github-actions@github.com"
-                  git checkout -b "release/{{ inputs.version }}"
+                  git checkout -b "release/${{ inputs.version }}"
                   git add -f build/*
                   git rm -r .github/
                   git rm -r src/
@@ -51,8 +51,8 @@ jobs:
                   git rm package.json
                   git rm package-lock.json
                   git rm phpcs.xml.dist
-                  git commit -m "Release {{ inputs.version }}"
-                  git tag "v{{ inputs.version }}"
+                  git commit -m "Release ${{ inputs.version }}"
+                  git tag "${{ inputs.version }}"
                   git push --tags
 
             - name: Create GitHub release
