@@ -3,7 +3,7 @@
  * Plugin Name: Imageshop
  * Plugin URI:
  * Description: Use the Imageshop media library as your companys one source for all media.
- * Version: 0.0.4
+ * Version: 0.0.5
  * Author: Dekode
  * Author URI: https://dekode.no
  * License: MIT
