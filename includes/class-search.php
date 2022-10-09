@@ -118,12 +118,6 @@ class Search {
 			return;
 		}
 
-		// Querying for posts specifically attached ot a page does nothing, so do not process them.
-		if ( isset( $_POST['query']['post__in'] ) ) {
-			\wp_send_json_success( array() );
-			\wp_die();
-		}
-
 		$search_attributes = array(
 			'Pagesize' => 10,
 		);
