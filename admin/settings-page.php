@@ -27,7 +27,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<h1>
-					<?php \esc_html_e( 'Imageshop Sync Settings', 'imageshop' ); ?>
+					<?php \esc_html_e( 'Imageshop Sync Settings', 'imageshop-dam-connector' ); ?>
 				</h1>
 			</div>
 
@@ -37,14 +37,14 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<p>
-					<?php \esc_html_e( 'The Imageshop plugin will automatically replace your Media Library with the Imageshop media bank, giving you direct access to your organizations entire media portfolio.', 'imageshop' ); ?>
+					<?php \esc_html_e( 'The Imageshop plugin will automatically replace your Media Library with the Imageshop media bank, giving you direct access to your organizations entire media portfolio.', 'imageshop-dam-connector' ); ?>
 				</p>
 
 				<p>
-					<?php \esc_html_e( 'To make use of the Imageshop services, you will need to register for an account.', 'imageshop' ); ?>
+					<?php \esc_html_e( 'To make use of the Imageshop services, you will need to register for an account.', 'imageshop-dam-connector' ); ?>
 
 					<a href="https://www.imageshop.no" target="_blank">
-						<?php \esc_html_e( 'Create a new Imageshop account, or view your account details.', 'imageshop' ); ?>
+						<?php \esc_html_e( 'Create a new Imageshop account, or view your account details.', 'imageshop-dam-connector' ); ?>
 					</a>
 				</p>
 			</div>
@@ -58,7 +58,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 					<h2>
-						<?php \esc_html_e( 'Connection settings', 'imageshop' ); ?>
+						<?php \esc_html_e( 'Connection settings', 'imageshop-dam-connector' ); ?>
 					</h2>
 				</div>
 
@@ -70,7 +70,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<label for="imageshop_api_key">
-							<?php \esc_html_e( 'Imageshop Key:', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Imageshop Key:', 'imageshop-dam-connector' ); ?>
 						</label>
 					</div>
 
@@ -82,7 +82,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<label for="imageshop_upload_interface">
-							<?php \esc_html_e( 'Default interface:', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Default interface:', 'imageshop-dam-connector' ); ?>
 						</label>
 					</div>
 
@@ -107,7 +107,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 						<?php else : ?>
 
 						<em>
-							<?php \esc_html_e( 'To see available interfaces, please save a valid Imageshop key first..', 'imageshop' ); ?>
+							<?php \esc_html_e( 'To see available interfaces, please save a valid Imageshop key first..', 'imageshop-dam-connector' ); ?>
 						</em>
 
 						<?php endif; ?>
@@ -120,7 +120,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<button type="button" name="test" class="button button-primary imageshop__test__connection">
-							<?php \esc_html_e( 'Check the connection', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Check the connection', 'imageshop-dam-connector' ); ?>
 						</button>
 					</div>
 				</div>
@@ -130,7 +130,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 						<h2>
-							<?php \esc_html_e( 'Full sync commands', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Full sync commands', 'imageshop-dam-connector' ); ?>
 						</h2>
 					</div>
 
@@ -139,7 +139,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<button type="button" name="test" class="button button-primary imageshop__sync_wp_to_imageshop">
-							<?php \esc_html_e( 'Sync WordPress images to the Imageshop cloud', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Sync WordPress images to the Imageshop cloud', 'imageshop-dam-connector' ); ?>
 						</button>
 					</div>
 
@@ -148,7 +148,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2">
 						<button type="button" name="test" class="button button-primary imageshop__sync_imageshop_to_wp">
-							<?php \esc_html_e( 'Sync Imageshop cloud images to WordPress', 'imageshop' ); ?>
+							<?php \esc_html_e( 'Sync Imageshop cloud images to WordPress', 'imageshop-dam-connector' ); ?>
 						</button>
 					</div>
 

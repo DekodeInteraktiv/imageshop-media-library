@@ -71,17 +71,17 @@ const Import = ( { setStep } ) => {
 	return (
 		<>
 			<p>
-				{ __( 'Would you like to import your current media library to Imageshop?', 'imageshop' ) }
+				{ __( 'Would you like to import your current media library to Imageshop?', 'imageshop-dam-connector' ) }
 			</p>
 
 			<p>
-				{ __( 'By importing your media library, you ensure that it will remain available to insert into new posts or pages, and also makes it available to the rest of your organization via the normal Imageshop interfaces and other integrations.', 'imageshop' ) }
+				{ __( 'By importing your media library, you ensure that it will remain available to insert into new posts or pages, and also makes it available to the rest of your organization via the normal Imageshop interfaces and other integrations.', 'imageshop-dam-connector' ) }
 			</p>
 
 			{ doingImport &&
 				<div className="imageshop-import-progress-indicator">
 					<label htmlFor="imageshop-import-progress">
-						{ __( 'Import Progress', 'imageshop' ) }
+						{ __( 'Import Progress', 'imageshop-dam-connector' ) }
 					</label>
 					<progress
 						id="imageshop-import-progress"
@@ -93,11 +93,11 @@ const Import = ( { setStep } ) => {
 
 			<div className="imageshop-modal-actions">
 				<button type="button" className="button button-primary" onClick={ () => startImports() } disabled={ doingImport }>
-					{ __( 'Import existing media', 'imageshop' ) }
+					{ __( 'Import existing media', 'imageshop-dam-connector' ) }
 				</button>
 
 				<button type="button" className="button button-secondary" onClick={ () => setupComplete() } disabled={ doingImport }>
-					{ __( 'Continue without importing media', 'imageshop' ) }
+					{ __( 'Continue without importing media', 'imageshop-dam-connector' ) }
 				</button>
 			</div>
 		</>

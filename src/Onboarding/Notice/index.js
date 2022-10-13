@@ -35,16 +35,16 @@ const Notice = () => {
 		<>
 			<div className="notice notice-warning inline">
 				<h2>
-					{ __( 'Imageshop setup', 'imageshop' ) }
+					{ __( 'Imageshop setup', 'imageshop-dam-connector' ) }
 				</h2>
 
 				<p>
-					{ __( 'The Imageshop integration is almost ready to use, please complete the setup steps to start using Imageshop directly from your media library.', 'imageshop' ) }
+					{ __( 'The Imageshop integration is almost ready to use, please complete the setup steps to start using Imageshop directly from your media library.', 'imageshop-dam-connector' ) }
 				</p>
 
 				<p>
 					<button type="button" className="button button-primary" onClick={ () => setShowWizard( true ) }>
-						{ __( 'Complete setup', 'imageshop' ) }
+						{ __( 'Complete setup', 'imageshop-dam-connector' ) }
 					</button>
 				</p>
 			</div>

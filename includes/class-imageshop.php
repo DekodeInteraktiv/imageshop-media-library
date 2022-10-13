@@ -114,8 +114,8 @@ class Imageshop {
 	 */
 	public function register_menu() {
 		\add_options_page(
-			\esc_html__( 'Imageshop Sync', 'imageshop' ),
-			\esc_html__( 'Imageshop Sync', 'imageshop' ),
+			\esc_html__( 'Imageshop DAM', 'imageshop-dam-connector' ),
+			\esc_html__( 'Imageshop DAM', 'imageshop-dam-connector' ),
 			'manage_options',
 			'imageshop-settings',
 			array( $this, 'register_setting_page' )

@@ -18,12 +18,12 @@ const Wizard = ( { setShowWizard, setShowNotice } ) => {
 					<dialog className="imageshop-wizard">
 						<div className="imageshop-modal-header">
 							<h2>
-								{ __( 'Imageshop setup', 'imageshop' ) }
+								{ __( 'Imageshop setup', 'imageshop-dam-connector' ) }
 							</h2>
 
 							<button type="button" className="imageshop-modal-close" onClick={ () => setShowWizard( false ) }>
 								<span className={ 'dashicons dashicons-no' } />
-								<span className="screen-reader-text">{ __( 'Close Imageshop setup modal', 'imageshop' ) }</span>
+								<span className="screen-reader-text">{ __( 'Close Imageshop setup modal', 'imageshop-dam-connector' ) }</span>
 							</button>
 						</div>
 

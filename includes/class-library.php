@@ -63,11 +63,11 @@ class Library {
 			array(
 				'sources'           => array(
 					array(
-						'label' => __( 'Imageshop Media Library', 'imageshop' ),
+						'label' => __( 'Imageshop DAM Connector', 'imageshop-dam-connector' ),
 						'value' => 'imageshop',
 					),
 					array(
-						'label' => __( 'WordPress\'s Media Library', 'imageshop' ),
+						'label' => __( 'WordPress\'s Media Library', 'imageshop-dam-connector' ),
 						'value' => 'wordpress',
 					),
 				),

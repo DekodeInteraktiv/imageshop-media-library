@@ -16,7 +16,7 @@ const Interfaces = ( { setStep } ) => {
 				// Add non-valued interface to the option dropdown.
 				interfaces.push( {
 					value: '',
-					label: __( 'Select an interface', 'imageshop' ),
+					label: __( 'Select an interface', 'imageshop-dam-connector' ),
 				} );
 
 				response.interfaces.map( ( single ) => {
@@ -55,11 +55,11 @@ const Interfaces = ( { setStep } ) => {
 	return (
 		<>
 			<p>
-				{ __( 'Interfaces determine where files are stored in your Imageshop account.', 'imageshop')}
+				{ __( 'Interfaces determine where files are stored in your Imageshop account.', 'imageshop-dam-connector')}
 			</p>
 
 			<SelectControl
-				label={ __( 'Select which interface is used for uploaded media files', 'imageshop' ) }
+				label={ __( 'Select which interface is used for uploaded media files', 'imageshop-dam-connector' ) }
 				options={ availableInterfaces }
 				onChange={ ( selection ) => setApiInterface( selection ) }
 			/>
@@ -67,7 +67,7 @@ const Interfaces = ( { setStep } ) => {
 			<div className="imageshop-modal-actions">
 				{ apiInterface &&
 					<button type="button" className="button button-primary" onClick={ () => setStep( 4 ) }>
-						{ __( 'Continue to imports', 'imageshop' ) }
+						{ __( 'Continue to imports', 'imageshop-dam-connector' ) }
 					</button>
 				}
 			</div>

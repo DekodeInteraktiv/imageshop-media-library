@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Imageshop
+ * Plugin Name: Imageshop DAM Connector
  * Plugin URI:
  * Description: Use the Imageshop media library as your companys one source for all media.
  * Version: 0.0.5
- * Author: Dekode
- * Author URI: https://dekode.no
+ * Author: Imageshop
+ * Author URI: https://imageshop.org
  * License: MIT
- * Text Domain: imageshop
+ * Text Domain: imageshop-dam-connector
  * Domain Path: /languages
  * Requires PHP: 5.6
  * Requires at least: 5.6
@@ -48,7 +48,7 @@ function imageshop_incompatibile( $msg ) {
 						// translators: %s is the PHP version.
 						__(
 							'The Imageshop Media Library plugin requires PHP version 5.6 or higher. This site uses PHP version %s, which has caused the plugin to be automatically deactivated.',
-							'imageshop'
+							'imageshop-dam-connector'
 						),
 						PHP_VERSION
 					)

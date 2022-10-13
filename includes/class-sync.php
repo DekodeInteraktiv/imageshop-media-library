@@ -104,7 +104,7 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
+					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop-dam-connector' ),
 				),
 				425
 			);
@@ -135,7 +135,7 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => \esc_html__( 'No images were found in the local WordPress media library, that needs to be imported to Imageshop.', 'imageshop' ),
+					'message' => \esc_html__( 'No images were found in the local WordPress media library, that needs to be imported to Imageshop.', 'imageshop-dam-connector' ),
 				),
 				204
 			);
@@ -150,7 +150,7 @@ class Sync {
 			array(
 				'success' => true,
 				'status'  => 'success',
-				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
+				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop-dam-connector' ),
 			),
 			200
 		);
@@ -167,7 +167,7 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop' ),
+					'message' => \esc_html__( 'A previous import is still in progress, please wait for it to finish before scheduling another.', 'imageshop-dam-connector' ),
 				),
 				425
 			);
@@ -188,7 +188,7 @@ class Sync {
 				array(
 					'success' => false,
 					'status'  => 'error',
-					'message' => \esc_html__( 'No documents were found in the active Imageshop interface, that needs to be imported to the local WordPress install.', 'imageshop' ),
+					'message' => \esc_html__( 'No documents were found in the active Imageshop interface, that needs to be imported to the local WordPress install.', 'imageshop-dam-connector' ),
 				),
 				204
 			);
@@ -204,7 +204,7 @@ class Sync {
 			array(
 				'success' => true,
 				'status'  => 'success',
-				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop' ),
+				'message' => \esc_html__( 'The import has been scheduled, and should start momentarily.', 'imageshop-dam-connector' ),
 			),
 			200
 		);
@@ -339,11 +339,11 @@ class Sync {
 		?>
 		<div class="notice notice-warning">
 			<h2>
-				<?php \esc_html_e( 'Imageshop import status', 'imageshop' ); ?>
+				<?php \esc_html_e( 'Imageshop import status', 'imageshop-dam-connector' ); ?>
 			</h2>
 
 			<p>
-				<?php \esc_html_e( 'An import job has been initiated, the current status of it can be seen below. This notice will go away once the import is completed.', 'imageshop' ); ?>
+				<?php \esc_html_e( 'An import job has been initiated, the current status of it can be seen below. This notice will go away once the import is completed.', 'imageshop-dam-connector' ); ?>
 			</p>
 
 			<progress max="<?php echo \esc_attr( $status['total'] ); ?>" value="<?php echo \esc_attr( $status['imported'] ); ?>">
@@ -352,7 +352,7 @@ class Sync {
 						// translators: 1: Current progress. 2: Total items to import.
 						\esc_html__(
 							'%1$s of %2$s attachments imported to Imageshop',
-							'imageshop'
+							'imageshop-dam-connector'
 						),
 						$status['imported'],
 						$status['total']

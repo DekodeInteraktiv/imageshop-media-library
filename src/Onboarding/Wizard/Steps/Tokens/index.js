@@ -30,21 +30,21 @@ const Tokens = ( { setStep } ) => {
 	return (
 		<>
 			<p>
-				{ __( 'Enter your API token here. You can find your API token in your ImageShop account.', 'imageshop' ) }
+				{ __( 'Enter your API token here. You can find your API token in your ImageShop account.', 'imageshop-dam-connector' ) }
 			</p>
 
 			{ validationNotice &&
 				<>
 					{ validToken &&
 						<p className="valid-token">
-							{ __( '✔ Your API token is valid.', 'imageshop' ) }
+							{ __( '✔ Your API token is valid.', 'imageshop-dam-connector' ) }
 						</p>
 					}
 
 					{ ! validToken &&
 						<>
 							<p className="invalid-token">
-								{ __( '❌ Your API token is invalid:', 'imageshop' ) }
+								{ __( '❌ Your API token is invalid:', 'imageshop-dam-connector' ) }
 							</p>
 
 							<p className="invalid-token">
@@ -60,13 +60,13 @@ const Tokens = ( { setStep } ) => {
 			<div className="imageshop-modal-actions">
 				{ ! validToken &&
 					<button type="button" className="button button-primary" onClick={ () => testToken() }>
-						{ __( 'Test API token', 'imageshop' ) }
+						{ __( 'Test API token', 'imageshop-dam-connector' ) }
 					</button>
 				}
 
 				{ validToken &&
 					<button type="button" className="button button-primary" onClick={ () => setStep( 3 ) }>
-						{ __( 'Continue to upload settings', 'imageshop' ) }
+						{ __( 'Continue to upload settings', 'imageshop-dam-connector' ) }
 					</button>
 				}
 			</div>

@@ -10,12 +10,12 @@ const Completed = ( { setShowWizard, setShowNotice } ) => {
 	return (
 		<>
 			<p>
-				{ __( 'Your site has now been configured to use all media via Imageshop.', 'imageshop' ) }
+				{ __( 'Your site has now been configured to use all media via Imageshop.', 'imageshop-dam-connector' ) }
 			</p>
 
 			<div className="imageshop-modal-actions">
 				<button type="button" className="button button-primary" onClick={ () => closeOnboarding() }>
-					{ __( 'Finish setup', 'imageshop' ) }
+					{ __( 'Finish setup', 'imageshop-dam-connector' ) }
 				</button>
 			</div>
 		</>
