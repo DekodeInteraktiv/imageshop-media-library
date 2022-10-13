@@ -22,7 +22,7 @@
 		"build",
 		"includes",
 		"languages",
-		"imageshop-media-library.php",
+		"imageshop-dam-connector.php",
 		"readme.txt",
 		"uninstall.php"
 	]
