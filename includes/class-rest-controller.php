@@ -546,7 +546,7 @@ class REST_Controller {
 				'Querystring'   => '',
 				'Page'          => 0,
 				'Pagesize'      => 80,
-				'DocumentType'  => 'IMAGE',
+				'DocumentType'  => array( 'IMAGE' ),
 				'SortBy'        => 'DEFAULT',
 				'SortDirection' => 'DESC',
 			),
