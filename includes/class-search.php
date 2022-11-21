@@ -139,11 +139,6 @@ class Search {
 			$search_attributes['Page'] = ( $_POST['query']['paged'] - 1 );
 		}
 		if ( isset( $_POST['query']['posts_per_page'] ) ) {
-			// The default value is too heavy at this time, so discard and rely on the next request.
-			if ( 80 === (int) $_POST['query']['posts_per_page'] ) {
-				\wp_send_json_success( array() );
-				\wp_die();
-			}
 			$search_attributes['Pagesize'] = $_POST['query']['posts_per_page'];
 		}
 		if ( isset( $_POST['query']['imageshop_interface'] ) && ! empty( $_POST['query']['imageshop_interface'] ) ) {
