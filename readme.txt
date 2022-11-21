@@ -2,7 +2,7 @@
 Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
-Tested up to: 6.0
+Tested up to: 6.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
