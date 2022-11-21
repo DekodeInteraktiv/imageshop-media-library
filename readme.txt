@@ -25,6 +25,10 @@ The plugin will let you add it to any multisite, but each individual site will n
 
 If you at any point wish to stop using Imageshop for your files, you can export any files that have been used in content on your site to your local media library again, before deactivating the plugin.
 
+= I have an idea for an improvement or enhancement =
+
+We welcome both suggestions, discussions, and code! Check out the project source at https://github.com/DekodeInteraktiv/imageshop
+
 == Changelog ==
 
 * Bete release
