@@ -160,7 +160,7 @@ class Search {
 
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 			$this->attachment->append_document( $result->DocumentID, $result ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$result->DocumentID` is provided by the SaaS API.
-			$media[] = $this->imageshop_pseudo_post( $result, $search_attributes['InterfaceIds'][0] );
+			$media[] = $this->imageshop_pseudo_post( $result, ( isset ( $search_attributes['InterfaceIds'] ) ? $search_attributes['InterfaceIds'][0] : null ) );
 		}
 
 		\wp_send_json_success( $media );
