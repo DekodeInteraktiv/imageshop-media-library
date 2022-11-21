@@ -113,9 +113,15 @@ class Search {
 		}
 
 		// Do not process queries for documents or videos, which are not (yet) handled by Imageshop.
-		if ( isset( $_POST['query']['post_mime_type'] ) && ! in_array( 'image', $_POST['query']['post_mime_type'] ) ) {
-			\add_action( 'pre_get_posts', array( $this, 'skip_imageshop_items' ) );
-			return;
+		if ( isset( $_POST['query']['post_mime_type'] ) ) {
+			if (
+				( is_array( $_POST['query']['post_mime_type'] ) && ! in_array( 'image', $_POST['query']['post_mime_type'], true ) ) ||
+				( is_string( $_POST['query']['post_mime_type'] ) && 'image' !== strtolower( $_POST['query']['post_mime_type'] ) )
+			) {
+				\add_action( 'pre_get_posts', array( $this, 'skip_imageshop_items' ) );
+
+				return;
+			}
 		}
 
 		$search_attributes = array(
