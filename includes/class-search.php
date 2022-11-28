@@ -150,6 +150,19 @@ class Search {
 		\wp_die();
 	}
 
+	/**
+	 * Validate, and then sanitize, any input passed as search arguments.
+	 *
+	 * @param array $fields {
+	 *     An associative array of search parameters, and their default values.
+	 *
+	 *     @type string $field         The field name as used in the Imageshop API.
+	 *     @type mixed  $default_value The default value, if `null` is passed, the argument will be skipped.
+	 * }
+	 * @param array $post_request An associative array of `$_POST` request input values that should be mapped.
+	 *
+	 * @return array
+	 */
 	public function validate_and_assign_search_attributes( $fields, $post_request ) {
 		$attributes = array();
 
