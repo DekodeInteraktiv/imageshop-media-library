@@ -125,28 +125,15 @@ class Search {
 		}
 
 		$search_attributes = array(
-			'Pagesize' => 10,
+			'Pagesize'      => 25,
+			'Querystring'   => null,
+			'SortDirection' => null,
+			'Page'          => null,
+			'InterfaceIds'  => null,
+			'CategoryIds'   => null,
 		);
 
-		if ( isset( $_POST['query']['s'] ) ) {
-			$search_attributes['Querystring'] = $_POST['query']['s'];
-		}
-		if ( isset( $_POST['query']['order'] ) ) {
-			$search_attributes['SortDirection'] = $_POST['query']['order'];
-		}
-		if ( isset( $_POST['query']['paged'] ) ) {
-			// Subtract one, as Imageshop starts with page 0.
-			$search_attributes['Page'] = ( $_POST['query']['paged'] - 1 );
-		}
-		if ( isset( $_POST['query']['posts_per_page'] ) ) {
-			$search_attributes['Pagesize'] = $_POST['query']['posts_per_page'];
-		}
-		if ( isset( $_POST['query']['imageshop_interface'] ) && ! empty( $_POST['query']['imageshop_interface'] ) ) {
-			$search_attributes['InterfaceIds'] = array( \absint( $_POST['query']['imageshop_interface'] ) );
-		}
-		if ( isset( $_POST['query']['imageshop_category'] ) && ! empty( $_POST['query']['imageshop_category'] ) ) {
-			$search_attributes['CategoryIds'] = array( \absint( $_POST['query']['imageshop_category'] ) );
-		}
+		$search_attributes = $this->validate_and_assign_search_attributes( $search_attributes, $_POST['query'] );
 
 		$search_results = $this->imageshop->search( $search_attributes );
 
@@ -155,12 +142,92 @@ class Search {
 
 		foreach ( $search_results->DocumentList as $result ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$search_results->DocumentList` is provided by the SaaS API.
 			$this->attachment->append_document( $result->DocumentID, $result ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$result->DocumentID` is provided by the SaaS API.
-			$media[] = $this->imageshop_pseudo_post( $result, ( isset ( $search_attributes['InterfaceIds'] ) ? $search_attributes['InterfaceIds'][0] : null ) );
+			$media[] = $this->imageshop_pseudo_post( $result, ( isset( $search_attributes['InterfaceIds'] ) ? $search_attributes['InterfaceIds'][0] : null ) );
 		}
 
 		\wp_send_json_success( $media );
 
 		\wp_die();
+	}
+
+	public function validate_and_assign_search_attributes( $fields, $post_request ) {
+		$attributes = array();
+
+		foreach ( $fields as $field => $default_value ) {
+			switch ( $field ) {
+				case 'Querystring':
+					if ( isset( $post_request['s'] ) ) {
+						$attributes[ $field ] = \htmlspecialchars( $post_request['s'] );
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+				case 'SortDirection':
+					$allowed_values = array( 'DESC', 'ASC' );
+					if ( isset( $post_request['order'] ) && in_array( $post_request['order'], $allowed_values, true ) ) {
+						$attributes[ $field ] = \htmlspecialchars( $post_request['order'] );
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+				case 'Page':
+					if ( isset( $post_request['paged'] ) && preg_match( '/^([0-9]*)$/', $post_request['paged'] ) ) {
+						// Subtract one, as Imageshop starts with page 0.
+						$attributes[ $field ] = ( \absint( $post_request['paged'] ) - 1 );
+
+						// Never allow a negative value for this case.
+						if ( $attributes[ $field ] < 0 ) {
+							$attributes[ $field ] = 0;
+						}
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+				case 'Pagesize':
+					if ( isset( $post_request['paged'] ) && preg_match( '/^([0-9]*)$/', $post_request['posts_per_page'] ) ) {
+						// Subtract one, as Imageshop starts with page 0.
+						$attributes[ $field ] = \absint( $post_request['posts_per_page'] );
+
+						// Never allow a value below `1` for this case.
+						if ( $attributes[ $field ] < 1 ) {
+							$attributes[ $field ] = 1;
+						}
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+				case 'InterfaceIds':
+					if ( isset( $post_request['imageshop_interface'] ) && ! empty( $post_request['imageshop_interface'] ) ) {
+						$attributes[ $field ] = array();
+						$values               = (array) $post_request['imageshop_interface'];
+
+						foreach ( $values as $value ) {
+							if ( preg_match( '/^([0-9]*)$/', $value ) ) {
+								$attributes[ $field ][] = \absint( $value );
+							}
+						}
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+				case 'CategoryIds':
+					if ( isset( $post_request['imageshop_category'] ) && ! empty( $post_request['imageshop_category'] ) ) {
+						$attributes[ $field ] = array();
+						$values               = (array) $post_request['imageshop_category'];
+
+						foreach ( $values as $value ) {
+							if ( preg_match( '/^([0-9]*)$/', $value ) ) {
+								$attributes[ $field ][] = \absint( $value );
+							}
+						}
+					} elseif ( null !== $default_value ) {
+						$attributes[ $field ] = $default_value;
+					}
+					break;
+			}
+		}
+
+		return $attributes;
 	}
 
 	/**
