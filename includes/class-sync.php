@@ -299,6 +299,9 @@ class Sync {
 		$imageshop = Attachment::get_instance();
 		foreach ( $posts as $post ) {
 			$imageshop->export_to_imageshop( (int) $post['ID'] );
+
+			// Add an arbitrary wait between requests.
+			sleep( 2 );
 		}
 
 	}
