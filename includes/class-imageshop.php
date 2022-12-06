@@ -23,6 +23,20 @@ class Imageshop {
 		\add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		\add_action( 'admin_init', array( $this, 'register_settings' ) );
 		\add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
+		\add_action( 'update_option_imageshop_api_key', array( $this, 'flush_api_related_caches' ) );
+	}
+
+	/**
+	 * Flushes any caches that rely on data from the Imageshop API.
+	 *
+	 * When a new API key is provided, old cache data is no longer relevant,
+	 * this strongly ties into things such as interfaces and categories.
+	 *
+	 * @return void
+	 */
+	public function flush_api_related_caches() {
+		// Remove the old interface setting, these are unique to their individual API keys.
+		delete_option( 'imageshop_upload_interface' );
 	}
 
 	/**

@@ -90,6 +90,7 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 						<?php if ( ! empty( $api_key ) && $imageshop->test_valid_token() ) : ?>
 
 						<select id="imageshop_upload_interface" name="imageshop_upload_interface">
+							<option value="">&mdash; <?php esc_html_e( 'Select your default interface', 'imageshop-dam-connector' ); ?> &mdash;</option>
 							<?php
 							$interfaces = $imageshop->get_interfaces( true );
 
