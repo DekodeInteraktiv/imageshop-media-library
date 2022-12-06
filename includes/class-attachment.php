@@ -135,6 +135,8 @@ class Attachment {
 			'widest'  => 0,
 		);
 
+		$size_array = array();
+
 		$media_details = \get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
 		$document_id   = \get_post_meta( $attachment_id, '_imageshop_document_id', true );
 
@@ -148,7 +150,8 @@ class Attachment {
 				$media_details['sizes'][ $size ]['width'],
 				$media_details['sizes'][ $size ]['height'],
 			);
-		} else {
+		} elseif ( isset( $media_details['sizes']['original'] ) ) {
+			// The `original` size is, if it exists, a fallback size so that images can still load.
 			$size_array = array(
 				$media_details['sizes']['original']['width'],
 				$media_details['sizes']['original']['height'],
@@ -157,6 +160,11 @@ class Attachment {
 
 		$max_srcset_image_width = apply_filters( 'max_srcset_image_width', 2048, $size_array );
 		$srcset_meta['widest']  = 0;
+
+		// Bail early if there's no further data to iterate over.
+		if ( ! isset( $media_details['sizes'] ) || empty( $media_details['sizes'] ) ) {
+			return $srcset_meta;
+		}
 
 		foreach ( $media_details['sizes'] as $size => $data ) {
 			if ( $data['width'] > $max_srcset_image_width ) {
