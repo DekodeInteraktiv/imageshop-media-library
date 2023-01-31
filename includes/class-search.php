@@ -133,6 +133,10 @@ class Search {
 			'CategoryIds'   => null,
 		);
 
+		if ( isset( $_POST['query']['imageshop_language'] ) && ! empty( $_POST['query']['imageshop_language'] ) ) {
+			$this->imageshop->set_language( $_POST['query']['imageshop_language'] );
+		}
+
 		$search_attributes = $this->validate_and_assign_search_attributes( $search_attributes, $_POST['query'] );
 
 		$search_results = $this->imageshop->search( $search_attributes );

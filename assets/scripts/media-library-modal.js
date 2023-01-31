@@ -13,7 +13,7 @@
 
 			filters.all = {
 				// Change this: use whatever default label you'd like
-				text:  'Search Imageshop',
+				text: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.origins.imageshop : 'Search Imageshop' ),
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
 					imageshop_origin: 'imageshop'
@@ -23,7 +23,7 @@
 
 			filters.wp = {
 				// Change this: use whatever default label you'd like
-				text:  'Search WordPress library',
+				text: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.origins.wordpress : 'Search WordPress library' ),
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
 					imageshop_origin: 'wordpress'
@@ -57,7 +57,7 @@
 			});
 			filters.all = {
 				// Change this: use whatever default label you'd like
-				text:  'All interfaces',
+				text:  ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.interfaces.all : 'All interfaces' ),
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
 					imageshop_interface: '0'
@@ -76,7 +76,7 @@
 
 			filters.all = {
 				// Change this: use whatever default label you'd like
-				text:  '10 results per page',
+				text: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.pagination.all : '25 results per page' ),
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
 					posts_per_page: 25
@@ -86,6 +86,48 @@
 			this.filters = filters;
 		}
 	});
+
+	let ImageshopLanguageFilter = wp.media.view.AttachmentFilters.extend({
+		id: 'imageshop-media-library-language',
+
+		createFilters: function() {
+			var filters = {};
+			var defaultFilter = {
+				slug: '',
+				language: {
+					label: ''
+				}
+			};
+
+			if ( ImageshopMediaLibrary.languages ) {
+				for ( const[ slug, language ] of Object.entries( ImageshopMediaLibrary.languages ) ) {
+					if ( language.default ) {
+						defaultFilter = {
+							slug,
+							language,
+						};
+					}
+
+					filters[ slug ] = {
+						text: language.label,
+						props: {
+							imageshop_language: slug,
+						}
+					};
+				}
+			}
+			filters.all = {
+				// Change this: use whatever default label you'd like
+				text: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.language.all : 'Language' ),
+				props: {
+					// Change this: key needs to be the WP_Query var for the taxonomy
+					imageshop_language: ''
+				},
+				priority: 10
+			};
+			this.filters = filters;
+		}
+	})
 
 	let ImageshopCategoryFilters = wp.media.view.AttachmentFilters.extend({
 		id: 'imageshop-media-library-category',
@@ -118,7 +160,7 @@
 			}
 			filters.all = {
 				// Change this: use whatever default label you'd like
-				text:  'All categories',
+				text: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.categories.all : 'All categories' ),
 				props: {
 					// Change this: key needs to be the WP_Query var for the taxonomy
 					imageshop_category: ''
@@ -139,7 +181,7 @@
 			AttachmentsBrowser.prototype.createToolbar.call( this );
 
 			this.toolbar.set( 'ImageshopOriginFiltersLabel', new wp.media.view.Label({
-				value: 'Media library source origin',
+				value: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.origins.label : 'Media library source origin' ),
 				attributes: {
 					'for': 'imageshop-media-library-origin'
 				},
@@ -152,7 +194,7 @@
 			}).render() );
 
 			this.toolbar.set( 'ImageshopInterfaceFiltersLabel', new wp.media.view.Label({
-				value: 'Imageshop Interface',
+				value: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.interfaces.label : 'Imageshop Interface' ),
 				attributes: {
 					'for': 'imageshop-media-library-interface'
 				},
@@ -164,8 +206,21 @@
 				priority: -75
 			}).render() );
 
+			this.toolbar.set( 'ImageshopLanguageFilterLabel', new wp.media.view.Label({
+				value: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.language.label : 'Imageshop Language' ),
+				attributes: {
+					'for': 'imageshop-media-library-language'
+				},
+				priority: -75
+			}).render() );
+			this.toolbar.set( 'ImageshopLanguageFilter', new ImageshopLanguageFilter({
+				controller: this.controller,
+				model: this.collection.props,
+				priority: -75
+			}).render() );
+
 			this.toolbar.set( 'ImageshopCategoryFiltersLabel', new wp.media.view.Label({
-				value: 'Imageshop Category',
+				value: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.categories.label : 'Imageshop Category' ),
 				attributes: {
 					'for': 'imageshop-media-library-category'
 				},
@@ -178,7 +233,7 @@
 			}).render() );
 
 			this.toolbar.set( 'ImageshopPostsPerPageFilterLabel', new wp.media.view.Label({
-				value: 'Results per page',
+				value: ( ImageshopMediaLibrary.labels ? ImageshopMediaLibrary.labels.pagination.label : 'Results per page' ),
 				attributes: {
 					'for': 'imageshop-posts-per-page'
 				},

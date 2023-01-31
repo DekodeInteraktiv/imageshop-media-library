@@ -63,6 +63,11 @@ class REST_Controller {
 			$this->api_token = \get_option( 'imageshop_api_key', '' );
 		}
 
+		// If WordPress' language function is available, attempt to set the active language.
+		if ( function_exists( 'get_user_locale' ) ) {
+			$this->set_language( \get_locale() );
+		}
+
 		\add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
@@ -75,6 +80,49 @@ class REST_Controller {
 		if ( ! empty( $this->queued_permalinks ) ) {
 			$this->generate_permalinks_url( $this->queued_permalinks );
 		}
+	}
+
+	/**
+	 * Set the active language used for locale-related API responses.
+	 *
+	 * @param string $locale The locale to use for lookups.
+	 *
+	 * @return void
+	 */
+	public function set_language( $locale ) {
+		$language_code = '';
+
+		// Short locale formats of 2 characters are in the ISO-639-1 format, which is expected by the Imageshop API.
+		if ( 2 === strlen( $locale ) ) {
+			$language_code = strtolower( $locale );
+		} else {
+			// The fallback is just a basic pattern matcher for manually defined supported languages.
+			$available_locales = Imageshop::available_locales();
+
+			foreach ( $available_locales as $code => $attributes ) {
+				foreach ( $attributes['iso_codes'] as $iso => $type ) {
+					switch ( $type ) {
+						case 'string':
+							if ( $iso === $locale ) {
+								$language_code = $code;
+							}
+							break;
+						case 'regex':
+							if ( preg_match( $iso, $locale ) ) {
+								$language_code = $code;
+							}
+							break;
+					}
+				}
+			}
+		}
+
+		// Default language code fallback for API requests.
+		if ( empty( $language_code ) ) {
+			$language_code = 'en';
+		}
+
+		$this->language = $language_code;
 	}
 
 	/**
@@ -381,7 +429,7 @@ class REST_Controller {
 	public function get_original_permalink( $document_id ) {
 		$url = \add_query_arg(
 			array(
-				'language'   => 'no',
+				'language'   => $this->language,
 				'documentId' => $document_id,
 			),
 			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_ORIGINAL_PERMALINK
@@ -486,9 +534,12 @@ class REST_Controller {
 	 *
 	 * @return array
 	 */
-	public function get_categories( $interface = null, $lang = 'no' ) {
+	public function get_categories( $interface = null, $lang = null ) {
 		if ( null === $interface ) {
 			$interface = \get_option( 'imageshop_upload_interface' );
+		}
+		if ( null === $lang ) {
+			$lang = $this->language;
 		}
 
 		$transient_key = 'imageshop_categories_' . $interface . '_' . $lang;
@@ -542,7 +593,7 @@ class REST_Controller {
 		$attributes = \array_merge(
 			array(
 				'InterfaceIds'  => $interface_ids,
-				'Language'      => 'no',
+				'Language'      => $this->language,
 				'Querystring'   => '',
 				'Page'          => 0,
 				'Pagesize'      => 80,
@@ -577,7 +628,7 @@ class REST_Controller {
 	public function get_document( $id ) {
 		$url  = \add_query_arg(
 			array(
-				'language'   => 'no',
+				'language'   => $this->language,
 				'DocumentID' => $id,
 			),
 			self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_GET_DOCUMENT

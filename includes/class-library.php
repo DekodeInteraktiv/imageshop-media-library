@@ -74,6 +74,30 @@ class Library {
 				'interfaces'        => $imageshop->get_interfaces(),
 				'default_interface' => (int) \get_option( 'imageshop_upload_interface' ),
 				'categories'        => $imageshop->get_categories(),
+				'languages'         => Imageshop::available_locales(),
+				'labels'            => array(
+					'origins'    => array(
+						'label'     => esc_html__( 'Media library source origin', 'imageshop-dam-connector' ),
+						'imageshop' => esc_html__( 'Search Imageshop', 'imageshop-dam-connector' ),
+						'wordpress' => esc_html__( 'Search WordPress library', 'imageshop-dam-connector' ),
+					),
+					'interfaces' => array(
+						'label' => esc_html__( 'Imageshop Interface', 'imageshop-dam-connector' ),
+						'all'   => esc_html__( 'All interfaces', 'imageshop-dam-connector' ),
+					),
+					'language'   => array(
+						'label' => esc_html__( 'Imageshop Language', 'imageshop-dam-connector' ),
+						'all'   => esc_html__( 'Language', 'imageshop-dam-connector' ),
+					),
+					'categories' => array(
+						'label' => esc_html__( 'Imageshop Category', 'imageshop-dam-connector' ),
+						'all'   => esc_html__( 'All categories', 'imageshop-dam-connector' ),
+					),
+					'pagination' => array(
+						'label' => esc_html__( 'Results per page', 'imageshop-dam-connector' ),
+						'all'   => esc_html__( '25 results per page', 'imageshop-dam-connector' ),
+					),
+				),
 			)
 		);
 		// Overrides code styling to accommodate for a third dropdown filter
