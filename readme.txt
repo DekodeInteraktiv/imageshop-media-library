@@ -33,8 +33,11 @@ We welcome both suggestions, discussions, and code! Check out the project source
 == Changelog ==
 
 = 0.0.7 (TBD) =
-* Added fallback handling if an API key is changed, to allow old images to render still
+* Added fallback handling if an API key is changed, to allow old images to render still.
+* Added alternative to manually change the Imageshop lookup language when filtering media results.
+* Added translation wrappers for labels used within the media modal.
 * Improved the API settings screen to flush data when an existing API key is modified.
+* Improved handling of site languages to determine default Imageshop lookup languages.
 
 = 0.0.6 (2022-12-05) =
 * Initial release
