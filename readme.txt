@@ -3,7 +3,7 @@ Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 6.1
-Stable tag: 0.0.6
+Stable tag: 0.0.7
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,7 +32,7 @@ We welcome both suggestions, discussions, and code! Check out the project source
 
 == Changelog ==
 
-= 0.0.7 (TBD) =
+= 0.0.7 (2023-01-31) =
 * Added fallback handling if an API key is changed, to allow old images to render still.
 * Added alternative to manually change the Imageshop lookup language when filtering media results.
 * Added translation wrappers for labels used within the media modal.
