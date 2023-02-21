@@ -3,7 +3,7 @@ Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 6.1
-Stable tag: 0.0.7
+Stable tag: 0.0.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ If you at any point wish to stop using Imageshop for your files, you can export 
 We welcome both suggestions, discussions, and code! Check out the project source at https://github.com/DekodeInteraktiv/imageshop
 
 == Changelog ==
+
+= 0.0.8 (2023-02-21) =
+* Added backwards compatibility check when generating `preloaded_url` links for psotmeta.
+* Added fallback handler for generating srcset when `attachment_id` is passed as `0` when called outside the main loop.
 
 = 0.0.7 (2023-01-31) =
 * Added fallback handling if an API key is changed, to allow old images to render still.
