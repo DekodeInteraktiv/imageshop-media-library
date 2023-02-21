@@ -808,13 +808,14 @@ class Attachment {
 
 	public function preloaded_url( $media, $width, $height ) {
 		$imageshop = REST_Controller::get_instance();
+		$media_id  = ( is_object( $media ) ? $media->DocumentID : $media ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
 
 		$attachment = \get_posts(
 			array(
 				'post_type'      => 'attachment',
 				'post_status'    => 'inherit',
 				'meta_key'       => '_imageshop_document_id',
-				'meta_value'     => $media->DocumentID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+				'meta_value'     => $media_id,
 				'posts_per_page' => 1,
 			)
 		);
@@ -826,7 +827,7 @@ class Attachment {
 		return trim(
 			sprintf(
 				'%s/%s',
-				\untrailingslashit( $imageshop->create_permalinks_url( $media->DocumentID, $width, $height, $this->get_attachment_permalink_token_base( $attachment->ID ) ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
+				\untrailingslashit( $imageshop->create_permalinks_url( $media_id, $width, $height, $this->get_attachment_permalink_token_base( $attachment->ID ) ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is defined by the SaaS API.
 				urlencode( $this->get_attachment_filename( $attachment->ID ) )
 			)
 		);
