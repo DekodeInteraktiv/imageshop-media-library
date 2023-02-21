@@ -31,6 +31,17 @@ class Attachment {
 	}
 
 	/**
+	 * Check if a Post ID is both a valid ID, and belongs to an attachment.
+	 *
+	 * @param int $attachment_id The Post ID to validate against the attachment post type.
+	 *
+	 * @return bool
+	 */
+	private function is_valid_attachment_id( $attachment_id ) {
+		return ( ! empty( $attachment_id ) && 'attachment' === get_post_type( $attachment_id ) );
+	}
+
+	/**
 	 * Validate that post-content images being output have been given the appropriate srcset data when possible.
 	 *
 	 * @param string $filtered_image The HTML markup for the `img` tag.
@@ -40,11 +51,38 @@ class Attachment {
 	 * @return string The HTML markup with `srcset` and `sizes` attributes added if applicable.
 	 */
 	public function validate_post_content_image_srcset( $filtered_image, $context, $attachment_id ) {
+		global $wpdb;
 		$dimensions = array();
 
 		// Extract the image size slug.
 		preg_match( '/class=".+?size-(\S*)/si', $filtered_image, $size_slug );
 		$size_slug = ( isset( $size_slug[1] ) ? $size_slug[1] : 'full' );
+
+		// Edge-case scenario handler for when an attachment ID isn't passed, or an invalid post type is referenced.
+		if ( ! $this->is_valid_attachment_id( $attachment_id ) ) {
+			preg_match( '/src="(.+?)"/si', $filtered_image, $image_url );
+			$image_url = untrailingslashit( ( isset( $image_url[1] ) ? $image_url[1] : null ) );
+
+			// Return the original markup if no URL could be extracted.
+			if ( null === $image_url ) {
+				return $filtered_image;
+			}
+
+			$attachment_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT post_id FROM {$wpdb->postmeta} WHERE `meta_value` LIKE %s LIMIT 1",
+					sprintf(
+						'%%%s%%',
+						$image_url
+					)
+				)
+			);
+
+			// Return the original markup if no attachment could be found for the URL.
+			if ( ! $this->is_valid_attachment_id( $attachment_id ) ) {
+				return $filtered_image;
+			}
+		}
 
 		// Generate a fallback max width for images with no size defined.
 		preg_match( '/src=".+?-([0-9]+?)x([0-9]+?)\/?"/si', $filtered_image, $src_dimensions );
