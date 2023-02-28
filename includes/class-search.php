@@ -377,6 +377,10 @@ class Search {
 			'dateFormatted'         => $media->Created, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Created` is provided by the SaaS API.
 			'name'                  => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 			'sizes'                 => $image_sizes,
+			'compat'                => array(
+				'item' => $this->generate_attachment_form_fields( $wp_post_id, $media ),
+				'meta' => $this->generate_attachment_meta_fields( $wp_post_id, $media ),
+			),
 			'status'                => 'inherit',
 			'title'                 => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 			'url'                   => ( null !== $full_size_url ? $full_size_url : '' ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->ListThumbUrl` is provided by the SaaS API.
@@ -391,5 +395,48 @@ class Search {
 			'orientation'           => ( $original_media->Height > $original_media->Width ? 'portrait' : 'landscape' ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` and `$original_media->Width` are provided by the SaaS API.
 			'type'                  => ( $media->IsImage ? 'image' : ( $media->IsVideo ? 'video' : 'document' ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->IsImage` and `$media->IsVideo` are provided by the SaaS API.
 		);
+	}
+
+	/**
+	 * Generate attachment meta values for displaying in the media modal.
+	 *
+	 * @param int $post_id  The WordPress attachment Post ID.
+	 * @param object $media The Imageshop media object.
+	 *
+	 * @return string
+	 */
+	private function generate_attachment_meta_fields( $post_id, $media ) {
+		$fields = array();
+
+		$no_date_placeholder = sprintf(
+			'<em>%s</em>',
+			esc_html__( 'No date set', 'imageshop-dam-connector' )
+		);
+
+		$fields[] = sprintf(
+			'<div class="imageshpo-publish-until"><strong>%s</strong> %s</div>',
+			esc_html__( 'Publish until:', 'imageshop-dam-connector' ),
+			( ! empty( $media->PublishedUntil ) ? esc_html( $media->PublishedUntil ) : $no_date_placeholder ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->PublishedUntil` is provided by the SaaS API.
+		);
+
+		$fields[] = sprintf(
+			'<div class="imageshpo-right-expires"><strong>%s</strong> %s</div>',
+			esc_html__( 'Right expires:', 'imageshop-dam-connector' ),
+			( ! empty( $media->RightsExpiration ) ? esc_html( $media->RightsExpiration ) : $no_date_placeholder ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->RightsExpiration` is provided by the SaaS API.
+		);
+
+		return implode( "\n", $fields );
+	}
+
+	/**
+	 * Generate custom form fields and areas for the media modal.
+	 *
+	 * @param int $post_id  The WordPress attachment Post ID.
+	 * @param object $media The Imageshop media object.
+	 *
+	 * @return string
+	 */
+	private function generate_attachment_form_fields( $post_id, $media ) {
+		return '';
 	}
 }
