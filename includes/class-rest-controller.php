@@ -27,6 +27,7 @@ class REST_Controller {
 	private const IMAGESHOP_API_GET_DOCUMENT_LINK      = '/Document/GetDocumentLink';
 	private const IMAGESHOP_API_DELETE_DOCUMENT        = '/Document/DeleteDocument';
 	private const IMAGESHOP_API_GET_PERMALINK_URL      = '/Permalink/CreatePermaLinks';
+	private const IMAGESHOP_API_SET_METADATA           = '/Document/SetMetadata';
 
 	/**
 	 * @var REST_Controller
@@ -123,6 +124,15 @@ class REST_Controller {
 		}
 
 		$this->language = $language_code;
+	}
+
+	/**
+	 * Get the language code currently in use for API requests.
+	 *
+	 * @return string
+	 */
+	public function get_language() {
+		return $this->language;
 	}
 
 	/**
@@ -760,5 +770,22 @@ class REST_Controller {
 		);
 
 		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_DOWNLOAD, $args );
+	}
+
+	public function update_meta( $document_id, $payload ) {
+		$payload = array_merge(
+			array(
+				'DocumentId' => $document_id,
+			),
+			$payload
+		);
+
+		$args = array(
+			'method'  => 'PUT',
+			'headers' => $this->get_headers(),
+			'body'    => \wp_json_encode( $payload ),
+		);
+
+		return $this->execute_request( self::IMAGESHOP_API_BASE_URL . self::IMAGESHOP_API_SET_METADATA, $args );
 	}
 }

@@ -57,6 +57,11 @@ class Library {
 			)
 		);
 
+		\wp_enqueue_style(
+			'media-modal',
+			\plugins_url( '/assets/styles/media-modal.css', IMAGESHOP_PLUGIN_BASE_NAME )
+		);
+
 		\wp_localize_script(
 			'imageshop-media-library-filters',
 			'ImageshopMediaLibrary',
@@ -98,6 +103,9 @@ class Library {
 						'all'   => esc_html__( '25 results per page', 'imageshop-dam-connector' ),
 					),
 				),
+				'rest_url'       => array(
+					'update_metadata' => \rest_url( 'imageshop/v1/update-metadata' ),
+				)
 			)
 		);
 		// Overrides code styling to accommodate for a third dropdown filter

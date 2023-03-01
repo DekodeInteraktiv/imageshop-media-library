@@ -1,0 +1,24 @@
+.media-modal .imageshop-edit-toggle-wrapper {
+	width:65%;
+	float:right;
+	text-align:right;
+}
+
+.media-modal .imageshop-edit-form {
+	display: none;
+}
+.media-modal .imageshop-edit-form-feedback {
+	box-sizing: border-box;
+	display: none;
+	float: right;
+	margin: initial;
+	margin-bottom: 8px;
+	width: 65%;
+}
+
+.media-modal .setting select {
+	margin: 1px;
+	width: 65%;
+	float: right;
+	max-width: inherit;
+}

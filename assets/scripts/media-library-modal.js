@@ -291,4 +291,51 @@
 			}
 		}
 	});
-})()
+})();
+
+jQuery( document ).ready( function( $ ) {
+	$( document ).on( 'click', '.imageshop-edit-cancel', function( event ) {
+		event.preventDefault();
+
+		$( '.imageshop-edit-form' ).hide();
+		$( '.imageshop-edit-form-feedback' ).hide();
+		$( '.imageshop-edit-toggle-visibility' ).show();
+	} );
+	$( document ).on( 'click', '.imageshop-edit-toggle-visibility', function( event ) {
+		event.preventDefault();
+
+		$( '.imageshop-edit-form' ).show();
+		$( '.imageshop-edit-toggle-visibility' ).hide();
+	} );
+	$( document ).on( 'click', '.imageshop_perform_edit', function( event ) {
+		event.preventDefault();
+
+		const form = $( this ).closest( 'form' )[0];
+		const data = new FormData( form );
+		const editorFormFeedback = $( '.imageshop-edit-form-feedback' );
+
+		editorFormFeedback.hide();
+
+		$.ajax( {
+			type: 'POST',
+			url: ImageshopMediaLibrary.rest_url.update_metadata,
+			data: data,
+			processData: false,
+			contentType: false,
+			dataType: 'json'
+		} )
+			.done( function ( response ) {
+				$( '#attachment-details-alt-text' ).val( response.alt );
+				$( '#attachment-details-two-column-alt-text' ).val( response.alt );
+				$( '#attachment-details-title' ).val( response.title );
+				$( '#attachment-details-two-column-title' ).val( response.title );
+				$( '#attachment-details-caption' ).val ( response.caption );
+				$( '#attachment-details-two-column-caption' ).val ( response.caption );
+				$( '#attachment-details-description' ).val( response.description );
+				$( '#attachment-details-two-column-description' ).val( response.description );
+			} )
+			.fail( function ( response ) {
+				editorFormFeedback.show().text( response.responseJSON.message );
+			} );
+	} )
+} );
