@@ -27,7 +27,85 @@ class Attachment {
 			\add_filter( 'media_send_to_editor', array( $this, 'media_send_to_editor' ), 10, 2 );
 			\add_filter( 'wp_get_attachment_image_attributes', array( $this, 'validate_post_thumbnail_srcset' ), 10, 3 );
 			\add_filter( 'wp_content_img_tag', array( $this, 'validate_post_content_image_srcset' ), 10, 3 );
+
+			\add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		}
+	}
+
+	public function register_rest_routes() {
+		register_rest_route(
+			'imageshop/v1',
+			'/update-metadata',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'update_attachment_details_in_imageshop' ),
+				'permission_callback' => function() {
+					return \current_user_can( 'upload_files' );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Handle the REST response request to update an attachment's metadata.
+	 *
+	 * @param \WP_REST_Request $request The REST Request data.
+	 * @return array|\WP_Error
+	 */
+	public function update_attachment_details_in_imageshop( \WP_REST_Request $request ) {
+		$payload = array();
+		$imageshop = REST_Controller::get_instance();
+
+		foreach ( $request->get_params() as $key => $value ) {
+			switch ( $key ) {
+				case 'imageshop_name':
+					$payload['Name'] = $value;
+					break;
+				case 'imageshop_credits':
+					$payload['Credits'] = $value;
+					break;
+				case 'imageshop_rights':
+					$payload['Rights'] = $value;
+					break;
+				case 'imageshop_description':
+					$payload['Description'] = $value;
+					break;
+				case 'imageshop_tags':
+					$payload['Tags'] = $value;
+					break;
+				case 'imageshop_language':
+					$payload['Language'] = $value;
+					break;
+			}
+		}
+
+		// Updating metadata returns a boolean value response.
+		if ( $imageshop->update_meta( $request->get_param( 'imageshop_edit-id' ), $payload ) ) {
+			$media = $imageshop->get_document( $request->get_param( 'imageshop_edit-id' ) );
+
+			$caption = $media->Description; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
+
+			if ( ! empty( $media->Credits ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+				if ( ! empty( $caption ) ) {
+					$caption = \sprintf(
+						'%s (%s)',
+						$caption,
+						$media->Credits // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+					);
+				} else {
+					$caption = $media->Credits; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+				}
+			}
+
+			return array(
+				'title'       => $media->Name,
+				'alt'         => $media->Description,
+				'caption'     => $caption,
+				'description' => $media->Description,
+			);
+		}
+
+		return new \WP_Error( 'imageshop_update_metadata_error', __( 'There was an error updating the metadata for this image.', 'imageshop-dam-connector' ) );
 	}
 
 	/**

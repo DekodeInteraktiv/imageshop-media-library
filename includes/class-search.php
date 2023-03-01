@@ -25,6 +25,7 @@ class Search {
 			$this->attachment = Attachment::get_instance();
 
 			\add_action( 'wp_ajax_query-attachments', array( $this, 'search_media' ), 0 );
+			//\add_action( 'wp_ajax_upload-attachment', array( $this, 'search_media' ), 0 );
 			\add_filter( 'rest_prepare_attachment', array( $this, 'rest_image_override' ), 10, 2 );
 		}
 	}
@@ -425,6 +426,12 @@ class Search {
 			( ! empty( $media->RightsExpiration ) ? esc_html( $media->RightsExpiration ) : $no_date_placeholder ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->RightsExpiration` is provided by the SaaS API.
 		);
 
+		$fields[] = sprintf(
+			'<div class="imageshpo-documentid"><strong>%s</strong> %s</div>',
+			esc_html__( 'Imagesshop DocumentID:', 'imageshop-dam-connector' ),
+			$media->DocumentID // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
+		);
+
 		return implode( "\n", $fields );
 	}
 
@@ -437,6 +444,114 @@ class Search {
 	 * @return string
 	 */
 	private function generate_attachment_form_fields( $post_id, $media ) {
-		return '';
+		$prefix = 'imageshop_';
+		$fields = array();
+		$output = '';
+
+		$fields['name'] = array(
+			'label' => __( 'Name', 'imageshop-dam-connector' ),
+			'value' => $media->Name,
+		);
+		$fields['credits'] = array(
+			'label' => __( 'Credits', 'imageshop-dam-connector' ),
+			'value' => $media->Credits,
+		);
+		$fields['rights'] = array(
+			'label' => __( 'Rights', 'imageshop-dam-connector' ),
+			'value' => $media->Rights,
+		);
+		$fields['description'] = array(
+			'label' => __( 'Description', 'imageshop-dam-connector' ),
+			'value' => $media->Description,
+			'type'  => 'longtext',
+		);
+		$fields['language'] = array(
+			'label'   => __( 'Language', 'imageshop-dam-connector' ),
+			'value'   => $this->imageshop->get_language(),
+			'type'    => 'select',
+			'options' => array(
+				'en' => esc_html__( 'English', 'imageshop-dam-connector' ),
+				'da' => esc_html__( 'Danish', 'imageshop-dam-connector' ),
+				'no' => esc_html__( 'Norwegian', 'imageshop-dam-connector' ),
+				'sv' => esc_html__( 'Swedish', 'imageshop-dam-connector' ),
+			)
+		);
+		$fields['tags'] = array(
+			'label' => __( 'Tags', 'imageshop-dam-connector' ),
+			'value' => $media->Tags,
+		);
+
+		foreach ( $fields as $key => $field ) {
+			$type = ( isset( $field['type'] ) ? $field['type'] : 'text' );
+
+			switch ( $type ) {
+				case 'longtext':
+					$output .= sprintf(
+						'<div class="setting"><label for="%1$s" class="name">%2$s</label><textarea type="text" id="%1$s" name="%1$s">%3$s</textarea></div>',
+						esc_attr( $prefix . sanitize_title( $key ) ),
+						esc_html( $field['label'] ),
+						esc_attr( $field['value'] )
+					);
+					break;
+				case 'select':
+					$options = [];
+					foreach ( $field['options'] as $slug => $option ) {
+						$options[] = sprintf(
+							'<option value="%s"%s>%s</option>',
+							esc_attr( $slug ),
+							selected( $slug, $field['value'], false ),
+							esc_html( $option )
+						);
+					}
+					$output .= sprintf(
+						'<div class="setting"><label for="%1$s" class="name">%2$s</label><select id="%1$s" name="%1$s">%3$s</select></div>',
+						esc_attr( $prefix . sanitize_title( $key ) ),
+						esc_html( $field['label'] ),
+						implode( "\n", $options )
+					);
+					break;
+				case 'text':
+				default:
+					$output .= sprintf(
+						'<div class="setting"><label for="%1$s" class="name">%2$s</label><input type="text" id="%1$s" name="%1$s" value="%3$s"></div>',
+						esc_attr( $prefix . sanitize_title( $key ) ),
+						esc_html( $field['label'] ),
+						esc_attr( $field['value'] )
+					);
+			}
+		}
+
+		// Only add form submission if fields have been introduced.
+		if ( ! empty( $output ) ) {
+			$nonce_action = sprintf(
+				'imageshop_edit-%d',
+				$media->DocumentID // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
+			);
+
+			$output .= sprintf(
+				'<input type="hidden" name="imageshop_edit-id" value="%d">',
+				esc_attr( $media->DocumentID ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
+			);
+			$output .= wp_nonce_field( $nonce_action, 'imageshop_edit-nonce', false, false );
+			$output .= wp_nonce_field( 'wp_rest', '_wpnonce', false, false );
+			$output .= '<div class="imageshop-edit-form-feedback error"></div>';
+			$output .= sprintf(
+				'
+				<div class="imageshop-edit-toggle-wrapper">
+					<button type="button" class="button button-small button-primary imageshop_perform_edit">%s</button>
+					<button type="button" class="button button-small imageshop-edit-cancel">%s</button>
+				</div>',
+				esc_html__( 'Update Imageshop details', 'imageshop-dam-connector' ),
+				esc_html__( 'Cancel', 'imageshop-dam-connector' )
+			);
+
+			$output = sprintf(
+				'<div class="imageshop-edit-toggle-wrapper"><button type="button" class="button button-small button-link imageshop-edit-toggle-visibility">%s</button></div><div class="imageshop-edit-form">%s</div>',
+				esc_html__( 'Edit Imageshop details', 'imageshop-dam-connector' ),
+				$output
+			);
+		}
+
+		return $output;
 	}
 }
