@@ -33,7 +33,7 @@ jobs:
                   changelog="${changelog//$'\n'/'%0A'}"
                   changelog="${changelog//$'\r'/'%0D'}"
                   echo $changelog
-                  echo "::set-output name=changes::$changelog"
+                  echo "changes=$changelog" >> $GITHUB_OUTPUT
 
             - name: Build dependencies
               run: npm run build
