@@ -427,9 +427,15 @@ class Search {
 		);
 
 		$fields[] = sprintf(
+			'<div class="imageshpo-post-id"><strong>%s</strong> %s</div>',
+			esc_html__( 'WordPress Attachment ID:', 'imageshop-dam-connector' ),
+			esc_html( $post_id )
+		);
+
+		$fields[] = sprintf(
 			'<div class="imageshpo-documentid"><strong>%s</strong> %s</div>',
 			esc_html__( 'Imagesshop DocumentID:', 'imageshop-dam-connector' ),
-			$media->DocumentID // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
+			esc_html( $media->DocumentID ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
 		);
 
 		return implode( "\n", $fields );
@@ -450,21 +456,25 @@ class Search {
 
 		$fields['name'] = array(
 			'label' => __( 'Name', 'imageshop-dam-connector' ),
-			'value' => $media->Name,
+			'value' => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
 		);
+
 		$fields['credits'] = array(
 			'label' => __( 'Credits', 'imageshop-dam-connector' ),
-			'value' => $media->Credits,
+			'value' => $media->Credits, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
 		);
+
 		$fields['rights'] = array(
 			'label' => __( 'Rights', 'imageshop-dam-connector' ),
-			'value' => $media->Rights,
+			'value' => $media->Rights, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Rights` is provided by the SaaS API.
 		);
+
 		$fields['description'] = array(
 			'label' => __( 'Description', 'imageshop-dam-connector' ),
-			'value' => $media->Description,
+			'value' => $media->Description, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
 			'type'  => 'longtext',
 		);
+
 		$fields['language'] = array(
 			'label'   => __( 'Language', 'imageshop-dam-connector' ),
 			'value'   => $this->imageshop->get_language(),
@@ -474,11 +484,12 @@ class Search {
 				'da' => esc_html__( 'Danish', 'imageshop-dam-connector' ),
 				'no' => esc_html__( 'Norwegian', 'imageshop-dam-connector' ),
 				'sv' => esc_html__( 'Swedish', 'imageshop-dam-connector' ),
-			)
+			),
 		);
+
 		$fields['tags'] = array(
 			'label' => __( 'Tags', 'imageshop-dam-connector' ),
-			'value' => $media->Tags,
+			'value' => $media->Tags, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Tags` is provided by the SaaS API.
 		);
 
 		foreach ( $fields as $key => $field ) {
@@ -494,7 +505,8 @@ class Search {
 					);
 					break;
 				case 'select':
-					$options = [];
+					$options = array();
+
 					foreach ( $field['options'] as $slug => $option ) {
 						$options[] = sprintf(
 							'<option value="%s"%s>%s</option>',
@@ -546,7 +558,16 @@ class Search {
 			);
 
 			$output = sprintf(
-				'<div class="imageshop-edit-toggle-wrapper"><button type="button" class="button button-small button-link imageshop-edit-toggle-visibility">%s</button></div><div class="imageshop-edit-form">%s</div>',
+				'
+				<div class="imageshop-edit-toggle-wrapper">
+					<button type="button" class="button button-small button-link imageshop-flush-cache" data-imageshop-id="%d" data-flush-nonce="%s">%s</button>
+					<button type="button" class="button button-small button-link imageshop-edit-toggle-visibility">%s</button>
+				</div>
+				<div class="imageshop-ajax-generic-feedback notice"></div>
+				<div class="imageshop-edit-form">%s</div>',
+				esc_attr( $post_id ),
+				esc_attr( wp_create_nonce( 'imageshop-flush-cache-' . $post_id ) ),
+				esc_html__( 'Regenerate Imageshop cache', 'imageshop-dam-connector' ),
 				esc_html__( 'Edit Imageshop details', 'imageshop-dam-connector' ),
 				$output
 			);

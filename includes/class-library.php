@@ -103,9 +103,13 @@ class Library {
 						'all'   => esc_html__( '25 results per page', 'imageshop-dam-connector' ),
 					),
 				),
-				'rest_url'       => array(
+				'nonce'             => array(
+					'rest' => \wp_create_nonce( 'wp_rest' ),
+				),
+				'rest_url'          => array(
 					'update_metadata' => \rest_url( 'imageshop/v1/update-metadata' ),
-				)
+					'flush_cache'     => \rest_url( 'imageshop/v1/flush-cache' ),
+				),
 			)
 		);
 		// Overrides code styling to accommodate for a third dropdown filter

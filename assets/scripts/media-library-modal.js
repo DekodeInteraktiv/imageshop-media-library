@@ -337,5 +337,36 @@ jQuery( document ).ready( function( $ ) {
 			.fail( function ( response ) {
 				editorFormFeedback.show().text( response.responseJSON.message );
 			} );
-	} )
+	} );
+
+	$( document ).on( 'click', '.imageshop-flush-cache', function( event ) {
+		event.preventDefault();
+
+		const feedbackWrapper = $( '.imageshop-ajax-generic-feedback' );
+
+		// Clear existing AJAX feedbacks and states.
+		feedbackWrapper
+			.removeClass( 'notice-error' )
+			.removeClass( 'notice-success' )
+			.removeClass( 'notice-warning' )
+			.hide();
+
+		$.ajax( {
+			type: 'POST',
+			url: ImageshopMediaLibrary.rest_url.flush_cache,
+			data: {
+				_wpnonce: ImageshopMediaLibrary.nonce.rest,
+				edit_nonce: $( this ).data( 'flush-nonce' ),
+				id: $( this ).data( 'imageshop-id' )
+			},
+			dataType: 'json'
+		} )
+			.done( function ( response ) {
+				feedbackWrapper.addClass( 'notice-success' ).text( response.message ).show();
+			} )
+			.fail( function ( response ) {
+				console.log( response );
+				feedbackWrapper.addClass( 'notice-error' ).text( response.responseJSON.message ).show();
+			} );
+	} );
 } );

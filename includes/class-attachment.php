@@ -44,6 +44,54 @@ class Attachment {
 				},
 			)
 		);
+
+		register_rest_route(
+			'imageshop/v1',
+			'/flush-cache',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'flush_local_imageshop_references' ),
+				'permission_callback' => function() {
+					return \current_user_can( 'upload_files' );
+				},
+			)
+		);
+	}
+
+	public function flush_local_imageshop_references( \WP_REST_Request $request ) {
+		if ( ! wp_verify_nonce( $request->get_param( 'edit_nonce' ), 'imageshop-flush-cache-' . $request->get_param( 'id' ) ) ) {
+			return new \WP_Error(
+				'imageshop_flush_cache',
+				esc_html__( 'An invalid timed security token (nonce) was passed, please refresh your page and try again.', 'imageshop-dam-connector' ),
+				array(
+					'status' => 403,
+				)
+			);
+		}
+
+		if ( 'attachment' !== get_post_type( $request->get_param( 'id' ) ) ) {
+			return new \WP_Error(
+				'imageshop_flush_cache',
+				esc_html__( 'The ID used with this request does not belong to an attachment.', 'imageshop-dam-connector' ),
+				array(
+					'status' => 400,
+				)
+			);
+		}
+
+		// Delete the stores permalink variations.
+		delete_post_meta( $request->get_param( 'id' ), '_imageshop_permalinks' );
+
+		// Delete the stored metadata.
+		delete_post_meta( $request->get_param( 'id' ), '_imageshop_media_sizes' );
+
+		// generate new metadata, which will also generate new permalinks as needed.
+		$this->generate_imageshop_metadata( get_post( $request->get_param( 'id' ) ) );
+
+		return array(
+			'success' => true,
+			'message' => esc_html__( 'The Imageshop references have been re-created.', 'imageshop-dam-connector' ),
+		);
 	}
 
 	/**
@@ -53,7 +101,7 @@ class Attachment {
 	 * @return array|\WP_Error
 	 */
 	public function update_attachment_details_in_imageshop( \WP_REST_Request $request ) {
-		$payload = array();
+		$payload   = array();
 		$imageshop = REST_Controller::get_instance();
 
 		foreach ( $request->get_params() as $key => $value ) {
@@ -98,10 +146,10 @@ class Attachment {
 			}
 
 			return array(
-				'title'       => $media->Name,
-				'alt'         => $media->Description,
+				'title'       => $media->Name, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Name` is provided by the SaaS API.
+				'alt'         => $media->Description, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
 				'caption'     => $caption,
-				'description' => $media->Description,
+				'description' => $media->Description, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
 			);
 		}
 
@@ -844,7 +892,9 @@ class Attachment {
 		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
 			if ( 'Original' === $document->VersionName ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is defined by the SaaS API.
 				$original_image = $document;
-				break;
+			}
+			if ( isset( $document->IsOriginal ) && $document->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->IsOriginal` is defined by the SaaS API.
+				$original_image = $document;
 			}
 		}
 
