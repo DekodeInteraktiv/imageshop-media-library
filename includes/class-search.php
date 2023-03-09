@@ -437,9 +437,9 @@ class Search {
 		);
 
 		$fields[] = sprintf(
-			'<div class="imageshpo-documentid"><strong>%s</strong> %s</div>',
-			esc_html__( 'Imagesshop DocumentID:', 'imageshop-dam-connector' ),
-			esc_html( $media->DocumentID ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->DocumentID` is provided by the SaaS API.
+			'<div class="imageshpo-document-code"><strong>%s</strong> %s</div>',
+			esc_html__( 'Imagesshop Document Code:', 'imageshop-dam-connector' ),
+			esc_html( $media->Code ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Code` is provided by the SaaS API.
 		);
 
 		return implode( "\n", $fields );
