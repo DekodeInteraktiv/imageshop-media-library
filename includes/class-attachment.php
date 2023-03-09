@@ -254,6 +254,25 @@ class Attachment {
 			);
 		}
 
+		$append_classes = array();
+
+		// Check if a `imageshop-document-id-###` class is present, and if not, add it.
+		if ( ! stristr( $filtered_image, 'imageshop-document-id-' ) ) {
+			$append_classes['imageshop'] = sprintf(
+				'imageshop-document-id-%s',
+				get_post_meta( $attachment_id, '_imageshop_document_id', true )
+			);
+		}
+
+		// Check if a `wp-image-###` class is present, and if not, add it.
+		if ( ! preg_match( '/class=".*?wp-image-[0-9]{1,}.*?"/si', $filtered_image ) ) {
+			$append_classes['wp'] = 'wp-image-' . $attachment_id;
+		}
+
+		if ( ! empty( $append_classes ) ) {
+			$filtered_image = str_replace( 'class="', 'class="' . esc_attr( implode( ' ', $append_classes ) ) . ' ', $filtered_image );
+		}
+
 		return $filtered_image;
 	}
 

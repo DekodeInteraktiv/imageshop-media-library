@@ -431,12 +431,6 @@ class Search {
 		}
 
 		$fields[] = sprintf(
-			'<div class="imageshpo-post-id"><strong>%s</strong> %s</div>',
-			esc_html__( 'WordPress Attachment ID:', 'imageshop-dam-connector' ),
-			esc_html( $post_id )
-		);
-
-		$fields[] = sprintf(
 			'<div class="imageshpo-document-code"><strong>%s</strong> %s</div>',
 			esc_html__( 'Imagesshop Document Code:', 'imageshop-dam-connector' ),
 			esc_html( $media->Code ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Code` is provided by the SaaS API.
