@@ -414,17 +414,21 @@ class Search {
 			esc_html__( 'No date set', 'imageshop-dam-connector' )
 		);
 
-		$fields[] = sprintf(
-			'<div class="imageshpo-publish-until"><strong>%s</strong> %s</div>',
-			esc_html__( 'Publish until:', 'imageshop-dam-connector' ),
-			( ! empty( $media->PublishedUntil ) ? esc_html( $media->PublishedUntil ) : $no_date_placeholder ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->PublishedUntil` is provided by the SaaS API.
-		);
+		if ( ! empty( $media->PublishedUntil ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->PublishedUntil` is provided by the SaaS API.
+			$fields[] = sprintf(
+				'<div class="imageshpo-publish-until"><strong>%s</strong> %s</div>',
+				esc_html__( 'Publish until:', 'imageshop-dam-connector' ),
+				esc_html( $media->PublishedUntil ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->PublishedUntil` is provided by the SaaS API.
+			);
+		}
 
-		$fields[] = sprintf(
-			'<div class="imageshpo-right-expires"><strong>%s</strong> %s</div>',
-			esc_html__( 'Right expires:', 'imageshop-dam-connector' ),
-			( ! empty( $media->RightsExpiration ) ? esc_html( $media->RightsExpiration ) : $no_date_placeholder ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->RightsExpiration` is provided by the SaaS API.
-		);
+		if ( ! empty( $media->RightsExpiration ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->RightsExpiration` is provided by the SaaS API.
+			$fields[] = sprintf(
+				'<div class="imageshpo-right-expires"><strong>%s</strong> %s</div>',
+				esc_html__( 'Right expires:', 'imageshop-dam-connector' ),
+				esc_html( $media->RightsExpiration ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->RightsExpiration` is provided by the SaaS API.
+			);
+		}
 
 		$fields[] = sprintf(
 			'<div class="imageshpo-post-id"><strong>%s</strong> %s</div>',
