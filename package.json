@@ -24,6 +24,7 @@
 		"languages",
 		"imageshop-dam-connector.php",
 		"readme.txt",
-		"uninstall.php"
+		"uninstall.php",
+		"changelog.txt"
 	]
 }
