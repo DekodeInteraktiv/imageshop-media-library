@@ -71,11 +71,11 @@ const Import = ( { setStep } ) => {
 	return (
 		<>
 			<p>
-				{ __( 'Would you like to import your current media library to Imageshop?', 'imageshop-dam-connector' ) }
+				{ __( 'Would you like to import your current Wordpress media library to Imageshop? This would make your media be available both in Imageshop and in the Imageshop plugin.', 'imageshop-dam-connector' ) }
 			</p>
 
 			<p>
-				{ __( 'By importing your media library, you ensure that it will remain available to insert into new posts or pages, and also makes it available to the rest of your organization via the normal Imageshop interfaces and other integrations.', 'imageshop-dam-connector' ) }
+				{ __( 'WARNING: Such an import may take quite a long time to complete, and is not required for your existing media to keep showing as usual. You should only perform an import if you know that you need existing media to be available in Imageshop as well.', 'imageshop-dam-connector' ) }
 			</p>
 
 			{ doingImport &&
@@ -92,12 +92,12 @@ const Import = ( { setStep } ) => {
 			}
 
 			<div className="imageshop-modal-actions">
-				<button type="button" className="button button-primary" onClick={ () => startImports() } disabled={ doingImport }>
-					{ __( 'Import existing media', 'imageshop-dam-connector' ) }
+				<button type="button" className="button button-primary" onClick={ () => setupComplete() } disabled={ doingImport }>
+					{ __( 'Continue without importing media', 'imageshop-dam-connector' ) }
 				</button>
 
-				<button type="button" className="button button-secondary" onClick={ () => setupComplete() } disabled={ doingImport }>
-					{ __( 'Continue without importing media', 'imageshop-dam-connector' ) }
+				<button type="button" className="button button-link button-link-delete" onClick={ () => startImports() } disabled={ doingImport }>
+					{ __( 'Import existing media', 'imageshop-dam-connector' ) }
 				</button>
 			</div>
 		</>
