@@ -134,10 +134,12 @@
 
 		createFilters: function() {
 			var filters = {};
+			var incremental = 0;
 
 			if ( ImageshopMediaLibrary.categories ) {
 				ImageshopMediaLibrary.categories.map( ( category ) => {
-					filters[ category.CategoryID ] = {
+					incremental++;
+					filters[ incremental ] = {
 						text: category.CategoryName,
 						props: {
 							// Change this: key needs to be the WP_Query var for the taxonomy
@@ -147,7 +149,8 @@
 
 					if ( category.Children ) {
 						category.Children.map( ( child ) => {
-							filters[ child.CategoryID ] = {
+							incremental++;
+							filters[ incremental ] = {
 								text: ' - ' + child.CategoryName,
 								props: {
 									// Change this: key needs to be the WP_Query var for the taxonomy
