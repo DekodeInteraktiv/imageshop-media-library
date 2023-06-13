@@ -2,11 +2,11 @@
 	"name": "imageshop",
 	"version": "1.0.0",
 	"devDependencies": {
-		"@wordpress/env": "~5.2.0",
-		"@wordpress/scripts": "~24.0.0",
-		"@wordpress/stylelint-config": "~21.0.0",
-		"react": "~17.0.2",
-		"react-dom": "~17.0.2"
+		"@wordpress/env": "^8.1.0",
+		"@wordpress/scripts": "^26.6.0",
+		"@wordpress/stylelint-config": "^21.18.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
 	},
 	"scripts": {
 		"build": "wp-scripts build src/onboarding.js",
