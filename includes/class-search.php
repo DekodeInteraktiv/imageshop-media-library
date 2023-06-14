@@ -392,7 +392,11 @@ class Search {
 			'height'                => $original_media->Height, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` is provided by the SaaS API.
 			'width'                 => $original_media->Width, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Width` is provided by the SaaS API.
 			'filesizeInBytes'       => $original_media->FileSize, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->FileSize` is provided by the SaaS API.
-			'filesizeHumanReadable' => \size_format( $original_media->FileSize ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->FileSize` is provided by the SaaS API.
+			'filesizeHumanReadable' => sprintf(
+				'%s (%s)',
+				\size_format( $original_media->FileSize ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->FileSize` is provided by the SaaS API.
+				__( 'Original image size, different sizes will be presented to site visitors', 'imageshop-dam-connector' )
+			),
 			'orientation'           => ( $original_media->Height > $original_media->Width ? 'portrait' : 'landscape' ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_media->Height` and `$original_media->Width` are provided by the SaaS API.
 			'type'                  => ( $media->IsImage ? 'image' : ( $media->IsVideo ? 'video' : 'document' ) ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->IsImage` and `$media->IsVideo` are provided by the SaaS API.
 		);
