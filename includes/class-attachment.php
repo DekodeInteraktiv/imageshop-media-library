@@ -711,19 +711,7 @@ class Attachment {
 			return $media_details;
 		}
 
-		$original_image = null;
-		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
-			// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
-			if ( 'Original' === $document->VersionName && null === $original_image ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is provided by the SaaS API.
-				$original_image = $document;
-			}
-
-			// An actually declared original should always take priority.
-			if ( 1 === $document->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is defined by the SaaS API.
-				$original_image = $document;
-				break;
-			}
-		}
+		$original_image = Attachment::get_document_original_file( $media, null );
 
 		if ( $original_image && ( 0 === $original_image->Width || 0 === $original_image->Height ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$original_image->Width` and `$original_image->Height` are provided by the SaaS API.
 			$dimensions = $this->get_original_dimensions( $media->InterfaceList, $original_image ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->InterfaceList` is provided by the SaaS API.
@@ -916,6 +904,11 @@ class Attachment {
 	}
 
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
+		// If dimensions are both 0, this image would never be visible, so skip the size.
+		if ( 0 === $height && 0 === $width ) {
+			return null;
+		}
+
 		// Check for a local copy of the permalink first.
 		$local_sizes = $this->get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop );
 		if ( null !== $local_sizes ) {
