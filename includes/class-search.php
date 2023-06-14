@@ -311,20 +311,7 @@ class Search {
 			}
 		}
 
-		$original_media = null;
-
-		foreach ( $media->SubDocumentList as $sub ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is provided by the SaaS API.
-			// For some reason, `IsOriginal` may sometimes be `0`, even on an original image.
-			if ( 'Original' === $sub->VersionName && null === $original_media ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->VersionName` is provided by the SaaS API.
-				$original_media = $sub;
-			}
-
-			// An actually declared original should always take priority.
-			if ( 1 === $sub->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$sub->IsOriginal` is provided by the SaaS API.
-				$original_media = $sub;
-				break;
-			}
-		}
+		$original_media = Attachment::get_document_original_file( $media, null );
 
 		if ( null === $original_media ) {
 			$original_media = (object) array(

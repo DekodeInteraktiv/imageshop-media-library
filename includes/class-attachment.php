@@ -896,6 +896,25 @@ class Attachment {
 		$this->documents[ $document_id ] = $document_details;
 	}
 
+	public static function get_document_original_file( $media, $default = array() ) {
+		$original_image     = array();
+		$original_fallbacks = array();
+
+		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
+			// The version name given to an original file is not consistent, but generally prefixed with "Original".
+			if ( \substr( \strtolower( $document->VersionName ), 0, 8 ) === 'original' ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is defined by the SaaS API.
+				$original_fallbacks[] = $document;
+			}
+
+			// If the document is explicitly declared an original, use it.
+			if ( isset( $document->IsOriginal ) && $document->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->IsOriginal` is defined by the SaaS API.
+				$original_image = $document;
+			}
+		}
+
+		return ( $original_image ? $original_image : ( $original_fallbacks ? $original_fallbacks[0] : $default ) );
+	}
+
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
 		// Check for a local copy of the permalink first.
 		$local_sizes = $this->get_local_permalink_for_size( $document_id, $filename, $width, $height, $crop );
@@ -907,15 +926,7 @@ class Attachment {
 
 		$media = $this->get_document( $document_id );
 
-		$original_image = array();
-		foreach ( $media->SubDocumentList as $document ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->SubDocumentList` is defined by the SaaS API.
-			if ( 'Original' === $document->VersionName ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->VersionName` is defined by the SaaS API.
-				$original_image = $document;
-			}
-			if ( isset( $document->IsOriginal ) && $document->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->IsOriginal` is defined by the SaaS API.
-				$original_image = $document;
-			}
-		}
+		$original_image = self::get_document_original_file( $media );
 
 		// If no original image to calculate crops of exist, skip this size.
 		if ( empty( $original_image ) && ( 0 === $width || 0 === $height ) ) {
