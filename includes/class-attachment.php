@@ -179,6 +179,7 @@ class Attachment {
 	public function validate_post_content_image_srcset( $filtered_image, $context, $attachment_id ) {
 		global $wpdb;
 		$dimensions = array();
+		$upload_dir = wp_upload_dir();
 
 		// Extract the image size slug.
 		preg_match( '/class=".+?size-(\S*)/si', $filtered_image, $size_slug );
@@ -194,12 +195,41 @@ class Attachment {
 				return $filtered_image;
 			}
 
+			/*
+			 * Manipulate the image URL to only return the expected path as used by the `_wp_attached_file` meta key.
+			 *
+			 * Start by checking if the image has a `YYYY/MM` path structure, and start splitting the URL from there.
+			 * This is preferred, as it is more accurate, but not all media has this structure.
+			 */
+			if ( preg_match( '/\/\d{4}\/\d{2}\//', $image_url ) ) {
+				$image_meta_parts = explode( $upload_dir['subdir'], $image_url, 2 );
+
+				if ( $image_meta_parts ) {
+					$image_meta_value = str_replace( $image_meta_parts[0], '', $image_url );
+				}
+			} else {
+				/*
+				 * If the media item doesn't have a `YYYY/MM` path structure, we need to presume it is all in one folder,
+				 * and split it by the directory separator and rely on the final bit being what we need.
+				 */
+				$image_meta_value = explode( '/', $image_url );
+				$image_meta_value = end( $image_meta_value );
+			}
+
+			// If, for whatever reason, we still don't have a value, return the original markup.
+			if ( empty( $image_meta_value ) ) {
+				return $filtered_image;
+			}
+
+			// Make sure there are no leading, or trailing, slashes.
+			$image_meta_value = trim( $image_meta_value, '/' );
+
 			$attachment_id = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT post_id FROM {$wpdb->postmeta} WHERE `meta_value` LIKE %s LIMIT 1",
 					sprintf(
 						'%%%s%%',
-						$image_url
+						$image_meta_value
 					)
 				)
 			);
