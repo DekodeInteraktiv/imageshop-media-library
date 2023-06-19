@@ -232,14 +232,24 @@ class Attachment {
 			return $caption;
 		}
 
-		$imageshop_caption = \get_transient( '_imageshop_attachment_caption_' . $post_id );
+		// The ID the metadata is stored under.
+		$transient_id = sprintf(
+			'_imageshop_attachment_caption_%s_%s',
+			\get_locale(),
+			$post_id
+		);
+
+		$imageshop_caption = \get_transient( $transient_id );
 
 		if ( false === $imageshop_caption ) {
 			$imageshop = REST_Controller::get_instance();
-			$media     = $imageshop->get_document( $document_id );
+
+			$imageshop->set_language( \get_locale() );
+
+			$media = $imageshop->get_document( $document_id );
 
 			$imageshop_caption = self::generate_attachment_caption( $media );
-			\set_transient( '_imageshop_attachment_caption_' . $post_id, $imageshop_caption, WEEK_IN_SECONDS );
+			\set_transient( $transient_id, $imageshop_caption, WEEK_IN_SECONDS );
 		}
 
 		return $imageshop_caption;
