@@ -28,6 +28,8 @@ class Attachment {
 			\add_filter( 'wp_get_attachment_image_attributes', array( $this, 'validate_post_thumbnail_srcset' ), 10, 3 );
 			\add_filter( 'wp_content_img_tag', array( $this, 'validate_post_content_image_srcset' ), 10, 3 );
 
+			\add_filter( 'wp_get_attachment_caption', array( $this, 'get_attachment_caption' ), 10, 2 );
+
 			\add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		}
 	}
@@ -80,13 +82,16 @@ class Attachment {
 		}
 
 		// Delete the stores permalink variations.
-		delete_post_meta( $request->get_param( 'id' ), '_imageshop_permalinks' );
+		\delete_post_meta( $request->get_param( 'id' ), '_imageshop_permalinks' );
 
 		// Delete the stored metadata.
-		delete_post_meta( $request->get_param( 'id' ), '_imageshop_media_sizes' );
+		\delete_post_meta( $request->get_param( 'id' ), '_imageshop_media_sizes' );
 
 		// generate new metadata, which will also generate new permalinks as needed.
 		$this->generate_imageshop_metadata( get_post( $request->get_param( 'id' ) ) );
+
+		// Remove transient caches relating ot this entry.
+		\delete_transient( '_imageshop_attachment_caption_' . $request->get_param( 'id' ) );
 
 		return array(
 			'success' => true,
@@ -213,6 +218,31 @@ class Attachment {
 	 */
 	private function should_override_media( $attachment_id ) {
 		return $this->is_valid_attachment_type( $attachment_id ) && $this->is_valid_attachment_id( $attachment_id );
+	}
+
+	public function get_attachment_caption( $caption, $post_id ) {
+		if ( ! $this->should_override_media( $post_id ) ) {
+			return $caption;
+		}
+
+		$document_id = \get_post_meta( $post_id, '_imageshop_document_id', true );
+
+		// Don't override if there is no Imageshop ID assocaition.
+		if ( ! $document_id ) {
+			return $caption;
+		}
+
+		$imageshop_caption = \get_transient( '_imageshop_attachment_caption_' . $post_id );
+
+		if ( false === $imageshop_caption ) {
+			$imageshop = REST_Controller::get_instance();
+			$media     = $imageshop->get_document( $document_id );
+
+			$imageshop_caption = self::generate_attachment_caption( $media );
+			\set_transient( '_imageshop_attachment_caption_' . $post_id, $imageshop_caption, WEEK_IN_SECONDS );
+		}
+
+		return $imageshop_caption;
 	}
 
 	/**
@@ -991,6 +1021,35 @@ class Attachment {
 		}
 
 		return ( $original_image ? $original_image : ( $original_fallbacks ? $original_fallbacks[0] : $default ) );
+	}
+
+	/**
+	 * Generate an image caption from the media object.
+	 *
+	 * @param object $media The media object.
+	 *
+	 * @return string|null
+	 */
+	public static function generate_attachment_caption( $media ) {
+		if ( ! is_object( $media ) ) {
+			return null;
+		}
+
+		$caption = $media->Description; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
+
+		if ( ! empty( $media->Credits ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+			if ( ! empty( $caption ) ) {
+				$caption = \sprintf(
+					'%s (%s)',
+					$caption,
+					$media->Credits // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+				);
+			} else {
+				$caption = $media->Credits; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
+			}
+		}
+
+		return $caption;
 	}
 
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
