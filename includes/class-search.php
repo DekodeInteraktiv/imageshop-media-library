@@ -297,19 +297,7 @@ class Search {
 			}
 		}
 
-		$caption = $media->Description; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Description` is provided by the SaaS API.
-
-		if ( ! empty( $media->Credits ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
-			if ( ! empty( $caption ) ) {
-				$caption = \sprintf(
-					'%s (%s)',
-					$caption,
-					$media->Credits // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
-				);
-			} else {
-				$caption = $media->Credits; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->Credits` is provided by the SaaS API.
-			}
-		}
+		$caption = Attachment::generate_attachment_caption( $media );
 
 		$original_media = Attachment::get_document_original_file( $media, null );
 
