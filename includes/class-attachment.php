@@ -168,6 +168,54 @@ class Attachment {
 	}
 
 	/**
+	 * Check if an attachment ID contains a valid image mime-type that can be used with Imageshop.
+	 *
+	 * @param int $attachment_id The Post ID to validate against the attachment post type.
+	 *
+	 * @return bool
+	 */
+	private function is_valid_attachment_type( $attachment_id ) {
+		$attachment = get_post( $attachment_id );
+
+		if ( ! $attachment ) {
+			return false;
+		}
+
+		$mime_type = get_post_mime_type( $attachment );
+
+		/**
+		 * A non-associative array of mime types that are allowed to be considered media
+		 * files that Imageshop can generate, and supply.
+		 *
+		 * @param array $allowed_mimes The allowed mime types.
+		 */
+		$allowed_mimes = apply_filters(
+			'imageshop_allowed_mimes',
+			array(
+				'image/jpeg',
+				'image/png',
+				'image/gif',
+				'image/bmp',
+				'image/tiff',
+				'image/webp',
+			)
+		);
+
+		return in_array( $mime_type, $allowed_mimes, true );
+	}
+
+	/**
+	 * A collection of checks to determine if the media should be overridden with Imageshop data.
+	 *
+	 * @param int $attachment_id The attachment post ID to validate against.
+	 *
+	 * @return bool
+	 */
+	private function should_override_media( $attachment_id ) {
+		return $this->is_valid_attachment_type( $attachment_id ) && $this->is_valid_attachment_id( $attachment_id );
+	}
+
+	/**
 	 * Validate that post-content images being output have been given the appropriate srcset data when possible.
 	 *
 	 * @param string $filtered_image The HTML markup for the `img` tag.
@@ -316,6 +364,10 @@ class Attachment {
 	 * @return array
 	 */
 	public function validate_post_thumbnail_srcset( $attr, $attachment, $size ) {
+		if ( ! $this->should_override_media( $attachment->ID ) ) {
+			return $attr;
+		}
+
 		if ( ! isset( $attr['srcset'] ) ) {
 			$srcset_meta = $this->generate_attachment_srcset( $attachment->ID, $size );
 
@@ -540,6 +592,10 @@ class Attachment {
 	 * @return array|false
 	 */
 	public function attachment_image_src( $image, $attachment_id, $size ) {
+		if ( ! $this->should_override_media( $attachment_id ) ) {
+			return $image;
+		}
+
 		$media_details = \get_post_meta( $attachment_id, '_imageshop_media_sizes', true );
 		$document_id   = \get_post_meta( $attachment_id, '_imageshop_document_id', true );
 
@@ -644,6 +700,10 @@ class Attachment {
 	 */
 	public function filter_wp_generate_attachment_metadata( $metadata, $attachment_id ) {
 		if ( false === \wp_attachment_is_image( $attachment_id ) ) {
+			return $metadata;
+		}
+
+		if ( ! $this->should_override_media( $attachment_id ) ) {
 			return $metadata;
 		}
 
@@ -1095,6 +1155,10 @@ class Attachment {
 	 * @return string
 	 */
 	public function attachment_url( $url, $post_id ) {
+		if ( ! $this->should_override_media( $post_id ) ) {
+			return $url;
+		}
+
 		$media_meta  = \get_post_meta( $post_id, '_imageshop_media_sizes', true );
 		$document_id = \get_post_meta( $post_id, '_imageshop_document_id', true );
 
