@@ -3,7 +3,7 @@ Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 6.1
-Stable tag: 0.0.9
+Stable tag: 1.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,9 +32,10 @@ We welcome both suggestions, discussions, and code! Check out the project source
 
 == Changelog ==
 
-= 0.1.0 (2023-03-24) =
-* Introduced additional metadata displays in the media modal
-* Added opportunity to update the metadata of media items directly from the WordPress media modal
-* Added class-names for identifying and targeting specific media items in the front-end markup of images.
-* Improved image dimension detection when generating image sizes (fixes cases where the primary image was not identified, and images may have been generated with a 1px width and height)
-* Improved the onboarding flow with better explanations of what importing media to Imageshop involves, and guiding the user more actively.
+= 1.0.0 (2023-06-20) =
+* Media filter: Use numeration for categories to avoid filter reordering on CategoryID's.
+* Media library: Add a note about image sizes.
+* Attachments: Fix an issue where 0x0 pixel image sizes would be needlessly generated.
+* Attachments: Avoid repetative fallback actions when the domain for an attachment does not match the site URL.
+* Attachments: Add dynamic generation of media captions.
+* Attachments: Ensure mime-types match image media before attempting to generate image variations.
