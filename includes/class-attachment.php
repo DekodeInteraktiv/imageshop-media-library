@@ -647,6 +647,11 @@ class Attachment {
 		if ( empty( $media_details ) && $document_id ) {
 			$att           = Attachment::get_instance();
 			$media_details = $att->generate_imageshop_metadata( \get_post( $attachment_id ) );
+
+			// If we still do not have a valid media_details array, bail.
+			if ( empty( $media_details ) || empty( $media_details['sizes'] ) ) {
+				return $image;
+			}
 		}
 
 		if ( 'full' === $size ) {
