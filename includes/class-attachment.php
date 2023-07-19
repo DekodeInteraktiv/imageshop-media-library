@@ -450,6 +450,11 @@ class Attachment {
 			return array();
 		}
 
+		// If the media details are empty, break out early.
+		if ( empty( $media_details ) || empty( $media_details['sizes'] ) ) {
+			return array();
+		}
+
 		if ( isset( $media_details['sizes'][ $size ] ) ) {
 			$size_array = array(
 				$media_details['sizes'][ $size ]['width'],
