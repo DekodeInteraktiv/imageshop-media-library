@@ -455,7 +455,9 @@ class Attachment {
 			return array();
 		}
 
-		if ( isset( $media_details['sizes'][ $size ] ) ) {
+		if ( is_array( $size ) ) {
+			$size_array = $size;
+		} elseif ( isset( $media_details['sizes'][ $size ] ) ) {
 			$size_array = array(
 				$media_details['sizes'][ $size ]['width'],
 				$media_details['sizes'][ $size ]['height'],
