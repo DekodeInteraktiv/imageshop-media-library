@@ -3,7 +3,7 @@ Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 6.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,9 @@ If you at any point wish to stop using Imageshop for your files, you can export 
 We welcome both suggestions, discussions, and code! Check out the project source at https://github.com/DekodeInteraktiv/imageshop
 
 == Changelog ==
+
+= 1.0.2 (2023-07-20) =
+* Imageshpo API: Add secondary declaration for media interfaces to improve support during uthe upload procedure.
 
 = 1.0.1 (2023-07-19) =
 * Attachments: Fall back to local images if the Imageshop API response fails for any reason.
