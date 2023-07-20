@@ -249,7 +249,12 @@ class REST_Controller {
 			'fileName'      => \str_replace( '/', '_', $name ),
 			'interfaceName' => \get_option( 'imageshop_upload_interface' ),
 			'doc'           => array(
-				'Active' => true,
+				'Active'     => true,
+				'interfaces' => array(
+					array(
+						'id' => \get_option( 'imageshop_upload_interface' ),
+					),
+				),
 			),
 		);
 
