@@ -1037,7 +1037,7 @@ class Attachment {
 			}
 
 			// If the document is explicitly declared an original, use it.
-			if ( isset( $document->IsOriginal ) && $document->IsOriginal ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->IsOriginal` is defined by the SaaS API.
+			if ( isset( $document->IsOriginal ) && true === \boolval( $document->IsOriginal ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$document->IsOriginal` is defined by the SaaS API.
 				$original_image = $document;
 			}
 		}
