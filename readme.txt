@@ -32,6 +32,9 @@ We welcome both suggestions, discussions, and code! Check out the project source
 
 == Changelog ==
 
+= 1.0.4 (2023-09-05) =
+* Attachments: Fix a race condition where a 0x0 pixel image size could be generated if the image was being processsed by third party code during the upload process.
+
 = 1.0.3 (2023-08-14) =
 * Attachments: Improve the identification of original images to generate the appropriate media sizes.
 
