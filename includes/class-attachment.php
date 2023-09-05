@@ -454,7 +454,11 @@ class Attachment {
 
 		// If the media details are empty, break out early.
 		if ( empty( $media_details ) || empty( $media_details['sizes'] ) ) {
-			return array();
+			$media_details = $this->generate_imageshop_metadata( get_post( $attachment_id ) );
+
+			if ( empty( $media_details ) || empty( $media_details['sizes'] ) ) {
+				return array();
+			}
 		}
 
 		if ( is_array( $size ) ) {
@@ -889,6 +893,14 @@ class Attachment {
 		$media_details = array(
 			'sizes' => array(),
 		);
+
+		/*
+		 * If the media has been attempted fetched previously, and we're still
+		 * waiting for Imageshop to process it, return the original image.
+		 */
+		if ( false !== \get_transient( '_imageshop_attachment_' . $post->ID . '_processing' ) ) {
+			return $media_details;
+		}
 
 		$image_sizes = Attachment::get_wp_image_sizes();
 
