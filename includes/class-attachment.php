@@ -13,7 +13,9 @@ namespace Imageshop\WordPress;
 class Attachment {
 	private static $instance;
 
-	private $documents = array();
+	private array $documents = array();
+
+	private bool $iterative_src = false;
 
 	/**
 	 * Class constructor.
@@ -651,6 +653,14 @@ class Attachment {
 			return $image;
 		}
 
+		/*
+		 * If the media has been attempted fetched previously, and we're still
+		 * waiting for Imageshop to process it, return the original image.
+		 */
+		if ( false !== \get_transient( '_imageshop_attachment_' . $attachment_id . '_processing' ) ) {
+			return $image;
+		}
+
 		if ( empty( $media_details ) && $document_id ) {
 			$att           = Attachment::get_instance();
 			$media_details = $att->generate_imageshop_metadata( \get_post( $attachment_id ) );
@@ -711,8 +721,6 @@ class Attachment {
 				$data = $media_details['sizes']['thumbnail'];
 			} else {
 				$data = $media_details['sizes']['original'];
-
-				//					return false;
 			}
 		} elseif ( ! empty( $media_details['sizes'][ $size ] ) ) {
 			$data = $media_details['sizes'][ $size ];
@@ -727,8 +735,46 @@ class Attachment {
 
 		// If, for whatever reason, the original image is missing, get a permalink for the original as a fallback.
 		if ( empty( $data['source_url'] ) ) {
-			$new_source         = $this->get_permalink_for_size( $document_id, $media_details['sizes']['original']['file'], $media_details['sizes']['original']['width'], $media_details['sizes']['original']['height'], false );
+			$new_source = $this->get_permalink_for_size( $document_id, $media_details['sizes']['original']['file'], $media_details['sizes']['original']['width'], $media_details['sizes']['original']['height'], false );
+
+			// If the returned permalink is empty, return the original image.
+			if ( empty( $new_source ) ) {
+				return $image;
+			}
+
 			$data['source_url'] = $new_source['source_url'];
+		}
+
+		/*
+		 * If a race condition has happened, and the image was generated at a 0x0 px size,
+		 * try to regenerate it if we are not already iterating on the process.
+		 */
+		if ( false === $this->iterative_src && ( 0 === (int) $data['width'] && 0 === (int) $data['height'] ) ) {
+			// Make sure we do not infinitely loop.
+			$this->iterative_src = true;
+
+			// Remove the metadata and try to regenerate it as this is invalid.
+			\delete_post_meta( $attachment_id, '_imageshop_media_sizes' );
+
+			// Attempt to fetch a fresh copy of media sizes.
+			$data = $this->attachment_image_src( $image, $attachment_id, $size );
+
+			// Reset the iterative flag.
+			$this->iterative_src = false;
+
+			/*
+			 * If the data is still defined as 0x0, return the original image and
+			 * abort this iteration, allowing for it to be re-checked on the next request.
+			 */
+			if ( 0 === $data['width'] && 0 === $data['height'] ) {
+				// Remove the still faulty metadata, as keeping it may lead to unintentional processing.
+				\delete_post_meta( $attachment_id, '_imageshop_media_sizes' );
+
+				// Set a value to prevent processing for 5 minutes to avoid unnecessary server strain while data is generated.
+				\set_transient( '_imageshop_attachment_' . $attachment_id . '_processing', 'processing', 5 * MINUTE_IN_SECONDS );
+
+				return $image;
+			}
 		}
 
 		return \array_merge(
@@ -1076,7 +1122,7 @@ class Attachment {
 
 	public function get_permalink_for_size( $document_id, $filename, $width, $height, $crop = false ) {
 		// If dimensions are both 0, this image would never be visible, so skip the size.
-		if ( 0 === $height && 0 === $width ) {
+		if ( 0 === (int) $height && 0 === (int) $width ) {
 			return null;
 		}
 
