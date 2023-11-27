@@ -273,6 +273,11 @@ class Attachment {
 	public function validate_post_content_image_srcset( $filtered_image, $context, $attachment_id ) {
 		global $wpdb;
 
+		// If the page being processed is within the admin interface, do not manipulate anything.
+		if ( \is_admin() ) {
+			return $filtered_image;
+		}
+
 		/*
 		 * Large sites with a lot of manual media manipulation may encounter
 		 * performance issues when extracting media information from the post
