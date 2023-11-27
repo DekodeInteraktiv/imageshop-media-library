@@ -17,6 +17,8 @@ class Attachment {
 
 	private bool $iterative_src = false;
 
+	private string $is_srcset_content_img_tag_disabled = 'no';
+
 	/**
 	 * Class constructor.
 	 */
@@ -33,6 +35,8 @@ class Attachment {
 			\add_filter( 'wp_get_attachment_caption', array( $this, 'get_attachment_caption' ), 10, 2 );
 
 			\add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+
+			$this->is_srcset_content_img_tag_disabled = \get_option( 'imageshop_disable_srcset', 'no' );
 		}
 	}
 
@@ -268,6 +272,16 @@ class Attachment {
 	 */
 	public function validate_post_content_image_srcset( $filtered_image, $context, $attachment_id ) {
 		global $wpdb;
+
+		/*
+		 * Large sites with a lot of manual media manipulation may encounter
+		 * performance issues when extracting media information from the post
+		 * content, and as such need a way to opt out of this behaviour.
+		 */
+		if ( 'yes' === $this->is_srcset_content_img_tag_disabled ) {
+			return $filtered_image;
+		}
+
 		$dimensions = array();
 		$upload_dir = wp_upload_dir();
 

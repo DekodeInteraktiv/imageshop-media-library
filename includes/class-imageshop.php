@@ -154,6 +154,7 @@ class Imageshop {
 	public function register_settings() {
 		\register_setting( 'imageshop_settings', 'imageshop_api_key' );
 		\register_setting( 'imageshop_settings', 'imageshop_upload_interface' );
+		\register_setting( 'imageshop_settings', 'imageshop_disable_srcset' );
 	}
 
 	/**

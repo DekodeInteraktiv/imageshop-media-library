@@ -11,6 +11,7 @@ $imageshop = REST_Controller::get_instance();
 
 $api_key           = \get_option( 'imageshop_api_key' );
 $default_interface = \get_option( 'imageshop_upload_interface' );
+$disable_srcset    = \get_option( 'imageshop_disable_srcset' );
 
 ?>
 <div class="imageshop__loader">
@@ -126,6 +127,38 @@ $default_interface = \get_option( 'imageshop_upload_interface' );
 					</div>
 				</div>
 			</div>
+
+			<div class="imageshop__block">
+				<div class="row">
+
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<h2>
+							<?php \esc_html_e( 'Advanced features', 'imageshop-dam-connector' ); ?>
+						</h2>
+					</div>
+
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<label>
+							<input type="checkbox" name="imageshop_disable_srcset" value="yes" <?php \checked( $disable_srcset, 'yes' ); ?> />
+							<?php \esc_html_e( 'Disable extended srcset attributes', 'imageshop-dam-connector' ); ?>
+						</label>
+
+						<p>
+							<?php \esc_html_e( 'Some users may experience performance issues when working with pages containing many manually added images that have not been processed by WordPress or Imageshop. This option will disable the extra processing performed to guarantee srcset attributes are applied.', 'imageshop-dam-connector' ); ?>
+						</p>
+
+						<p>
+							<?php \esc_html_e( 'Note that this may cause SEO warnings where large images are being loaded on your site, and should only be used if you are experiencing explicit performance issues.', 'imageshop-dam-connector' ); ?>
+						</p>
+					</div>
+				</div>
+
+				<div class="row"></div>
+			</div>
+
 			<div class="imageshop__block">
 				<div class="row">
 
