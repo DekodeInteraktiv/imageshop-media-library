@@ -280,6 +280,12 @@ class Attachment {
 		preg_match( '/class=".+?size-(\S*)/si', $filtered_image, $size_slug );
 		$size_slug = ( isset( $size_slug[1] ) ? $size_slug[1] : 'full' );
 
+		// Check if there is an image-reference class, and if so, extract the attachment ID.
+		if ( ! $this->is_valid_attachment_id( $attachment_id ) ) {
+			preg_match( '/class=".+?wp-image-([0-9]{1,})/si', $filtered_image, $attachment_id );
+			$attachment_id = ( isset( $attachment_id[1] ) ? $attachment_id[1] : null );
+		}
+
 		// Edge-case scenario handler for when an attachment ID isn't passed, or an invalid post type is referenced.
 		if ( ! $this->is_valid_attachment_id( $attachment_id ) ) {
 			preg_match( '/src="(.+?)"/si', $filtered_image, $image_url );
