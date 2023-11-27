@@ -275,6 +275,17 @@ class Search {
 
 		$media_file_type = \wp_check_filetype( $media->FileName )['type']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->FileName` is provided by the SaaS API.
 
+		// Fallback handling, if the image format is unknown and returns an empty string.
+		if ( empty( $media_file_type ) && isset( $media->IsImage ) && true === \boolval( $media->IsImage ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- `$media->IsImage` is provided by the SaaS API.
+			/*
+			 * Although this is not necessarily the right mime type, it is only used by WordPress to
+			 * determine if an image is allowed to be displayed, and Imageshop does conversions
+			 * behind the scenes to create JPEG variants for all secondary media formats (such as TIFF, etc.),
+			 * making this is a safe fallback.
+			 */
+			$media_file_type = 'image/jpeg';
+		}
+
 		if ( ! $wp_post ) {
 			$wp_post_id = \wp_insert_post(
 				array(
