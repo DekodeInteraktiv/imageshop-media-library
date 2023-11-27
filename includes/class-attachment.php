@@ -271,6 +271,11 @@ class Attachment {
 		$dimensions = array();
 		$upload_dir = wp_upload_dir();
 
+		// No manipulation is needed if the image has already been assigned `srcset` attributes.
+		if ( stristr( $filtered_image, 'srcset=' ) ) {
+			return $filtered_image;
+		}
+
 		// Extract the image size slug.
 		preg_match( '/class=".+?size-(\S*)/si', $filtered_image, $size_slug );
 		$size_slug = ( isset( $size_slug[1] ) ? $size_slug[1] : 'full' );
