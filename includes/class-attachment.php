@@ -316,7 +316,7 @@ class Attachment {
 
 			$attachment_id = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT post_id FROM {$wpdb->postmeta} WHERE `meta_value` LIKE %s LIMIT 1",
+					"SELECT post_id FROM {$wpdb->postmeta} WHERE ( `meta_key` = '_wp_attachment_metadata' OR `meta_key` = '_imageshop_permalinks' ) AND `meta_value` LIKE %s LIMIT 1",
 					sprintf(
 						'%%%s%%',
 						$image_meta_value
