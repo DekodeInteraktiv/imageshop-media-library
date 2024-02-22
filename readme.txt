@@ -3,7 +3,7 @@ Tags: media library, media cdn, DAM
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 6.2
-Stable tag: 1.0.4
+Stable tag: 1.1.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,12 @@ If you at any point wish to stop using Imageshop for your files, you can export 
 We welcome both suggestions, discussions, and code! Check out the project source at https://github.com/DekodeInteraktiv/imageshop
 
 == Changelog ==
+
+= 1.1.0 (2024-02-22) =
+* Search: Ignore image mime-types when the image is served by Imageshop, these are always valid and checked by the Imageshop API.
+* Attachments: Improve the SQL query for fallback handling to be more performant in the database lookups it performs.
+* Attachments: Avoid duplicating the srcset generation if it already exists.
+* Attachments: Introduce a new advanced setting allowing site administrators to disable the srcset calculations on media-heavy sites that may not always be compatible with WordPress' media handling.
 
 = 1.0.4 (2023-09-05) =
 * Attachments: Fix a race condition where a 0x0 pixel image size could be generated if the image was being processsed by third party code during the upload process.
