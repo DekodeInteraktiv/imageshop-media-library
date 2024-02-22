@@ -278,15 +278,6 @@ class Attachment {
 			return $filtered_image;
 		}
 
-		/*
-		 * Large sites with a lot of manual media manipulation may encounter
-		 * performance issues when extracting media information from the post
-		 * content, and as such need a way to opt out of this behaviour.
-		 */
-		if ( 'yes' === $this->is_srcset_content_img_tag_disabled ) {
-			return $filtered_image;
-		}
-
 		$dimensions = array();
 		$upload_dir = wp_upload_dir();
 
@@ -303,6 +294,15 @@ class Attachment {
 		if ( ! $this->is_valid_attachment_id( $attachment_id ) ) {
 			preg_match( '/class=".+?wp-image-([0-9]{1,})/si', $filtered_image, $attachment_id );
 			$attachment_id = ( isset( $attachment_id[1] ) ? $attachment_id[1] : null );
+		}
+
+		/*
+		 * Large sites with a lot of manual media manipulation may encounter
+		 * performance issues when extracting media information from the post
+		 * content, and as such need a way to opt out of this behaviour.
+		 */
+		if ( ! $this->is_valid_attachment_id( $attachment_id ) && 'yes' === $this->is_srcset_content_img_tag_disabled ) {
+			return $filtered_image;
 		}
 
 		// Edge-case scenario handler for when an attachment ID isn't passed, or an invalid post type is referenced.
